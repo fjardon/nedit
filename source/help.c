@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: help.c,v 1.50.2.6 2001/09/20 19:30:27 tringali Exp $";
+static const char CVSID[] = "$Id: help.c,v 1.50.2.7 2001/10/02 17:06:41 amai Exp $";
 /*******************************************************************************
 *									       *
 * help.c -- Nirvana Editor help display					       *
@@ -105,15 +105,14 @@ static const char *const HelpTitles[NUM_TOPICS] = {
  */
 
 static const char *const HelpText[NUM_TOPICS] = {
-"NEdit Version 5.2  (Release Candidate 1)\n"
-"(September 2001)\n"
-"\n"
-"     Built on: %s, %s, %s\n"
-"     Built at: %s, %s\n"
-"   With Motif: %d [%s]\n"
-"Running Motif: %d\n"
-"       Server: %s %d\n"
-"\n\
+"NEdit Version 5.2  (Release Candidate 1)\n\
+(October 2001)\n\n\
+     Built on: %s, %s, %s\n\
+     Built at: %s, %s\n\
+   With Motif: %d [%s]\n\
+Running Motif: %d\n\
+       Server: %s %d\n\
+\n\
 NEdit was written by Mark Edel, Joy Kyriakopulos, Christopher Conrad, \
 Jim Clark, Arnulfo Zepeda-Navratil, Suresh Ravoor, Tony Balinski, Max \
 Vohlken, Yunliang Yu, Donna Reid, Arne Førlie, Eddy De Greef, Steve \
@@ -4947,7 +4946,9 @@ void PrintVersion(void) {
                   COMPILE_OS, COMPILE_MACHINE, COMPILE_COMPILER,
                   __DATE__, __TIME__,
                   XmVersion, XmVERSION_STRING,
-                  xmUseVersion);
+                  xmUseVersion,
+                  ServerVendor(TheDisplay),
+                  VendorRelease(TheDisplay));
     puts(text);
     free(text);
 }
