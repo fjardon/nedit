@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: nedit.c,v 1.18 2001/08/18 12:24:59 amai Exp $";
+static const char CVSID[] = "$Id: nedit.c,v 1.18.2.1 2001/09/20 14:24:21 tringali Exp $";
 /*******************************************************************************
 *									       *
 * nedit.c -- Nirvana Editor main program				       *
@@ -80,8 +80,8 @@ Display *TheDisplay = NULL;
 char *ArgV0 = NULL;
 Boolean IsServer = False;
 
-#define NEDIT_DEFAULT_FONT "-*-helvetica-medium-r-normal-*-12-*-*-*-*-iso8859-*"
-#define NEDIT_FIXED_FONT   "-*-courier-medium-r-normal-*-12-*-*-*-*-iso8859-*"
+#define NEDIT_DEFAULT_FONT "-*-helvetica-medium-r-normal-*-12-*-*-*-*-*-*"
+#define NEDIT_FIXED_FONT   "-*-courier-medium-r-normal-*-12-*-*-*-*-*-*"
 
 static char *fallbackResources[] = {
     "*menuBar.marginHeight: 0",
