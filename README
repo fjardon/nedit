@@ -1,6 +1,6 @@
                     NEdit Version 5.4RC2,  October 2003
 
-$Id: README,v 1.31.2.5 2003/09/28 15:05:31 edg Exp $
+$Id: README,v 1.31.2.6 2003/11/14 00:19:43 n8gray Exp $
 	     
 
 NEdit is a multi-purpose text editor for the X Window System, which combines a
@@ -259,6 +259,13 @@ file, which is necessary for running Motif programs.  When XKeysymDB is
 missing, NEdit will spew screenfulls of messages about translation table syntax
 errors, and many keys won't work.  You can obtain a copy of the XKeysymDB file
 from the contrib sub-directory of the NEdit distribution directory.  
+
+
+Mac OS X Systems
+
+You will probably need to edit makefiles/Makefile.macosx to point NEdit at
+the correct version of Motif.  There are comments in the makefile to help you
+do this correctly.
 
 
 SGI Systems
