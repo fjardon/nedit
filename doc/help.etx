@@ -1,4 +1,4 @@
-.. $Id: help.etx,v 1.49.2.1 2003/06/22 00:42:33 n8gray Exp $
+.. $Id: help.etx,v 1.49.2.2 2003/07/29 17:54:49 slobasso Exp $
 .. NOTE: Remember to supply 'version' variable on setext command line.
 ..       For example,  setext -m -v "version=NEdit Version 6.0".
 ..
@@ -2741,13 +2741,18 @@ Range Sets
   Changes the range set r so that it contains all ranges not in r. Does not
   return a value.
 
+**rangeset_get_by_name( r, name )**
+  Returns an array of active rangeset identifiers, with integer keys starting at 0,
+  whose name matches name.
+
 **rangeset_info( r )**
   Returns an array containing information about the range set r. The array
   has the following keys: **defined** (whether a range set with identifier
   r is defined), **count** (the number of ranges in the range set), **color**
   (the current background color of the range set, an empty string if the
-  range set has no color), and **mode** (the name of the modify-response
-  mode of the range set).
+  range set has no color), **name** (the user supplied name of the range set,
+  an empty string if the range set has no name), and **mode** (the name of the
+  modify-response mode of the range set).
 
 **rangeset_range( r, [index] )**
   Returns details of a specific range in the range set r.  The range is 
@@ -2770,6 +2775,9 @@ Range Sets
   color is at empty string, removes the coloring of r.  No check is made 
   regarding the validity of color: if the color is invalid (a bad name,
   or not supported by the hardware) this has unpredictable effects.
+
+**rangeset_set_name( r, name )**
+  Apply the name to the range set r.
 
 **rangeset_set_mode( r, type )**
   Changes the behaviour of the range set r when modifications to the text
@@ -2794,8 +2802,8 @@ Highlighting Information
   Note that if any of the functions is used while in Plain mode or while syntax
   highlighting is off, the behaviour is undefined.
 
-**get_pattern( pos )**
-**get_pattern( pattern_name )**
+**get_pattern( pos [, "position"] )**
+**get_pattern( pattern_name [, "name"] )**
   Returns an array containing the pattern attributes of the character at
   position 'pos' or for pattern 'pattern_name'. The elements in this array are:
 
@@ -2804,9 +2812,11 @@ Highlighting Information
 * **extension** -- The length in the text which uses the same highlighting pattern. NOTE: This element is not set if the function's parameter is a pattern name.
 
   If 'position' or 'pattern_name' is invalid, an empty array is returned.
+  If the optional argument of "position" or "name" is not supplied, the first
+  argument is used as a position if it is a valid integer, otherwise as a name.
 
-**get_style( pos )**
-**get_style( style_name )**
+**get_style( pos [, "position"] )**
+**get_style( style_name [, "name"] )**
   Returns an array containing the style attributes of the character at
   position 'pos' or for style 'style_name'. The elements in this array are:
 
@@ -2825,6 +2835,8 @@ Highlighting Information
   listed for your color in rgb.txt.
 
   If 'position' or 'style_name' is invalid, an empty array is returned.
+  If the optional argument of "position" or "name" is not supplied, the first
+  argument is used as a position if it is a valid integer, otherwise as a name.
 
    ----------------------------------------------------------------------
 

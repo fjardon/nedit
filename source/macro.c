@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: macro.c,v 1.71 2003/06/05 22:01:52 n8gray Exp $";
+static const char CVSID[] = "$Id: macro.c,v 1.71.2.1 2003/07/29 17:54:49 slobasso Exp $";
 /*******************************************************************************
 *                                                                              *
 * macro.c -- Macro file processing, learn/replay, and built-in macro           *
@@ -347,6 +347,8 @@ static int rangesetCreateMS(WindowInfo *window, DataValue *argList, int nArgs,
       DataValue *result, char **errMsg);
 static int rangesetDestroyMS(WindowInfo *window, DataValue *argList, int nArgs,
       DataValue *result, char **errMsg);
+static int rangesetGetByNameMS(WindowInfo *window, DataValue *argList, int nArgs,
+      DataValue *result, char **errMsg);
 static int rangesetAddMS(WindowInfo *window, DataValue *argList, int nArgs,
       DataValue *result, char **errMsg);
 static int rangesetSubtractMS(WindowInfo *window, DataValue *argList, int nArgs,
@@ -360,6 +362,8 @@ static int rangesetRangeMS(WindowInfo *window, DataValue *argList, int nArgs,
 static int rangesetIncludesPosMS(WindowInfo *window, DataValue *argList,
       int nArgs, DataValue *result, char **errMsg);
 static int rangesetSetColorMS(WindowInfo *window, DataValue *argList,
+      int nArgs, DataValue *result, char **errMsg);
+static int rangesetSetNameMS(WindowInfo *window, DataValue *argList,
       int nArgs, DataValue *result, char **errMsg);
 static int rangesetSetModeMS(WindowInfo *window, DataValue *argList,
       int nArgs, DataValue *result, char **errMsg);
@@ -383,7 +387,8 @@ static BuiltInSubr MacroSubrs[] = {lengthMS, getRangeMS, tPrintMS,
         rangesetCreateMS, rangesetDestroyMS,
         rangesetAddMS, rangesetSubtractMS, rangesetInvertMS, 
         rangesetInfoMS, rangesetRangeMS, rangesetIncludesPosMS, 
-        rangesetSetColorMS, rangesetSetModeMS,
+        rangesetSetColorMS, rangesetSetNameMS, rangesetSetModeMS,
+        rangesetGetByNameMS,
         getPatternMS, getStyleMS
     };
 #define N_MACRO_SUBRS (sizeof MacroSubrs/sizeof *MacroSubrs)
@@ -400,7 +405,8 @@ static const char *MacroSubrNames[N_MACRO_SUBRS] = {"length", "get_range", "t_pr
         "rangeset_create", "rangeset_destroy",
         "rangeset_add", "rangeset_subtract", "rangeset_invert", 
         "rangeset_info", "rangeset_range", "rangeset_includes",
-        "rangeset_set_color", "rangeset_set_mode",
+        "rangeset_set_color", "rangeset_set_name", "rangeset_set_mode",
+        "rangeset_get_by_name",
         "get_pattern", "get_style"
     };
 static BuiltInSubr SpecialVars[] = {cursorMV, lineMV, columnMV,
@@ -2464,11 +2470,18 @@ static int replaceInStringMS(WindowInfo *window, DataValue *argList, int nArgs,
     if (replacedStr == NULL) {
         if (force) {
             /* Just copy the original DataValue */
-            result->val.str = argList[0].val.str;
-        } else {
-    	    result->val.str = PERM_ALLOC_STR("");
+            if (argList[0].tag == STRING_TAG) {
+                result->val.str = argList[0].val.str;
+            }
+            else {
+                result->val.str = AllocStringCpy(string);
+            }
         }
-    } else {
+        else {
+            result->val.str = PERM_ALLOC_STR("");
+        }
+    }
+    else {
 	replaceEnd = copyStart + replacedLen;
 	result->val.str = AllocString(replaceEnd + strlen(&string[copyEnd])+1);
 	strncpy(result->val.str, string, copyStart);
@@ -2614,16 +2627,18 @@ static int tPrintMS(WindowInfo *window, DataValue *argList, int nArgs,
 static int getenvMS(WindowInfo *window, DataValue *argList, int nArgs,
     	DataValue *result, char **errMsg)
 {
+    char stringStorage[1][TYPE_INT_STR_SIZE(int)];
+    char *name;
     char *value;
 
     /* Get name of variable to get */
     if (nArgs != 1)
       	return wrongNArgsErr(errMsg);
-    if (argList[0].tag != STRING_TAG) {
+    if (!readStringArg(argList[0], &name, stringStorage[0], errMsg)) {
 	*errMsg = "argument to %s must be a string";
 	return False;
     }
-    value = getenv(argList[0].val.str);
+    value = getenv(name);
     if (value == NULL)
 	value = "";
 	
@@ -3487,7 +3502,7 @@ static int splitMS(WindowInfo *window, DataValue *argList, int nArgs,
     char *sourceStr, *splitStr, *typeSplitStr;
     int searchType, beginPos, foundStart, foundEnd, strLength;
     int found, elementEnd, indexNum;
-    char indexStr[28], *allocIndexStr;
+    char indexStr[TYPE_INT_STR_SIZE(int)], *allocIndexStr;
     DataValue element;
     int elementLen;
     
@@ -4082,7 +4097,7 @@ static int rangesetListMV(WindowInfo *window, DataValue *argList, int nArgs,
     RangesetTable *rangesetTable = window->buffer->rangesetTable;
     unsigned char *rangesetList;
     char *allocIndexStr;
-    char indexStr[4] ;
+    char indexStr[TYPE_INT_STR_SIZE(int)] ;
     int nRangesets, i;
     DataValue element;
 
@@ -4106,7 +4121,7 @@ static int rangesetListMV(WindowInfo *window, DataValue *argList, int nArgs,
         strcpy(allocIndexStr, indexStr);
         
         if (!ArrayInsert(result, allocIndexStr, &element))
-        M_FAILURE("Failed to insert array element in %s");
+            M_FAILURE("Failed to insert array element in %s");
     }
 
     return True;
@@ -4124,10 +4139,10 @@ static int rangesetListMV(WindowInfo *window, DataValue *argList, int nArgs,
 static int rangesetCreateMS(WindowInfo *window, DataValue *argList, int nArgs,
       DataValue *result, char **errMsg)
 {
-    char label;
+    int label;
     int i, nRangesetsRequired;
     DataValue element;
-    char indexStr[3], *allocIndexStr;
+    char indexStr[TYPE_INT_STR_SIZE(int)], *allocIndexStr;
     
     RangesetTable *rangesetTable = window->buffer->rangesetTable;
        
@@ -4185,9 +4200,10 @@ static int rangesetDestroyMS(WindowInfo *window, DataValue *argList, int nArgs,
     RangesetTable *rangesetTable = window->buffer->rangesetTable;
     DataValue *array;
     DataValue element;
-    char keyString[3];
-    char deleteLabels[N_RANGESETS];
+    char keyString[TYPE_INT_STR_SIZE(int)];
+    int deleteLabels[N_RANGESETS];
     int i, arraySize;
+    int label = 0;
     
     if (nArgs != 1) {
         return wrongNArgsErr(errMsg);
@@ -4208,12 +4224,12 @@ static int rangesetDestroyMS(WindowInfo *window, DataValue *argList, int nArgs,
                 M_FAILURE("Invalid key in array in %s");
             }
             
-            if (element.tag != INT_TAG
-                    || !RangesetLabelOK(element.val.n)) {
+            if (!readIntArg(element, &label, errMsg)
+                    || !RangesetLabelOK(label)) {
                 M_FAILURE("Invalid rangeset label in array in %s");
             }
             
-            deleteLabels[i] = element.val.n;
+            deleteLabels[i] = label;
         }
         
         for (i = 0; i < arraySize; i++) {
@@ -4222,20 +4238,86 @@ static int rangesetDestroyMS(WindowInfo *window, DataValue *argList, int nArgs,
     }    
             
     else {        
-        if (argList[0].tag != INT_TAG 
-                || !RangesetLabelOK(argList[0].val.n)) {
+        if (!readIntArg(argList[0], &label, errMsg)
+                || !RangesetLabelOK(label)) {
             M_FAILURE("Invalid rangeset label in %s");
         }
         
         if(rangesetTable != NULL) {
-            RangesetForget(rangesetTable, argList[0].val.n);
+            RangesetForget(rangesetTable, label);
         }
     }
 
     /* set up result */
     result->tag = NO_TAG;
-    return True;}
+    return True;
+}
 
+
+/*
+** Built-in macro subroutine for getting all range sets with a specfic name.
+** Arguments are $1: range set name.
+** return value is an array indexed 0 to n, with the rangeset labels as values;
+*/
+
+static int rangesetGetByNameMS(WindowInfo *window, DataValue *argList, int nArgs,
+      DataValue *result, char **errMsg)
+{
+    char stringStorage[1][TYPE_INT_STR_SIZE(int)];
+    Rangeset *rangeset;
+    int label;
+    char *name, *rangeset_name;
+    RangesetTable *rangesetTable = window->buffer->rangesetTable;
+    unsigned char *rangesetList;
+    char *allocIndexStr;
+    char indexStr[TYPE_INT_STR_SIZE(int)] ;
+    int nRangesets, i, insertIndex = 0;
+    DataValue element;
+
+    if (nArgs != 1) {
+        return wrongNArgsErr(errMsg);
+    }
+
+    if (!readStringArg(argList[0], &name, stringStorage[0], errMsg)) {
+        M_FAILURE("First parameter is not a name string in %s");
+    }
+
+    result->tag = ARRAY_TAG;
+    result->val.arrayPtr = ArrayNew();
+    
+    if (rangesetTable == NULL) {
+        return True;
+    }
+    
+    rangesetList = RangesetGetList(rangesetTable);
+    nRangesets = strlen((char *)rangesetList);
+    for (i = 0; i < nRangesets; ++i) {
+        label = rangesetList[i];
+        rangeset = RangesetFetch(rangesetTable, label);
+        if (rangeset) {
+            rangeset_name = RangesetGetName(rangeset);
+            if (strcmp(name, rangeset_name ? rangeset_name : "") == 0) {
+                element.tag = INT_TAG;
+                element.val.n = label;
+
+                sprintf(indexStr, "%d", insertIndex);
+                allocIndexStr = AllocString(strlen(indexStr) + 1);
+                if (allocIndexStr == NULL)
+                    M_FAILURE("Failed to allocate array key in %s");
+
+                strcpy(allocIndexStr, indexStr);
+
+                if (!ArrayInsert(result, allocIndexStr, &element))
+                    M_FAILURE("Failed to insert array element in %s");
+
+                ++insertIndex;
+            }
+        }
+    }
+
+    return True;
+}
+    
 
 /*
 ** Built-in macro subroutine for adding to a range set. Arguments are $1: range
@@ -4252,12 +4334,13 @@ static int rangesetAddMS(WindowInfo *window, DataValue *argList, int nArgs,
     RangesetTable *rangesetTable = buffer->rangesetTable;
     Rangeset *targetRangeset, *sourceRangeset;
     int start, end, isRect, rectStart, rectEnd, maxpos, index;
+    int label = 0;
 
     if (nArgs < 1 || nArgs > 3)
         return wrongNArgsErr(errMsg);
 
-    if (argList[0].tag != INT_TAG 
-            || !RangesetLabelOK(argList[0].val.n)) {
+    if (!readIntArg(argList[0], &label, errMsg) 
+            || !RangesetLabelOK(label)) {
         M_FAILURE("First parameter is an invalid rangeset label in %s");
     }
 
@@ -4265,7 +4348,7 @@ static int rangesetAddMS(WindowInfo *window, DataValue *argList, int nArgs,
         M_FAILURE("Rangeset does not exist in %s");
     }
 
-    targetRangeset = RangesetFetch(rangesetTable, argList[0].val.n);
+    targetRangeset = RangesetFetch(rangesetTable, label);
 
     if (targetRangeset == NULL) {
         M_FAILURE("Rangeset does not exist in %s");
@@ -4286,12 +4369,12 @@ static int rangesetAddMS(WindowInfo *window, DataValue *argList, int nArgs,
     
     if (nArgs == 2) {
         /* add ranges taken from a second set */
-        if (argList[1].tag != INT_TAG
-                || !RangesetLabelOK(argList[1].val.n)) {
+        if (!readIntArg(argList[1], &label, errMsg)
+                || !RangesetLabelOK(label)) {
             M_FAILURE("Second parameter is an invalid rangeset label in %s");
         }
       
-        sourceRangeset = RangesetFetch(rangesetTable, argList[1].val.n);
+        sourceRangeset = RangesetFetch(rangesetTable, label);
         if (sourceRangeset == NULL) {
             M_FAILURE("Second rangeset does not exist in %s");
         }
@@ -4353,13 +4436,14 @@ static int rangesetSubtractMS(WindowInfo *window, DataValue *argList, int nArgs,
     RangesetTable *rangesetTable = buffer->rangesetTable;
     Rangeset *targetRangeset, *sourceRangeset;
     int start, end, isRect, rectStart, rectEnd, maxpos;
+    int label = 0;
 
     if (nArgs < 1 || nArgs > 3) {
         return wrongNArgsErr(errMsg);
     }
 
-    if (argList[0].tag != INT_TAG 
-            || !RangesetLabelOK(argList[0].val.n)) {
+    if (!readIntArg(argList[0], &label, errMsg) 
+            || !RangesetLabelOK(label)) {
         M_FAILURE("First parameter is an invalid rangeset label in %s");
     }
 
@@ -4367,7 +4451,7 @@ static int rangesetSubtractMS(WindowInfo *window, DataValue *argList, int nArgs,
         M_FAILURE("Rangeset does not exist in %s");
     }
     
-    targetRangeset = RangesetFetch(rangesetTable, argList[0].val.n);
+    targetRangeset = RangesetFetch(rangesetTable, label);
     if (targetRangeset == NULL) {
         M_FAILURE("Rangeset does not exist in %s");
     }
@@ -4383,12 +4467,12 @@ static int rangesetSubtractMS(WindowInfo *window, DataValue *argList, int nArgs,
     
     if (nArgs == 2) {
         /* remove ranges taken from a second set */
-        if (argList[1].tag != INT_TAG 
-                || !RangesetLabelOK(argList[1].val.n)) {
+        if (!readIntArg(argList[1], &label, errMsg)
+                || !RangesetLabelOK(label)) {
             M_FAILURE("Second parameter is an invalid rangeset label in %s");
         }
         
-        sourceRangeset = RangesetFetch(rangesetTable, argList[1].val.n);
+        sourceRangeset = RangesetFetch(rangesetTable, label);
         if (sourceRangeset == NULL) {
             M_FAILURE("Second rangeset does not exist in %s");
         }
@@ -4431,12 +4515,13 @@ static int rangesetInvertMS(WindowInfo *window, DataValue *argList, int nArgs,
     
     RangesetTable *rangesetTable = window->buffer->rangesetTable;
     Rangeset *rangeset;
+    int label = 0;
 
     if (nArgs != 1)
         return wrongNArgsErr(errMsg);
 
-    if (argList[0].tag != INT_TAG 
-            || !RangesetLabelOK(argList[0].val.n)) {
+    if (!readIntArg(argList[0], &label, errMsg) 
+            || !RangesetLabelOK(label)) {
         M_FAILURE("First parameter is an invalid rangeset label in %s");
     }
     
@@ -4444,7 +4529,7 @@ static int rangesetInvertMS(WindowInfo *window, DataValue *argList, int nArgs,
         M_FAILURE("Rangeset does not exist in %s");
     }
 
-    rangeset = RangesetFetch(rangesetTable, argList[0].val.n);
+    rangeset = RangesetFetch(rangesetTable, label);
     if (rangeset == NULL) {
         M_FAILURE("Rangeset does not exist in %s");
     }
@@ -4470,31 +4555,24 @@ static int rangesetInfoMS(WindowInfo *window, DataValue *argList, int nArgs,
 {
     RangesetTable *rangesetTable = window->buffer->rangesetTable;
     Rangeset *rangeset = NULL;
-    unsigned char label;
     int count, defined;
-    char *color, *mode;
+    char *color, *name, *mode;
     DataValue element;
+    int label = 0;
     
-    static char *definedIndex = "\001defined";
-    static char *countIndex = "\001count";
-    static char *colorIndex = "\001color";
-    static char *modeIndex = "\001mode";
- 
     if (nArgs != 1)
       return wrongNArgsErr(errMsg);
         
-    if (argList[0].tag != INT_TAG 
-            || !RangesetLabelOK(argList[0].val.n)) {
+    if (!readIntArg(argList[0], &label, errMsg) 
+            || !RangesetLabelOK(label)) {
         M_FAILURE("First parameter is an invalid rangeset label in %s");
     }
 
-    label = argList[0].val.n;
-    
     if (rangesetTable != NULL) {
         rangeset = RangesetFetch(rangesetTable, label);
     }
 
-    RangesetGetInfo(rangeset, &defined, &label, &count, &color, &mode);
+    RangesetGetInfo(rangeset, &defined, &label, &count, &color, &name, &mode);
     
     /* set up result */    
     result->tag = ARRAY_TAG;
@@ -4502,12 +4580,12 @@ static int rangesetInfoMS(WindowInfo *window, DataValue *argList, int nArgs,
     
     element.tag = INT_TAG;
     element.val.n = defined;
-    if (!ArrayInsert(result, definedIndex+1, &element))
+    if (!ArrayInsert(result, PERM_ALLOC_STR("defined"), &element))
         M_FAILURE("Failed to insert array element \"defined\" in %s");
         
     element.tag = INT_TAG;
     element.val.n = count;
-    if (!ArrayInsert(result, countIndex+1, &element))
+    if (!ArrayInsert(result, PERM_ALLOC_STR("count"), &element))
         M_FAILURE("Failed to insert array element \"count\" in %s");
         
     element.tag = STRING_TAG;
@@ -4515,15 +4593,25 @@ static int rangesetInfoMS(WindowInfo *window, DataValue *argList, int nArgs,
     if (element.val.str == NULL)
         M_FAILURE("Failed to allocate array value \"color\" in %s");
     strcpy(element.val.str, color);
-    if (!ArrayInsert(result, colorIndex+1, &element))
+    if (!ArrayInsert(result, PERM_ALLOC_STR("color"), &element))
         M_FAILURE("Failed to insert array element \"color\" in %s");
+  
+    element.tag = STRING_TAG;
+    element.val.str = AllocString(strlen(name) + 1);
+    if (element.val.str == NULL) {
+        M_FAILURE("Failed to allocate array value \"name\" in %s");
+    }
+    strcpy(element.val.str, name);
+    if (!ArrayInsert(result, PERM_ALLOC_STR("name"), &element)) {
+        M_FAILURE("Failed to insert array element \"name\" in %s");
+    }
   
     element.tag = STRING_TAG;
     element.val.str = AllocString(strlen(mode) + 1);
     if (element.val.str == NULL)
         M_FAILURE("Failed to allocate array value \"mode\" in %s");
     strcpy(element.val.str, mode);
-    if (!ArrayInsert(result, modeIndex+1, &element))
+    if (!ArrayInsert(result, PERM_ALLOC_STR("mode"), &element))
         M_FAILURE("Failed to insert array element \"mode\" in %s");
   
     return True;
@@ -4544,16 +4632,14 @@ static int rangesetRangeMS(WindowInfo *window, DataValue *argList, int nArgs,
     Rangeset *rangeset;
     int start, end, dummy, rangeIndex, ok;
     DataValue element;
-
-    static char *startIndex = "\001start";
-    static char *endIndex = "\001end";
+    int label = 0;
 
     if (nArgs < 1 || nArgs > 2) {
         return wrongNArgsErr(errMsg);
     }
 
-    if (argList[0].tag != INT_TAG 
-            || !RangesetLabelOK(argList[0].val.n)) {
+    if (!readIntArg(argList[0], &label, errMsg) 
+            || !RangesetLabelOK(label)) {
         M_FAILURE("First parameter is an invalid rangeset label in %s");
     }
     
@@ -4562,7 +4648,7 @@ static int rangesetRangeMS(WindowInfo *window, DataValue *argList, int nArgs,
     }
 
     ok = False;
-    rangeset = RangesetFetch(rangesetTable, argList[0].val.n);
+    rangeset = RangesetFetch(rangesetTable, label);
     if (rangeset != NULL) {
         if (nArgs == 1) {
             rangeIndex = RangesetGetNRanges(rangeset) - 1;
@@ -4587,13 +4673,13 @@ static int rangesetRangeMS(WindowInfo *window, DataValue *argList, int nArgs,
     
     element.tag = INT_TAG;
     element.val.n = start;
-    if (!ArrayInsert(result, startIndex+1, &element))
-    M_FAILURE("Failed to insert array element \"start\" in %s");
+    if (!ArrayInsert(result, PERM_ALLOC_STR("start"), &element))
+        M_FAILURE("Failed to insert array element \"start\" in %s");
 
     element.tag = INT_TAG;
     element.val.n = end;
-    if (!ArrayInsert(result, endIndex+1, &element))
-    M_FAILURE("Failed to insert array element \"end\" in %s");
+    if (!ArrayInsert(result, PERM_ALLOC_STR("end"), &element))
+        M_FAILURE("Failed to insert array element \"end\" in %s");
 
     return True;
 }
@@ -4612,13 +4698,14 @@ static int rangesetIncludesPosMS(WindowInfo *window, DataValue *argList,
     RangesetTable *rangesetTable = buffer->rangesetTable;
     Rangeset *rangeset;
     int pos, rangeIndex, maxpos;
+    int label = 0;
 
     if (nArgs < 1 || nArgs > 2) {
         return wrongNArgsErr(errMsg);
     }
 
-    if (argList[0].tag != INT_TAG 
-            || !RangesetLabelOK(argList[0].val.n)) { 
+    if (!readIntArg(argList[0], &label, errMsg) 
+            || !RangesetLabelOK(label)) { 
         M_FAILURE("First parameter is an invalid rangeset label in %s");
     }
     
@@ -4626,7 +4713,7 @@ static int rangesetIncludesPosMS(WindowInfo *window, DataValue *argList,
         M_FAILURE("Rangeset does not exist in %s");
     }
     
-    rangeset = RangesetFetch(rangesetTable, argList[0].val.n);
+    rangeset = RangesetFetch(rangesetTable, label);
     if (rangeset == NULL) {
         M_FAILURE("Rangeset does not exist in %s");
     }
@@ -4662,17 +4749,19 @@ static int rangesetIncludesPosMS(WindowInfo *window, DataValue *argList,
 static int rangesetSetColorMS(WindowInfo *window, DataValue *argList,
       int nArgs, DataValue *result, char **errMsg)
 {
+    char stringStorage[1][TYPE_INT_STR_SIZE(int)];
     textBuffer *buffer = window->buffer;
     RangesetTable *rangesetTable = buffer->rangesetTable;
     Rangeset *rangeset;
     char *color_name;
+    int label = 0;
 
     if (nArgs != 2) {
         return wrongNArgsErr(errMsg);
     }
 
-    if (argList[0].tag != INT_TAG 
-            || !RangesetLabelOK(argList[0].val.n)) {
+    if (!readIntArg(argList[0], &label, errMsg) 
+            || !RangesetLabelOK(label)) {
         M_FAILURE("First parameter is an invalid rangeset label in %s");
     }
 
@@ -4680,20 +4769,66 @@ static int rangesetSetColorMS(WindowInfo *window, DataValue *argList,
         M_FAILURE("Rangeset does not exist in %s");
     }
 
-    rangeset = RangesetFetch(rangesetTable, argList[0].val.n);
+    rangeset = RangesetFetch(rangesetTable, label);
     if (rangeset == NULL) {
         M_FAILURE("Rangeset does not exist in %s");
     }
 
     color_name = "";
     if (rangeset != NULL) {
-        if (argList[1].tag != STRING_TAG) {
+        if (!readStringArg(argList[1], &color_name, stringStorage[0], errMsg)) {
             M_FAILURE("Second parameter is not a color name string in %s");
         }
-        color_name = argList[1].val.str;
     }
     
     RangesetAssignColorName(rangeset, color_name);
+            
+    /* set up result */
+    result->tag = NO_TAG;
+    return True;
+}
+
+/*
+** Set the name of a range set's ranges. Returns
+** true if the rangeset is valid.
+*/
+
+static int rangesetSetNameMS(WindowInfo *window, DataValue *argList,
+      int nArgs, DataValue *result, char **errMsg)
+{
+    char stringStorage[1][TYPE_INT_STR_SIZE(int)];
+    textBuffer *buffer = window->buffer;
+    RangesetTable *rangesetTable = buffer->rangesetTable;
+    Rangeset *rangeset;
+    char *name;
+    int label = 0;
+
+    if (nArgs != 2) {
+        return wrongNArgsErr(errMsg);
+    }
+
+    if (!readIntArg(argList[0], &label, errMsg)
+        || !RangesetLabelOK(label)) {
+        M_FAILURE("First parameter is an invalid rangeset label in %s");
+    }
+
+    if (rangesetTable == NULL) {
+        M_FAILURE("Rangeset does not exist in %s");
+    }
+
+    rangeset = RangesetFetch(rangesetTable, label);
+    if (rangeset == NULL) {
+        M_FAILURE("Rangeset does not exist in %s");
+    }
+
+    name = "";
+    if (rangeset != NULL) {
+        if (!readStringArg(argList[1], &name, stringStorage[0], errMsg)) {
+            M_FAILURE("Second parameter is not a valid name string in %s");
+        }
+    }
+    
+    RangesetAssignName(rangeset, name);
             
     /* set up result */
     result->tag = NO_TAG;
@@ -4708,18 +4843,20 @@ static int rangesetSetColorMS(WindowInfo *window, DataValue *argList,
 static int rangesetSetModeMS(WindowInfo *window, DataValue *argList,
       int nArgs, DataValue *result, char **errMsg)
 {
+    char stringStorage[1][TYPE_INT_STR_SIZE(int)];
     textBuffer *buffer = window->buffer;
     RangesetTable *rangesetTable = buffer->rangesetTable;
     Rangeset *rangeset;
     char *update_fn_name;
     int ok;
+    int label = 0;
 
     if (nArgs < 1 || nArgs > 2) {
         return wrongNArgsErr(errMsg);
     }
 
-    if (argList[0].tag != INT_TAG 
-            || !RangesetLabelOK(argList[0].val.n)) {
+    if (!readIntArg(argList[0], &label, errMsg) 
+            || !RangesetLabelOK(label)) {
         M_FAILURE("First parameter is an invalid rangeset label in %s");
     }
 
@@ -4727,7 +4864,7 @@ static int rangesetSetModeMS(WindowInfo *window, DataValue *argList,
         M_FAILURE("Rangeset does not exist in %s");
     }
 
-    rangeset = RangesetFetch(rangesetTable, argList[0].val.n);
+    rangeset = RangesetFetch(rangesetTable, label);
     if (rangeset == NULL) {
         M_FAILURE("Rangeset does not exist in %s");
     }
@@ -4735,10 +4872,9 @@ static int rangesetSetModeMS(WindowInfo *window, DataValue *argList,
     update_fn_name = "";
     if (rangeset != NULL) {
         if (nArgs == 2) {
-            if (argList[1].tag != STRING_TAG) {
+            if (!readStringArg(argList[1], &update_fn_name, stringStorage[0], errMsg)) {
                 M_FAILURE("Second parameter is not a string in %s");
             }
-            update_fn_name = argList[1].val.str;
         }
     }
     
@@ -4775,8 +4911,12 @@ static int rangesetSetModeMS(WindowInfo *window, DataValue *argList,
 static int getStyleMS(WindowInfo *window, DataValue *argList, int nArgs,
         DataValue *result, char **errMsg)
 {
+    char stringStorage[2][TYPE_INT_STR_SIZE(int)];
+    int arg1IsName = 1;
+    char *paramType;
     int styleCode=0;
     char *styleName;
+    int cursorPos;
 
     DataValue DV;
 
@@ -4784,8 +4924,28 @@ static int getStyleMS(WindowInfo *window, DataValue *argList, int nArgs,
     int r, g, b;
 
     /* Validate number of arguments */
-    if (nArgs != 1) {
+    if (!(nArgs >= 1 && nArgs <= 2)) {
         return wrongNArgsErr(errMsg);
+    }
+    
+    if (nArgs > 1) {
+        if (!readStringArg(argList[1], &paramType, stringStorage[1], errMsg)) {
+            M_FAILURE("Second parameter is not a string in %s");
+        }
+        if (strcmp(paramType, "name") == 0) {
+            arg1IsName = 1;
+        }
+        else if (strcmp(paramType, "position") == 0) {
+            arg1IsName = 0;
+        }
+        else {
+            M_FAILURE("Second parameter is not a valid value in %s");
+        }
+    }
+    else {
+        if (readIntArg(argList[0], &cursorPos, errMsg)) {
+            arg1IsName = 0;
+        }
     }
 
     /* Prepare result */
@@ -4793,15 +4953,23 @@ static int getStyleMS(WindowInfo *window, DataValue *argList, int nArgs,
     result->val.arrayPtr = NULL;
 
     /* Convert argument to whatever its type is */
-    if (argList[0].tag == STRING_TAG) {
-        styleName = argList[0].val.str;
-        if (!NamedStyleExists(styleName)) {
+    if (arg1IsName) {
+        char *inStyleName;
+        if (!readStringArg(argList[0], &inStyleName, stringStorage[0], errMsg)) {
+            M_FAILURE("First parameter is not a string in %s");
+        }
+        if (!NamedStyleExists(inStyleName)) {
             /* if the given name is invalid we just return an empty array. */
             return True;
         }
+        if (argList[0].tag == STRING_TAG) {
+            styleName = argList[0].val.str;
+        }
+        else {
+            styleName = AllocStringCpy(inStyleName);
+        }
     }
     else {
-        int cursorPos;
         textBuffer *buf = window->buffer;
 
         if (!readIntArg(argList[0], &cursorPos, errMsg)) {
@@ -4809,8 +4977,7 @@ static int getStyleMS(WindowInfo *window, DataValue *argList, int nArgs,
         }
 
         /*  Verify sane cursor position */
-        if ((cursorPos < 0) || (cursorPos >= buf->length))
-        {
+        if ((cursorPos < 0) || (cursorPos >= buf->length)) {
             /*  If the position is not legal, we cannot guess anything about
                 the style, so we return an empty array. */
             return True;
@@ -4902,6 +5069,9 @@ static int getStyleMS(WindowInfo *window, DataValue *argList, int nArgs,
 static int getPatternMS(WindowInfo *window, DataValue *argList, int nArgs,
         DataValue *result, char **errMsg)
 {
+    char stringStorage[2][TYPE_INT_STR_SIZE(int)];
+    int arg1IsName = 1;
+    char *paramType;
     int cursorPos = -1;
     textBuffer *buffer = window->buffer;
     
@@ -4919,27 +5089,63 @@ static int getPatternMS(WindowInfo *window, DataValue *argList, int nArgs,
     result->val.arrayPtr = NULL;
 
     /* Validate number of arguments */
-    if (nArgs != 1)
-    {
+    if (!(nArgs >= 1 && nArgs <= 2)) {
         return wrongNArgsErr(errMsg);
     }
     
+    if (nArgs > 1) {
+        if (!readStringArg(argList[1], &paramType, stringStorage[1], errMsg)) {
+            M_FAILURE("Second parameter is not a string in %s");
+        }
+        if (strcmp(paramType, "name") == 0) {
+            arg1IsName = 1;
+        }
+        else if (strcmp(paramType, "position") == 0) {
+            arg1IsName = 0;
+        }
+        else {
+            M_FAILURE("Second parameter is not a valid value in %s");
+        }
+    }
+    else {
+        if (readIntArg(argList[0], &cursorPos, errMsg)) {
+            arg1IsName = 0;
+        }
+    }
+
     /*  Convert argument to whatever its type is and set styleName and
         patternName accordingly. */
-    if (argList[0].tag == INT_TAG)
-    {
+    if (arg1IsName) {
+        char *inPatternName;
+        /*  This is used to learn about a pattern's style. */
+        if (!readStringArg(argList[0], &inPatternName, stringStorage[0], errMsg)) {
+            M_FAILURE("First parameter is not a string in %s");
+        }
+        pattern = FindPatternOfWindow(window, inPatternName);
+        if (pattern == NULL) {
+            /* The pattern's name is unknown. */
+            return True;
+        }
+        if (argList[0].tag == STRING_TAG) {
+            patternName = argList[0].val.str;
+        }
+        else {
+            patternName = AllocStringCpy(inPatternName);
+        }
+        styleName = AllocStringCpy(pattern->style);
+        extensionRequired = False;  /* no position -> no extension */
+    }
+    else {
         /* The most straightforward case: Get a pattern, style and extension
            for a cursor position. */
-        if (!readIntArg(argList[0], &cursorPos, errMsg))
-        {
+        if (!readIntArg(argList[0], &cursorPos, errMsg)) {
             return False;
         }
 
         /*  Verify sane cursor position
          *  You would expect that buffer->length would be among the sane
          *  positions, but we have n characters and n+1 cursor positions. */
-        if ((cursorPos < 0) || (cursorPos >= buffer->length))
-        {
+        if ((cursorPos < 0) || (cursorPos >= buffer->length)) {
             /*  If the position is not legal, we cannot guess anything about
                 the style, so we return an empty array. */
             return True;
@@ -4947,30 +5153,13 @@ static int getPatternMS(WindowInfo *window, DataValue *argList, int nArgs,
 
         /* Determine style name */
         styleCode = HighlightCodeOfPos(window, cursorPos);
-        if (styleCode == 0)
-        {
+        if (styleCode == 0) {
             /* if there is no style we just return an empty array. */
             return True;
         }
 
         styleName = AllocStringCpy(HighlightStyleOfCode(window, styleCode));
         patternName = AllocStringCpy(HighlightNameOfCode(window, styleCode));
-    } else if (argList[0].tag == STRING_TAG)
-    {
-        /*  This is used to learn about a pattern's style. */
-        patternName = argList[0].val.str;
-        pattern = FindPatternOfWindow(window, patternName);
-        if (pattern == NULL)
-        {
-            /* The pattern's name is unknown. */
-            return True;
-        }
-        styleName = AllocStringCpy(pattern->style);
-        extensionRequired = False;  /* no position -> no extension */
-    } else
-    {
-        *errMsg = "Position or pattern name string expected as parameter to %s";
-        return False;
     }
 
     /* initialize array */
@@ -4982,16 +5171,14 @@ static int getPatternMS(WindowInfo *window, DataValue *argList, int nArgs,
     /* insert pattern name */
     DV.val.str = patternName;
     M_STR_ALLOC_ASSERT(DV);
-    if (!ArrayInsert(result, PERM_ALLOC_STR("pattern"), &DV))
-    {
+    if (!ArrayInsert(result, PERM_ALLOC_STR("pattern"), &DV)) {
         M_ARRAY_INSERT_FAILURE();
     }
 
     /* insert style name */
     DV.val.str = styleName;
     M_STR_ALLOC_ASSERT(DV);
-    if (!ArrayInsert(result, PERM_ALLOC_STR("style"), &DV))
-    {
+    if (!ArrayInsert(result, PERM_ALLOC_STR("style"), &DV)) {
         M_ARRAY_INSERT_FAILURE();
     }
 
@@ -4999,12 +5186,10 @@ static int getPatternMS(WindowInfo *window, DataValue *argList, int nArgs,
     DV.tag = INT_TAG;
 
     /* insert extent */
-    if (extensionRequired)
-    {
+    if (extensionRequired) {
         checkCode = 0;
         DV.val.n = HighlightLengthOfCodeFromPos(window, cursorPos, &checkCode);
-        if (!ArrayInsert(result, PERM_ALLOC_STR("extension"), &DV))
-        {
+        if (!ArrayInsert(result, PERM_ALLOC_STR("extension"), &DV)) {
             M_ARRAY_INSERT_FAILURE();
         }
     }
