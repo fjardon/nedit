@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: shell.c,v 1.18.2.1 2002/03/22 15:54:12 edg Exp $";
+static const char CVSID[] = "$Id: shell.c,v 1.18.2.2 2002/03/23 17:04:04 edg Exp $";
 /*******************************************************************************
 *									       *
 * shell.c -- Nirvana Editor shell command execution			       *
@@ -125,7 +125,8 @@ static void freeBufList(buffer **bufList);
 static void removeTrailingNewlines(char *string);
 static void createOutputDialog(Widget parent, char *text);
 static void destroyOutDialogCB(Widget w, XtPointer callback, XtPointer closure);
-static void measureText(char *text, int wrapWidth, int *rows, int *cols);
+static void measureText(char *text, int wrapWidth, int *rows, int *cols,
+	int *wrapped);
 static void truncateString(char *string, int length);
 static int substitutePercent(char *outStr, const char *inStr, const char *fileStr,
 	const char *lineStr, int outLen);
@@ -1065,12 +1066,12 @@ static void removeTrailingNewlines(char *string)
 static void createOutputDialog(Widget parent, char *text)
 {
     Arg al[50];
-    int ac, rows, cols, hasScrollBar;
+    int ac, rows, cols, hasScrollBar, wrapped;
     Widget form, textW, button;
     XmString st1;
 
     /* measure the width and height of the text to determine size for dialog */
-    measureText(text, MAX_OUT_DIALOG_COLS, &rows, &cols);
+    measureText(text, MAX_OUT_DIALOG_COLS, &rows, &cols, &wrapped);
     if (rows > MAX_OUT_DIALOG_ROWS) {
     	rows = MAX_OUT_DIALOG_ROWS;
     	hasScrollBar = True;
@@ -1080,7 +1081,12 @@ static void createOutputDialog(Widget parent, char *text)
     	cols = MAX_OUT_DIALOG_COLS;
     if (cols == 0)
     	cols = 1;
-    
+    /* Without completely emulating Motif's wrapping algorithm, we can't
+       be sure that we haven't underestimated the number of lines in case
+       a line has wrapped, so let's assume that some lines could be obscured
+       */
+    if (wrapped)
+	hasScrollBar = True;
     ac = 0;
     form = CreateFormDialog(parent, "shellOutForm", al, ac);
 
@@ -1133,11 +1139,13 @@ static void destroyOutDialogCB(Widget w, XtPointer callback, XtPointer closure)
 ** Measure the width and height of a string of text.  Assumes 8 character
 ** tabs.  wrapWidth specifies a number of columns at which text wraps.
 */
-static void measureText(char *text, int wrapWidth, int *rows, int *cols)
+static void measureText(char *text, int wrapWidth, int *rows, int *cols,
+	int *wrapped)
 {
     int maxCols = 0, line = 1, col = 0, wrapCol;
     char *c;
     
+    *wrapped = 0;
     for (c=text; *c!='\0'; c++) {
     	if (*c=='\n') {
 	    line++;
@@ -1164,9 +1172,15 @@ static void measureText(char *text, int wrapWidth, int *rows, int *cols)
            The worst that can happen is that some extra blank lines are shown
            at the end of the dialog (in contrast to an under-estimation, which
            could make the last lines invisible).
+           On the other hand, without emulating Motif's wrapping algorithm
+           completely, we can't be sure that we don't underestimate the number
+           of lines (Motif uses word wrap, and this counting algorithm uses
+           character wrap). Therefore, we remember whether there is a line
+           that has wrapped. In that case we allways install a scroll bar.
 	   */
 	if (col > wrapWidth) {
 	    line++;
+	    *wrapped = 1;
 	    col = wrapCol;
 	} else if (col > maxCols) {
 	    maxCols = col;
