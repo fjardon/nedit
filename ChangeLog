@@ -1,12 +1,116 @@
+2003-11-19 13:44  edg
+
+	* README, ReleaseNotes, doc/nc.man, doc/nedit.man,
+	source/help_data.h, source/help_topic.h (BETA-5-4.[7,5,3,3,9,6]):
+	Bumped version number to 5.4.
+
+2003-11-18 15:11  edg
+
+	* source/menu.c (1.81): Fix for SF bug #844395: SGI_CUSTOM overtype
+	crash.
+
+2003-11-18 12:16  edg
+
+	* util/fileUtils.c (1.31): Decreased the threshold for MAC file
+	format detection to 1 carriage return instead of 2.
+
+2003-11-17 10:13  edg
+
+	* util/prefFile.c (BETA-5-4.1): Fix for nc crash on VMS (Michael
+	Smith).
+
+2003-11-16 13:50  yooden
+
+	* doc/help.etx (1.51): Fixed wrong documentation of $sub_sep,
+	pointed out by Jörg Fischer.
+
+2003-11-14 23:46  yooden
+
+	* source/: file.c (1.69), smartIndent.c (1.29): Fixes two small
+	bugs: Wrong block and wrong argc.
+
+2003-11-14 00:19  n8gray
+
+	* README, makefiles/Makefile.macosx (BETA-5-4.[6,2]): Reworked the
+	OS X makefile and added a note about building on OS X to the
+	README.
+
+2003-11-13 07:09  n8gray
+
+	* util/check_lin_tif.c (BETA-5-4.7): Changed error/warning messages
+	to be non-Linux-centric.
+
+2003-11-08 00:15  yooden
+
+	* source/file.c (1.68): Changes typo in resource name.
+
+2003-11-07 17:27  edg
+
+	* doc/help.etx, source/help_data.h, source/macro.c
+	(BETA-5-4.[9,8,4]): Removed the bogus rgb values from the array
+	returned by get_pattern_by_name().  Prevented the special "top"
+	pattern from showing up in the array returned by
+	get_style_at_pos().  Various minor code cleanups and comment fixes.
+	 (Mostly contributed by Tony Balinski).
+
+2003-11-03 16:31  edg
+
+	* doc/help.etx, source/help_data.h, source/highlight.c,
+	source/highlight.h, source/macro.c (BETA-5-4.[8,7,1,1,3]): Changed
+	the "extension" field returned by get_pattern_at_pos() to "extent"
+	and added an "extent" field to the return value of
+	get_style_at_pos().
+
+2003-10-24 15:29  edg
+
+	* doc/help.etx (BETA-5-4.7): Typo fix (Yury).
+
+2003-10-24 10:51  edg
+
+	* doc/help.etx (1.50), source/help_data.h (1.48), source/text.c
+	(1.44): Extended scroll_down() and scroll_up() such that one can
+	specify a scroll unit (lines or pages, default: lines) and
+	corrected the behaviour for CTRL + mouse wheel (scrolling no longer
+	moves the cursor nor destroys the selection).
+
+2003-10-22 20:05  tringali
+
+	* source/help.c (1.96), source/highlightData.c (1.55),
+	source/nedit.c (1.50), source/nedit.h (1.40), source/preferences.c
+	(1.100), source/smartIndent.c (1.28), source/textSel.c (1.13),
+	source/userCmds.c (1.33), source/window.c (1.86),
+	util/check_lin_tif.c (1.6), util/misc.c (1.59), util/misc.h (1.20):
+	Changed widget hierarchy so we have a single (hidden) top-level
+	application shell.  All the top-level windows (editors, syntax,
+	macros, etc.) are now TopLevelShell children of the application
+	shell.	This is the standard way of structuring multiple-window
+	applications, and we've been standing on our heads trying to work
+	around problems the old approach causes (no visual propogation to
+	children, no way to address types of top-level windows by name in
+	resources, session management bugs, etc).  Some advanced X resource
+	customizations may need to change, but for the better, I think.
+
+2003-10-20 16:38  tringali
+
+	* source/interpret.c (tags: BETA-5-4-RC2) (BETA-5-4.1): Change
+	#define to be in column 0; some compilers will not accept this
+	indented.
+
+2003-10-20 13:59  edg
+
+	* ChangeLog (tags: BETA-5-4-RC2) (BETA-5-4.2): Regenerated
+	(cvs2cl.pl -b -r -t --accum  --gmt).
+
 2003-10-20 08:29  edg
 
 	* doc/nc.man, doc/nedit.man, source/help_data.h,
-	source/help_topic.h (BETA-5-4.[2,2,6,5]): Regenerated for 5.4RC2.
+	source/help_topic.h (BETA-5-4.[2,2,6,5]) (utags: BETA-5-4-RC2):
+	Regenerated for 5.4RC2.
 
 2003-10-20 08:25  edg
 
-	* doc/Makefile (BETA-5-4.2): Use double suffix rule for man page
-	generation iso. GNU make extension.
+	* doc/Makefile (tags: BETA-5-4-RC2) (BETA-5-4.2): Use double suffix
+	rule for man page generation iso. GNU make extension.
 
 2003-10-15 23:08  yooden
 
