@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: preferences.c,v 1.98.2.4 2003/07/25 14:12:48 tringali Exp $";
+static const char CVSID[] = "$Id: preferences.c,v 1.98.2.5 2003/08/15 21:58:46 n8gray Exp $";
 /*******************************************************************************
 *									       *
 * preferences.c -- Nirvana Editor preferences processing		       *
@@ -1151,6 +1151,10 @@ void RestoreNEditPrefs(XrmDatabase prefDB, XrmDatabase appDB)
         migrateColorResources(prefDB, appDB);
         updateShellCmdsTo5dot4();
         updatePatternsTo5dot4();
+    }
+    /* Migrate colors if there's no config file yet */
+    if (!PrefData.prefFileRead) {
+        migrateColorResources(prefDB, appDB);
     }
    
     /* Do further parsing on resource types which RestorePreferences does
