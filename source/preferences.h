@@ -1,8 +1,17 @@
-/* $Id: preferences.h,v 1.11 2001/08/15 09:00:21 amai Exp $ */
+/* $Id: preferences.h,v 1.20.2.1 2002/04/15 10:46:35 edg Exp $ */
 #define PLAIN_LANGUAGE_MODE -1
 
 /* maximum number of language modes allowed */
 #define MAX_LANGUAGE_MODES 127
+
+#define MAX_TITLE_FORMAT_LEN 50
+
+/* Identifiers for individual fonts in the help fonts list */
+enum helpFonts {HELP_FONT, BOLD_HELP_FONT, ITALIC_HELP_FONT,
+    BOLD_ITALIC_HELP_FONT, FIXED_HELP_FONT, BOLD_FIXED_HELP_FONT,
+    ITALIC_FIXED_HELP_FONT, BOLD_ITALIC_FIXED_HELP_FONT, HELP_LINK_FONT,
+    H1_HELP_FONT, H2_HELP_FONT, H3_HELP_FONT, NUM_HELP_FONTS
+};
 
 XrmDatabase CreateNEditPrefDB(int *argcInOut, char **argvInOut);
 void RestoreNEditPrefs(XrmDatabase prefDB, XrmDatabase appDB);
@@ -52,16 +61,21 @@ void SetPrefInsertTabs(int state);
 int GetPrefInsertTabs(void);
 void SetPrefShowMatching(int state);
 int GetPrefShowMatching(void);
+void SetPrefMatchSyntaxBased(int state);
+int GetPrefMatchSyntaxBased(void);
 void SetPrefHighlightSyntax(int state);
 int GetPrefHighlightSyntax(void);
 void SetPrefRepositionDialogs(int state);
 int GetPrefRepositionDialogs(void);
+void SetPrefAppendLF(int state);
+int GetPrefAppendLF(void);
 void SetPrefSortOpenPrevMenu(int state);
 int GetPrefSortOpenPrevMenu(void);
 void SetPrefTagFile(const char *tagFileName);
 char *GetPrefTagFile(void);
 int GetPrefSmartTags(void);
 void SetPrefSmartTags(int state);
+int GetPrefAlwaysCheckRelTagsSpecs(void);
 void SetPrefFont(char *fontName);
 void SetPrefBoldFont(char *fontName);
 void SetPrefItalicFont(char *fontName);
@@ -74,6 +88,8 @@ XmFontList GetPrefFontList(void);
 XFontStruct *GetPrefBoldFont(void);
 XFontStruct *GetPrefItalicFont(void);
 XFontStruct *GetPrefBoldItalicFont(void);
+char *GetPrefHelpFontName(int index);
+char *GetPrefHelpLinkColor();
 void SetPrefShell(const char *shell);
 char *GetPrefShell(void);
 void SetPrefGeometry(const char *geometry);
@@ -99,7 +115,7 @@ char *LanguageModeName(int mode);
 char *GetWindowDelimiters(WindowInfo *window);
 int ReadNumericField(char **inPtr, int *value);
 char *ReadSymbolicField(char **inPtr);
-char *ReadSymbolicFieldTextWidget(Widget textW, char *fieldName, int silent);
+char *ReadSymbolicFieldTextWidget(Widget textW, const char *fieldName, int silent);
 int ReadQuotedString(char **inPtr, char **errMsg, char **string);
 char *MakeQuotedString(const char *string);
 char *EscapeSensitiveChars(const char *string);
@@ -116,11 +132,16 @@ Widget CreateLanguageModeMenu(Widget parent, XtCallbackProc cbProc,
 void SetLangModeMenu(Widget optMenu, const char *modeName);
 Widget CreateLanguageModeSubMenu(WindowInfo *window, Widget parent, char *name,
     	char *label, char mnemonic);
+void SetPrefFindReplaceUsesSelection(int state);
 int GetPrefFindReplaceUsesSelection(void);
 int GetPrefStickyCaseSenseBtn(void);
+void SetPrefStickyCaseSenseBtn(int state);
 void SetPrefBeepOnSearchWrap(int state);
 int GetPrefBeepOnSearchWrap(void);
 #ifdef REPLACE_SCOPE
 void SetPrefReplaceDefScope(int scope);
 int GetPrefReplaceDefScope(void);
 #endif
+void SetPrefTitleFormat(const char* format);
+const char* GetPrefTitleFormat(void);
+int GetPrefOverrideVirtKeyBindings(void);

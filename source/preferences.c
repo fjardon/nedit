@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: preferences.c,v 1.49.2.2 2002/03/13 12:05:49 edg Exp $";
+static const char CVSID[] = "$Id: preferences.c,v 1.49.2.3 2002/04/15 10:46:35 edg Exp $";
 /*******************************************************************************
 *									       *
 * preferences.c -- Nirvana Editor preferences processing		       *
@@ -1516,7 +1516,7 @@ int GetPrefSmartTags(void)
     return PrefData.smartTags;
 }
 
-int GetPrefAlwaysCheckRelativeTagsSpecs(void)
+int GetPrefAlwaysCheckRelTagsSpecs(void)
 {
     return PrefData.alwaysCheckRelativeTagsSpecs;
 }
