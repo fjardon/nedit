@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: help.c,v 1.76.2.3 2002/03/15 08:51:50 edg Exp $";
+static const char CVSID[] = "$Id: help.c,v 1.76.2.4 2002/03/18 23:15:37 edg Exp $";
 /*******************************************************************************
 *									       *
 * help.c -- Nirvana Editor help display					       *
@@ -474,8 +474,7 @@ static Widget createHelpPanel(Widget parent, int topic)
     btn = XtVaCreateManagedWidget("find", xmPushButtonWidgetClass, form,
     	    XmNlabelString, st1=XmStringCreateSimple("Find..."),
     	    XmNmnemonic, 'F',
-    	    XmNhighlightThickness, 0,
-   	    XmNbottomAttachment, XmATTACH_FORM,
+    	    XmNbottomAttachment, XmATTACH_FORM,
 	    XmNleftAttachment, XmATTACH_POSITION,
 	    XmNleftPosition, 3,
 	    XmNrightAttachment, XmATTACH_POSITION,
@@ -486,7 +485,6 @@ static Widget createHelpPanel(Widget parent, int topic)
     btn = XtVaCreateManagedWidget("findAgain", xmPushButtonWidgetClass, form,
     	    XmNlabelString, st1=XmStringCreateSimple("Find Again"),
     	    XmNmnemonic, 'A',
-    	    XmNhighlightThickness, 0,
    	    XmNbottomAttachment, XmATTACH_FORM,
 	    XmNleftAttachment, XmATTACH_POSITION,
 	    XmNleftPosition, 27,
@@ -498,7 +496,6 @@ static Widget createHelpPanel(Widget parent, int topic)
     btn = XtVaCreateManagedWidget("print", xmPushButtonWidgetClass, form,
     	    XmNlabelString, st1=XmStringCreateSimple("Print..."),
     	    XmNmnemonic, 'r',
-    	    XmNhighlightThickness, 0,
    	    XmNbottomAttachment, XmATTACH_FORM,
 	    XmNleftAttachment, XmATTACH_POSITION,
 	    XmNleftPosition, 51,
@@ -509,7 +506,6 @@ static Widget createHelpPanel(Widget parent, int topic)
 
     dismissBtn = XtVaCreateManagedWidget("dismiss", xmPushButtonWidgetClass,
 	    form, XmNlabelString, st1=XmStringCreateSimple("Dismiss"),
-    	    XmNhighlightThickness, 0,
    	    XmNbottomAttachment, XmATTACH_FORM,
 	    XmNleftAttachment, XmATTACH_POSITION,
 	    XmNleftPosition, 75,
@@ -522,7 +518,6 @@ static Widget createHelpPanel(Widget parent, int topic)
     btn = XtVaCreateManagedWidget("prevTopic", xmPushButtonWidgetClass, 
       	    form, XmNlabelString, st1=XmStringCreateSimple("Prev. Topic"),
     	    XmNmnemonic, 'P', 
-    	    XmNhighlightThickness, 0,
     	    XmNbottomAttachment, XmATTACH_WIDGET,
       	    XmNbottomWidget, dismissBtn,
 	    XmNleftAttachment, XmATTACH_POSITION,
@@ -535,7 +530,6 @@ static Widget createHelpPanel(Widget parent, int topic)
     btn = XtVaCreateManagedWidget("nextTopic", xmPushButtonWidgetClass, form,
     	    XmNlabelString, st1=XmStringCreateSimple("Next Topic"),
     	    XmNmnemonic, 'N', 
-    	    XmNhighlightThickness, 0,
     	    XmNbottomAttachment, XmATTACH_WIDGET,
       	    XmNbottomWidget, dismissBtn,
 	    XmNleftAttachment, XmATTACH_POSITION,
@@ -548,7 +542,6 @@ static Widget createHelpPanel(Widget parent, int topic)
     btn = XtVaCreateManagedWidget("histBack", xmPushButtonWidgetClass, form,
     	    XmNlabelString, st1=XmStringCreateSimple("Backw. Hist."),
     	    XmNmnemonic, 'B', 
-    	    XmNhighlightThickness, 0,
     	    XmNbottomAttachment, XmATTACH_WIDGET,
       	    XmNbottomWidget, dismissBtn,
 	    XmNleftAttachment, XmATTACH_POSITION,
@@ -561,7 +554,6 @@ static Widget createHelpPanel(Widget parent, int topic)
     btnFW = XtVaCreateManagedWidget("histForw", xmPushButtonWidgetClass, form,
     	    XmNlabelString, st1=XmStringCreateSimple("Forw. Hist."),
       	    XmNmnemonic, 'H', 
-    	    XmNhighlightThickness, 0,
     	    XmNbottomAttachment, XmATTACH_WIDGET,
       	    XmNbottomWidget, dismissBtn,
 	    XmNleftAttachment, XmATTACH_POSITION,
@@ -572,9 +564,8 @@ static Widget createHelpPanel(Widget parent, int topic)
     XmStringFree(st1);
     
     /* Create a text widget inside of a scrolled window widget */
-    sw = XtVaCreateManagedWidget("sw", xmScrolledWindowWidgetClass,
-    	    form, XmNspacing, 0, XmNhighlightThickness, 0,
-	    XmNshadowThickness, 2,
+    sw = XtVaCreateManagedWidget("sw", xmScrolledWindowWidgetClass, form,
+ 	    XmNshadowThickness, 2,
 	    XmNtopAttachment, XmATTACH_FORM,
 	    XmNleftAttachment, XmATTACH_FORM,
     	    XmNrightAttachment, XmATTACH_FORM,
@@ -594,7 +585,7 @@ static Widget createHelpPanel(Widget parent, int topic)
     XtVaSetValues(sw, XmNworkWindow, HelpTextPanes[topic],
 	    XmNhorizontalScrollBar, hScrollBar,
     	    XmNverticalScrollBar, vScrollBar, NULL);
-            
+    
     /* Initialize help style information, if it hasn't already been init'd */
     initHelpStyles (parent);
     
@@ -626,6 +617,9 @@ static Widget createHelpPanel(Widget parent, int topic)
     
     /* realize all of the widgets in the new window */
     RealizeWithoutForcingPosition(appShell);
+    
+    /* Give the text pane the initial focus */
+    XmProcessTraversal(HelpTextPanes[topic], XmTRAVERSE_CURRENT);
 
     /* Make close command in window menu gracefully prompt for close */
     AddMotifCloseCallback(appShell, (XtCallbackProc)dismissCB, appShell);
@@ -635,6 +629,7 @@ static Widget createHelpPanel(Widget parent, int topic)
     
     /* Set the window title */
     setHelpWinTitle(appShell, topic);
+    
     
 #ifdef EDITRES
     XtAddEventHandler (appShell, (EventMask)0, True,
@@ -849,6 +844,47 @@ static void follow_hyperlink(int topic, int charPosition, int newWindow)
     XtFree (link_text);
 }
 
+static void helpFocusButtonsAP(Widget w, XEvent *event, String *args,
+	Cardinal *nArgs)
+{   
+    XmProcessTraversal(w, XmTRAVERSE_NEXT_TAB_GROUP);
+}
+
+/* 
+ * handler for help-button-action(<button-name>)
+ * Calls the activate callback for the named button widget of the help text win.
+ */
+static void helpButtonActionAP(Widget w, XEvent *event, String *args,
+	Cardinal *nArgs)
+{
+    char buf[80];
+    int topic;
+    Widget btn;
+    
+    if(*nArgs != 1) {
+      	fprintf(stderr, "help-button-action: requires exactly one argument.\n");
+	return;
+    }
+    
+    /* Find the topic being displayed by this widget */
+    for (topic = 0; topic < NUM_TOPICS; topic++)
+	if (HelpTextPanes[topic] == w)
+	    break;
+    
+    if(topic == NUM_TOPICS || HelpWindows[topic] == NULL)
+      	return; /* Shouldn't happen */
+
+    /* Compose the button widget name */    
+    snprintf(buf, 79, "helpForm.%s", args[0]);
+    
+    btn=XtNameToWidget(HelpWindows[topic], buf);
+    if(btn) {
+      	XtCallCallbacks(btn, XmNactivateCallback, HelpWindows[topic]);
+    } else {
+      	fprintf(stderr, "help-button-action: invalid argument: %s\n", args[0]);
+    }
+}
+
 /* 
  * Handler for action help-hyperlink()
  * Arguments: none - init: record event position 
@@ -870,8 +906,8 @@ static void helpHyperlinkAP(Widget w, XEvent *event, String *args,
     int clickedPos, newWin;
     static int pressX=0, pressY=0;
     
+    /* called without arguments we just record coordinates */
     if(*nArgs == 0) {
-      	/* On initial button press, just record coordinates */
 	pressX = e->x;
 	pressY = e->y;
       	return;
@@ -884,6 +920,11 @@ static void helpHyperlinkAP(Widget w, XEvent *event, String *args,
 	return;
     }
     
+    /* 
+     * If for any reason (pointer moved - drag!, no hyperlink found) 
+     * this action can't follow a hyperlink then execute the the action 
+     * named in arg #3 (if provided)
+     */
     if (abs(pressX - e->x) > CLICK_THRESHOLD || 
       	abs(pressY - e->y) > CLICK_THRESHOLD) {
 	if(*nArgs == 3)
@@ -902,13 +943,19 @@ static void helpHyperlinkAP(Widget w, XEvent *event, String *args,
     for (topic = 0; topic < NUM_TOPICS; topic++)
 	if (HelpTextPanes[topic] == w)
 	    break;
+    
     if (topic == NUM_TOPICS){
+      	/* If we get here someone must have bound help-hyperlink to a non-help
+	 * text widget (!) Or some other really strange thing happened.
+	 */  	
 	if(*nArgs == 3)
       	    XtCallActionProc(w, args[2], event, NULL, 0);
 	return;
     }
     
-    /* Button was pressed on a hyperlink.  Lookup and dispatch */
+    /* If the action help-hyperlink had 3 arguments execute the action
+     * named in arg #2 before really following the link.
+     */
     if(*nArgs == 3)
       	XtCallActionProc(w, args[1], event, NULL, 0);
     
@@ -921,7 +968,9 @@ static void helpHyperlinkAP(Widget w, XEvent *event, String *args,
 void InstallHelpLinkActions(XtAppContext context)
 {   
     static XtActionsRec Actions[] = {
-      	{"help-hyperlink", helpHyperlinkAP}
+      	{"help-hyperlink", helpHyperlinkAP},
+	{"help-focus-buttons", helpFocusButtonsAP},
+	{"help-button-action", helpButtonActionAP}
     };
 
     XtAppAddActions(context, Actions, XtNumber(Actions));

@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: nedit.c,v 1.30.2.1 2002/03/15 08:51:50 edg Exp $";
+static const char CVSID[] = "$Id: nedit.c,v 1.30.2.2 2002/03/18 23:15:38 edg Exp $";
 /*******************************************************************************
 *									       *
 * nedit.c -- Nirvana Editor main program				       *
@@ -263,6 +263,9 @@ Ctrl~Alt~Meta<KeyPress>u: delete-to-start-of-line()\\n",
     "*windowsMenu.closePane.acceleratorText: Ctrl+1",
     "*helpMenu.mnemonic: H",
     "nedit.helpForm.sw.helpText*translations: #override\
+<Key>Tab:help-focus-buttons()\\n\
+<Key>Return:help-button-action(\"dismiss\")\\n\
+<KeyPress>osfCancel:help-button-action(\"dismiss\")\\n\
 ~Meta~Ctrl~Shift<Btn1Down>:\
     grab-focus() help-hyperlink()\\n\
 ~Meta~Ctrl~Shift<Btn1Up>:\
