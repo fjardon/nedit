@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: windowTitle.c,v 1.3.2.6 2002/03/19 08:51:21 edg Exp $";
+static const char CVSID[] = "$Id: windowTitle.c,v 1.3.2.7 2002/03/19 18:29:25 edg Exp $";
 /*******************************************************************************
 *                                                                              *
 * windowTitle.c -- Nirvana Editor window title customization                   *
@@ -1193,10 +1193,10 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
     
     /* Copy a variable width font from one of the labels to use for the
        preview (no editing is allowed, and with a fixed size font the
-       preview easily gets partially obscured). Also copy the background
+       preview easily gets partially obscured). Also copy the form background
        color to make it clear that this field is not editable */
-    XtVaGetValues(formatLbl, XmNfontList, &fontList,
-                  XmNbackground, &background, NULL);
+    XtVaGetValues(formatLbl, XmNfontList, &fontList, NULL);
+    XtVaGetValues(previewForm, XmNbackground, &background, NULL);
     
     etDialog.previewW = XtVaCreateManagedWidget("sample",
             xmTextFieldWidgetClass, previewForm,
