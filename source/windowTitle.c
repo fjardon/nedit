@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: windowTitle.c,v 1.3.2.4 2002/03/14 15:33:08 edg Exp $";
+static const char CVSID[] = "$Id: windowTitle.c,v 1.3.2.5 2002/03/17 11:21:15 yooden Exp $";
 /*******************************************************************************
 *                                                                              *
 * windowTitle.c -- Nirvana Editor window title customization                   *
@@ -1195,15 +1195,17 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
        preview easily gets partially obscured) */
     XtVaGetValues(formatLbl, XmNfontList, &fontList, NULL);
     
-    etDialog.previewW = XtVaCreateManagedWidget("sample", xmTextFieldWidgetClass,
-    	    previewForm,
-	    XmNeditable, False,
-	    XmNtopAttachment, XmATTACH_FORM,
-	    XmNleftAttachment, XmATTACH_FORM,
-	    XmNleftOffset, V_MARGIN,
-	    XmNrightAttachment, XmATTACH_FORM,
-	    XmNrightOffset, V_MARGIN, 
-	    XmNfontList, fontList, NULL);
+    etDialog.previewW = XtVaCreateManagedWidget("sample",
+            xmTextFieldWidgetClass, previewForm,
+            XmNeditable, False,
+            XmNcursorPositionVisible, False,
+            XmNtopAttachment, XmATTACH_FORM,
+            XmNleftAttachment, XmATTACH_FORM,
+            XmNleftOffset, V_MARGIN,
+            XmNrightAttachment, XmATTACH_FORM,
+            XmNrightOffset, V_MARGIN,
+            XmNfontList, fontList,
+            NULL);
     
     previewBox = XtVaCreateManagedWidget("previewBox", xmFormWidgetClass,
     	    previewForm,
