@@ -1,4 +1,4 @@
-# $Id: Makefile.macosx,v 1.4 2003/05/20 00:27:56 n8gray Exp $
+# $Id: Makefile.macosx,v 1.4.2.1 2003/06/12 17:35:03 edg Exp $
 # Makefile for MacOS X, using Tenon's Xtools
 # Contributed from hopperj@macconnect.com
 CC=cc
@@ -14,11 +14,15 @@ AR=Libtool
 CFLAGS=-O -no-cpp-precomp -DNO_XMIM -I${PREFIX}/include -DUSE_DIRENT -DUSE_LPR_PRINT_CMD -DUSE_XMIM
 LIBS= ${MOTIFLIB} -bind_at_load -L/usr/X11R6/lib /usr/X11R6/lib/libXm.2.dylib /usr/X11R6/lib/libXp.6.dylib -lm -lXpm \
 -lXext -lXt -lSM -lICE -lX11
+
 #
-# That would be an alternative set of flags using XFree86 with LessTif:
+# Alternatively, to build with Fink (http://fink.sourceforge.net/) using
+# XFree86, comment out the CFLAGS and LIBS above and uncomment the ones below.
 #
-#LIBS=-flat-namespace -force_flat_namespace -L/usr/local/lib\
-#     -L/usr/X11R6/lib -lm -lXm -lXt -lXpm -lXext -lSM -lICE -lX11
+# CFLAGS=-O -no-cpp-precomp -DNO_XMIM -I${PREFIX}/include -I/usr/X11R6/include -DUSE_DIRENT -DUSE_LPR_PRINT_CMD -DUSE_XMIM
+# LIBS=-force_flat_namespace -L${PREFIX}/lib\
+#     -L/usr/X11R6/lib -lXm -lXt -lXp -lXext -lSM -lICE -lX11
+#
 
 #
 # generic part
@@ -26,4 +30,4 @@ LIBS= ${MOTIFLIB} -bind_at_load -L/usr/X11R6/lib /usr/X11R6/lib/libXm.2.dylib /u
 ARFLAGS=-static -o 
 include Makefile.common
 
-verify_config:
+verify_config: check_tif_rule
