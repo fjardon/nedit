@@ -1,6 +1,6 @@
           Release Notes for NEdit Version 5.2, October 2001
 
-$Id: ReleaseNotes,v 1.9.2.1 2001/10/06 13:09:07 amai Exp $
+$Id: ReleaseNotes,v 1.9.2.2 2001/10/12 10:36:12 edg Exp $
 
 This file contains last minute notes to users about the release, which are not
 included in the documentation or README files included with the distribution
@@ -27,11 +27,11 @@ New Features in 5.2
    o Replacement across multiple windows in a session.
    o Case sensitivity may be set independently of regular expressions.
    o Add "Replace and Find" command, which saves keystrokes when doing
-     a large-scale search replace.
+     a large-scale find & replace.
 
  - ClearCase version-extended pathnames.
 
- - Many new macro subroutines.
+ - Many new macro subroutines and variables.
 
  - Array support in macros.
 
@@ -41,8 +41,15 @@ New Features in 5.2
  
  - Support for wheel mouse scrolling on servers that support it (XFree86). 
  
- - Insert Control Code dialog accepts value in any valid C notation
+ - Improved accelerator key handling.
 
+ - Insert Control Code dialog accepts value in any valid C notation
+ 
+ - Optional beeping when search operations wrap.
+
+ - Additional default search styles.
+
+ - Optional displaying of path names in the window list menu.
 
 
 Bug Fixes in 5.2
