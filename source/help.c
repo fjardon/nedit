@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: help.c,v 1.50.2.4 2001/09/07 07:46:47 amai Exp $";
+static const char CVSID[] = "$Id: help.c,v 1.50.2.5 2001/09/10 13:42:34 amai Exp $";
 /*******************************************************************************
 *									       *
 * help.c -- Nirvana Editor help display					       *
@@ -94,7 +94,8 @@ static const char *const HelpTitles[NUM_TOPICS] = {
 "Distribution Policy",
 "Tabs Dialog"};
 
-/* The policy for credit so far is this:
+/*
+   The policy for credit so far is this:
 
    You get "written by" credit if you have write access to the CVS
    repository and have contributed.
@@ -105,7 +106,7 @@ static const char *const HelpTitles[NUM_TOPICS] = {
 
 static const char *const HelpText[NUM_TOPICS] = {
 "NEdit Version 5.2  (Release Candidate 1)\n"
-"(August 2001)\n"
+"(September 2001)\n"
 "\n"
 "     Built on: %s, %s, %s\n"
 "     Built at: %s, %s\n"
@@ -4879,7 +4880,9 @@ static int findTopicFromShellWidget(Widget shellWidget)
          is being initialized. The following, public interface
          is known to initialize at least xmUseVersion.
 	 That interface is declared in <Xm/Xm.h> in Motif 1.2 only.
-	 As for Motif 2.1 we don't need this call anymore?! */
+	 As for Motif 2.1 we don't need this call anymore.
+	 This also holds for the Motif 2.1 version of LessTif
+	 releases > 0.93.0. */
 extern void XmRegisterConverters(void);
 #endif
 
