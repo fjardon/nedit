@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: help.c,v 1.50.2.3 2001/09/07 07:39:29 amai Exp $";
+static const char CVSID[] = "$Id: help.c,v 1.50.2.4 2001/09/07 07:46:47 amai Exp $";
 /*******************************************************************************
 *									       *
 * help.c -- Nirvana Editor help display					       *
@@ -2290,7 +2290,7 @@ the command line.  The -do macro is executed only once, on the next file on \
 the line.  -do without a file following it on the command line, executes \
 the macro on the first available window (presumably when you give a -do \
 command without a corresponding file or window, you intend it to do something \
-independent of the window in which it happens execute).\n\
+independent of the window in which it happens to execute).\n\
 \n\
 nc also accepts one command line option of its own, -noask (or -ask), \
 which instructs it whether to automatically start a server if one is not \
@@ -2306,7 +2306,7 @@ a ClearCase view, the server name will default to the name of the view (based \
 on the value of the CLEARCASE_ROOT environment variable).\n\
 \n\
 Communication between nc and nedit is through the X display. So as long as X \
-windows is set up and working properly, nc will will work \
+windows is set up and working properly, nc will work \
 properly as well.  nc uses the DISPLAY environment variable, the machine name \
 and your user name to find the appropriate server, meaning, if you have several \
 machines sharing a common file system, nc will not be able to find a server \

@@ -1,6 +1,6 @@
                      NEdit Version 5.2, August, 2001
 
-$Id: nedit.doc,v 1.4.2.1 2001/09/04 17:55:28 amai Exp $
+$Id: nedit.doc,v 1.4.2.2 2001/09/07 07:46:47 amai Exp $
 
 NEdit is a standard GUI (Graphical User Interface) style text editor for
 programs and plain-text files.  Users of Macintosh and MS Windows based text
@@ -3430,7 +3430,7 @@ command line.  The -do macro is executed only once, on the next file on the
 line.  -do without a file following it on the command line, executes the macro
 on the first available window (presumably when you give a -do command without a
 corresponding file or window, you intend it to do something independent of the
-window in which it happens execute).
+window in which it happens to execute).
 
 nc also accepts one command line option of its own, -noask (or -ask), which
 instructs it whether to automatically start a server if one is not available.
@@ -3444,7 +3444,7 @@ start, and communicate with, separate named servers.  A named server responds
 only to requests with the corresponding -svrname argument.
 
 Communication between nc and nedit is through the X display.  So as long as X
-windows is set up and working properly, nc will will work properly as well.  nc
+windows is set up and working properly, nc will work properly as well.  nc
 uses the DISPLAY environment variable, the machine name and your user name to
 find the appropriate server, meaning, if you have several machines sharing a
 common file system, nc will not be able to find a server that is running on a
