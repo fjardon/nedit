@@ -1,4 +1,4 @@
-.. $Id: help.etx,v 1.49 2003/06/05 22:01:48 n8gray Exp $
+.. $Id: help.etx,v 1.49.2.1 2003/06/22 00:42:33 n8gray Exp $
 .. NOTE: Remember to supply 'version' variable on setext command line.
 ..       For example,  setext -m -v "version=NEdit Version 6.0".
 ..
@@ -4804,7 +4804,7 @@ Version
   Jim Clark, Arnulfo Zepeda-Navratil, Suresh Ravoor, Tony Balinski, Max
   Vohlken, Yunliang Yu, Donna Reid, Arne Førlie, Eddy De Greef, Steve
   LoBasso, Alexander Mai, Scott Tringali, Thorsten Haude, Steve Haehn,
-  and Andrew Hood.
+  Andrew Hood, and Nathaniel Gray.
 
   The regular expression matching routines used in NEdit are adapted (with
   permission) from original code written by Henry Spencer at the
