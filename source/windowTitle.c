@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: windowTitle.c,v 1.3.2.1 2002/03/11 23:09:05 tringali Exp $";
+static const char CVSID[] = "$Id: windowTitle.c,v 1.3.2.2 2002/03/12 16:22:39 edg Exp $";
 /*******************************************************************************
 *                                                                              *
 * windowTitle.c -- Nirvana Editor window title customization                   *
@@ -1208,7 +1208,6 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
 	    XmNleftOffset, V_MARGIN,
 	    XmNrightAttachment, XmATTACH_FORM,
 	    XmNrightOffset, V_MARGIN, NULL);
-    XmStringFree(s1);
     
     previewBox = XtVaCreateManagedWidget("previewBox", xmFormWidgetClass,
     	    previewForm,
