@@ -285,7 +285,12 @@ particularly, whether it came from the NEdit site
 other ftp server or freeware distribution CD.  Despite the fact that
 Motif appears on almost all Unix platforms, the Motif libraries still
 vary from one machine to another.  Be sure to mention whether you're
-using Lesstif or Motif.</p>
+using LessTif or Motif. Running</p>
+<pre>
+   nedit -version
+</pre>
+should tell you those details.
+
 
 <p>If you are having configuration or appearance problems, you should probably
 look at the output from the command:</p>
@@ -365,7 +370,7 @@ include files and libXm.a</q>
 
 <p>Xm means Motif, which is an important part of NEdit's GUI interface.  Motif
 is standard on commercial Unix workstations, but not on free Unix platforms
-like Linux and FreeBSD.  On these systems, you can now use Lesstif, the
+like Linux and FreeBSD.  On these systems, you can now use LessTif, the
 GPL clone of Motif, or purchase a copy of Motif, which is usually relatively
 inexpensive, but not free.  You can find a list of companies selling Motif
 for Linux at:</p>
@@ -376,7 +381,7 @@ for Linux at:</p>
 </p>
 </blockquote>
 
-<p>As of this writing Lesstif is very close to being a fully reliable and
+<p>As of this writing LessTif is very close to being a fully reliable and
 complete replacement for Motif, so it's definitely worth trying before
 shelling out any money for a commercial copy.  Also remember that in most
 cases, you don't really need Motif libraries to use NEdit.  There
@@ -415,10 +420,10 @@ editor!</q>
 
 <a>
 
-<p>Several of the Linux distributions began including Lesstif (a free
+<p>Several of the Linux distributions began including LessTif (a free
 version of the Motif GUI library) before it was really ready for
 general use (particularly for something which needs to be as reliable
-as a text editor).  If you have a version of Lesstif prior to .89.4,
+as a text editor).  If you have a version of Lesstif prior to 0.92.26,
 you have to upgrade it, before it will support NEdit reliably.  To get
 the newest version, go to <site>http://lesstif.org</site>.  Alternatively,
 you can get pre-built, statically linked, executables from
