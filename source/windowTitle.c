@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: windowTitle.c,v 1.3.2.5 2002/03/17 11:21:15 yooden Exp $";
+static const char CVSID[] = "$Id: windowTitle.c,v 1.3.2.6 2002/03/19 08:51:21 edg Exp $";
 /*******************************************************************************
 *                                                                              *
 * windowTitle.c -- Nirvana Editor window title customization                   *
@@ -958,6 +958,7 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
     int defaultBtnOffset;
     Dimension	shadowThickness;
     Dimension	radioHeight, textHeight;
+    Pixel background;
     
     int ac = 0;
     XtSetArg(args[ac], XmNautoUnmanage, False); ac++;
@@ -1192,8 +1193,10 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
     
     /* Copy a variable width font from one of the labels to use for the
        preview (no editing is allowed, and with a fixed size font the
-       preview easily gets partially obscured) */
-    XtVaGetValues(formatLbl, XmNfontList, &fontList, NULL);
+       preview easily gets partially obscured). Also copy the background
+       color to make it clear that this field is not editable */
+    XtVaGetValues(formatLbl, XmNfontList, &fontList,
+                  XmNbackground, &background, NULL);
     
     etDialog.previewW = XtVaCreateManagedWidget("sample",
             xmTextFieldWidgetClass, previewForm,
@@ -1205,6 +1208,7 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
             XmNrightAttachment, XmATTACH_FORM,
             XmNrightOffset, V_MARGIN,
             XmNfontList, fontList,
+            XmNbackground, background,
             NULL);
     
     previewBox = XtVaCreateManagedWidget("previewBox", xmFormWidgetClass,
