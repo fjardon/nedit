@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: text.c,v 1.43 2003/05/16 16:47:20 slobasso Exp $";
+static const char CVSID[] = "$Id: text.c,v 1.43.2.1 2003/08/13 16:03:42 edg Exp $";
 /*******************************************************************************
 *									       *
 * text.c - Display text from a text buffer				       *
@@ -383,6 +383,9 @@ static char defaultTranslations[] =
     "Ctrl<KeyPress>Return: newline_and_indent()\n"
     "Shift<KeyPress>Return: newline_no_indent()\n"
     "<KeyPress>Return: newline()\n"
+    "Ctrl<KeyPress>osfActivate: newline_and_indent()\n"  /* KP_Enter */
+    "Shift<KeyPress>osfActivate: newline_no_indent()\n"
+    "<KeyPress>osfActivate: newline()\n"
     "Ctrl<KeyPress>Tab: self_insert()\n"
     "<KeyPress>Tab: process_tab()\n"
     "Alt Shift Ctrl<KeyPress>space: key_select(\"rect\")\n"
