@@ -61,7 +61,12 @@
 /* 
  * These are versions of LessTif that are known to be stable with NEdit in
  * Motif 1.2 mode.
- */
+ *
+ * XXX: For the moment, we don't think that there are any bugs that show up 
+ *      in Motif 2.1 mode that don't also show up in Motif 1.2 mode.  Thus
+ *      the code to do different things based on that info is disabled.  If
+ *      we do come across a version of lesstif that works in one mode but not
+ *      the other then we should revive the commented-out code.
 char *good_lesstif_1_2_versions[] = {
     "0.92.32",
     "0.93.0",
@@ -69,6 +74,7 @@ char *good_lesstif_1_2_versions[] = {
     "0.93.18",
     NULL
 };
+ */
 
 /* 
  * These are versions of LessTif that are known to be stable with NEdit in
@@ -85,7 +91,6 @@ char *good_lesstif_2_1_versions[] = {
 /* 
  * These are versions of LessTif that are known NOT to be stable with NEdit in
  * Motif 1.2 mode.
- */
 char *bad_lesstif_1_2_versions[] = {
     "0.93.25",
     "0.93.29",
@@ -96,6 +101,7 @@ char *bad_lesstif_1_2_versions[] = {
     "0.93.41",
     NULL
 };
+ */
 
 /* 
  * These are versions of LessTif that are known NOT to be stable with NEdit in
@@ -201,16 +207,17 @@ int main() {
     tif = "LessTif";
     lesstif_rev = get_lesstif_rev(vs);
     
+    /* XXX:  See comments above regarding Lesstif in Motif 1.2 vs. 2.1 mode
     if (XmVersion == 1002) {
         v_good = good_lesstif_1_2_versions;
         v_bad = bad_lesstif_1_2_versions;
-    } else if (XmVersion == 2001) {
+    } else if (XmVersion == 2001) { */
         v_good = good_lesstif_2_1_versions;
         v_bad = bad_lesstif_2_1_versions;
-    } else {
+    /* } else {
         fprintf(stderr, "Unexpected LessTif Version\n");
         finish(2, tif);
-    }
+    } */
     
     /* Check for known good LessTif versions */
     for(i=0; v_good[i]; i++) {
@@ -229,7 +236,7 @@ int main() {
     }
 #else
 
-    fprintf(stderr, "Open Motif detected.\n");
+    fprintf(stderr, "Open Motif or OSF Motif detected.\n");
     fprintf(stderr, "%s\n", vs);
     tif = "Open Motif";
     
