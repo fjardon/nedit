@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: windowTitle.c,v 1.3.2.2 2002/03/12 16:22:39 edg Exp $";
+static const char CVSID[] = "$Id: windowTitle.c,v 1.3.2.3 2002/03/13 12:04:33 edg Exp $";
 /*******************************************************************************
 *                                                                              *
 * windowTitle.c -- Nirvana Editor window title customization                   *
@@ -506,7 +506,6 @@ static void formatChangedCB(Widget w, XtPointer clientData, XtPointer callData)
     int  filenameSet = XmToggleButtonGetState(etDialog.oDirW);
     char *title;
     const char* serverName;
-    XmString s1;
     
     if (etDialog.suppressFormatUpdate)
     {
@@ -951,9 +950,10 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
 
     Widget buttonForm, formatLbl, previewFrame;
     Widget previewForm, previewBox, selectFrame, selectBox, selectForm;
-    Widget previewLbl, testLbl, selectLbl, sampleLbl;
+    Widget testLbl, selectLbl;
     Widget applyBtn, dismissBtn, restoreBtn, helpBtn;
     XmString s1;
+    XmFontList fontList;
     Arg args[20];
     int defaultBtnOffset;
     Dimension	shadowThickness;
@@ -1200,6 +1200,11 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
 	    XmNrightAttachment, XmATTACH_FORM,
 	    XmNrightPosition, RIGHT_MARGIN_POS, NULL);
     
+    /* Copy a variable width font from one of the labels to use for the
+       preview (no editing is allowed, and with a fixed size font the
+       preview easily gets partially obscured) */
+    XtVaGetValues(formatLbl, XmNfontList, &fontList, NULL);
+    
     etDialog.previewW = XtVaCreateManagedWidget("sample", xmTextFieldWidgetClass,
     	    previewForm,
 	    XmNeditable, False,
@@ -1207,7 +1212,8 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNleftOffset, V_MARGIN,
 	    XmNrightAttachment, XmATTACH_FORM,
-	    XmNrightOffset, V_MARGIN, NULL);
+	    XmNrightOffset, V_MARGIN, 
+	    XmNfontList, fontList, NULL);
     
     previewBox = XtVaCreateManagedWidget("previewBox", xmFormWidgetClass,
     	    previewForm,
