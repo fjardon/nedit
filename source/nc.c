@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: nc.c,v 1.34.2.2 2003/09/28 14:10:04 edg Exp $";
+static const char CVSID[] = "$Id: nc.c,v 1.34.2.3 2003/10/09 09:23:42 edg Exp $";
 /*******************************************************************************
 *									       *
 * nc.c -- Nirvana Editor client program for nedit server processes	       *
@@ -423,9 +423,17 @@ static void startNewServer(XtAppContext context,
         strcat(commandLine, " -svrname ");
         strcat(commandLine, Preferences.serverName);
     }
-    if (startServer("No servers available, start one? (y|n)[y]: ", commandLine) != 0) {
-        XtCloseDisplay(TheDisplay);
-        exit(EXIT_FAILURE);
+    switch (startServer("No servers available, start one? (y|n) [y]: ",
+                        commandLine))
+    {
+        case -1: /* Start failed */
+            XtCloseDisplay(TheDisplay);
+            exit(EXIT_FAILURE);
+            break;
+        case -2: /* Start canceled by user */
+            XtCloseDisplay(TheDisplay);
+            exit(EXIT_SUCCESS);
+            break;
     }
 
     /* Set up a timeout proc in case the server is dead.  The standard
@@ -494,7 +502,7 @@ static int startServer(const char *message, const char *commandLineArgs)
     	    c = getc(stdin);
 	} while (c == ' ' || c == '\t');
 	if (c != 'Y' && c != 'y' && c != '\n')
-    	    return 0;
+    	    return (-2);
     }
     
     /* start the server */
