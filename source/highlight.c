@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: highlight.c,v 1.25.2.3 2002/03/25 10:02:52 edg Exp $";
+static const char CVSID[] = "$Id: highlight.c,v 1.25.2.4 2002/04/10 09:41:33 edg Exp $";
 /*******************************************************************************
 *									       *
 * highlight.c -- Nirvana Editor syntax highlighting (text coloring and font    *
@@ -474,7 +474,7 @@ int TestHighlightPatterns(patternSet *patSet)
 void* GetHighlightInfo(WindowInfo *window, int pos)
 {
     int style;
-    highlightDataRec *pattern;
+    highlightDataRec *pattern = NULL;
     windowHighlightData *highlightData = 
 	(windowHighlightData *)window->highlightData; 
     if (!highlightData)
@@ -489,13 +489,15 @@ void* GetHighlightInfo(WindowInfo *window, int pos)
 	style = (int)BufGetCharacter(highlightData->styleBuffer, pos);
     }
 	    
-    pattern = patternOfStyle(highlightData->pass1Patterns, style);
-    if (!pattern)
-    {
+    if (highlightData->pass1Patterns) {
+       pattern = patternOfStyle(highlightData->pass1Patterns, style);
+    }
+    
+    if (!pattern && highlightData->pass2Patterns) {
 	pattern = patternOfStyle(highlightData->pass2Patterns, style);
     }
-    if (!pattern)
-    {
+    
+    if (!pattern) {
 	return NULL;
     }
     return (void*)pattern->userStyleIndex;    
