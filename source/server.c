@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: server.c,v 1.21.2.1 2003/08/12 11:43:27 edg Exp $";
+static const char CVSID[] = "$Id: server.c,v 1.21.2.2 2003/08/12 11:47:39 edg Exp $";
 /*******************************************************************************
 *									       *
 * server.c -- Nirvana Editor edit-server component			       *
