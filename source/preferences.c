@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: preferences.c,v 1.49.2.4 2002/04/23 19:52:40 edg Exp $";
+static const char CVSID[] = "$Id: preferences.c,v 1.49.2.5 2002/05/16 07:53:09 edg Exp $";
 /*******************************************************************************
 *									       *
 * preferences.c -- Nirvana Editor preferences processing		       *
@@ -940,6 +940,7 @@ static int lmDialogEmpty(void);
 static void updatePatternsTo5dot1(void);
 static void updatePatternsTo5dot2(void);
 static void updatePatternsTo5dot3(void);
+static void updateShellCmdsTo5dot3(void);
 static void spliceString(char **intoString, const char *insertString, const char *atExpr);
 static int regexFind(const char *inString, const char *expr);
 static int regexReplace(char **inString, const char *expr,
@@ -995,6 +996,7 @@ void RestoreNEditPrefs(XrmDatabase prefDB, XrmDatabase appDB)
     if (PrefData.prefFileRead && fileVer < 5003) {
         fprintf(stderr, "NEdit: Converting .nedit file from pre-5.3 version.\n"
                 "    To keep, use Preferences -> Save Defaults\n");
+	updateShellCmdsTo5dot3();
         updatePatternsTo5dot3();
     }
        
@@ -4707,6 +4709,91 @@ static int regexReplace(char **inString, const char *expr, const char *replaceWi
     *inString = newString;
     return TRUE;
 }
+
+
+#ifndef VMS
+/* 
+** Replace all '#' characters in shell commands by '##' to keep commands
+** containing those working. '#' is a line number placeholder in 5.3 and
+** had no special meaning before.
+*/
+static void updateShellCmdsTo5dot3(void)
+{
+    char *cOld, *cNew, *pCol, *pNL;
+    int  nHash, isCmd;
+    char *newString;
+
+    if(!TempStringPrefs.shellCmds)
+	return;
+
+    /* Count number of '#'. If there are '#' characters in the non-command
+    ** part of the definition we count too much and later allocate too much
+    ** memory for the new string, but this doesn't hurt.
+    */
+    for(cOld=TempStringPrefs.shellCmds, nHash=0; *cOld; cOld++)
+	if(*cOld == '#')
+	    nHash++;
+
+    /* No '#' -> no conversion necessary. */
+    if(!nHash)
+	return;
+
+    newString=XtMalloc(strlen(TempStringPrefs.shellCmds) + 1 + nHash);
+
+    cOld  = TempStringPrefs.shellCmds;
+    cNew  = newString;
+    isCmd = 0;
+    pCol  = NULL;
+    pNL   = NULL;
+
+    /* Copy all characters from TempStringPrefs.shellCmds into newString
+    ** and duplicate '#' in command parts. A simple check for really beeing
+    ** inside a command part (starting with '\n', between the the two last
+    ** '\n' a colon ':' must have been found) is preformed.
+    */
+    while(*cOld) {
+	/* actually every 2nd line is a command. We additionally
+	** check if there is a colon ':' in the previous line.
+	*/
+	if(*cOld=='\n') {
+	    if((pCol > pNL) && !isCmd)
+	      	isCmd=1;
+	    else
+	      	isCmd=0;
+	    pNL=cOld;
+	}
+
+	if(!isCmd && *cOld ==':')
+	    pCol = cOld;
+
+	/* Duplicate hashes if we're in a command part */
+	if(isCmd && *cOld=='#')
+	    *cNew++ = '#';
+
+	/* Copy every character */
+	*cNew++ = *cOld++;
+
+    }
+
+    /* Terminate new preferences string */
+    *cNew = 0;
+
+    /* free the old memory */
+    XtFree(TempStringPrefs.shellCmds);
+
+    /* exchange the string */
+    TempStringPrefs.shellCmds = newString;
+
+}
+
+#else
+
+static void updateShellCmdsTo5dot3(void) {
+    /* No shell commands in VMS ! */
+    return;
+}  
+
+#endif
 
 #ifdef SGI_CUSTOM
 /*
