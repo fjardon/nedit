@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: preferences.c,v 1.30.2.3 2001/09/30 19:49:54 edg Exp $";
+static const char CVSID[] = "$Id: preferences.c,v 1.30.2.4 2001/10/01 12:42:34 edg Exp $";
 /*******************************************************************************
 *									       *
 * preferences.c -- Nirvana Editor preferences processing		       *
@@ -4416,13 +4416,14 @@ static void updatePatternsTo5dot2(void)
     if (regexFind(TempStringPrefs.language, tclLm5dot1))
 	regexReplace(&TempStringPrefs.language, tclLm5dot1, tclLm5dot2);
 
-    /* Then insert the new modes, trying to keep them in alphabetical order */
+    /* Then append the new modes (trying to keep them in alphabetical order
+       makes no sense, since 5.1 didn't use alphabetical order). */
     if (!regexFind(TempStringPrefs.language, "^[ \t]*CSS:"))
-	spliceString(&TempStringPrefs.language, cssLm5dot2, "^[ \t]*Csh:");
+	spliceString(&TempStringPrefs.language, cssLm5dot2, NULL);
     if (!regexFind(TempStringPrefs.language, "^[ \t]*Regex:"))
-	spliceString(&TempStringPrefs.language, reLm5dot2, "^[ \t]*SGML HTML:");
+	spliceString(&TempStringPrefs.language, reLm5dot2, NULL);
     if (!regexFind(TempStringPrefs.language, "^[ \t]*XML:"))
-	spliceString(&TempStringPrefs.language, xmlLm5dot2, "^[ \t]*Yacc:");
+	spliceString(&TempStringPrefs.language, xmlLm5dot2, NULL);
 
     /* Finally, append the new highlight styles */
 
