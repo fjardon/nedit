@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: preferences.c,v 1.49.2.1 2002/03/12 20:22:34 edg Exp $";
+static const char CVSID[] = "$Id: preferences.c,v 1.49.2.2 2002/03/13 12:05:49 edg Exp $";
 /*******************************************************************************
 *									       *
 * preferences.c -- Nirvana Editor preferences processing		       *
@@ -3110,6 +3110,7 @@ void ChooseFonts(WindowInfo *window, int forWindow)
 	    XmNtopOffset, BTN_TEXT_OFFSET,
 	    XmNleftAttachment, XmATTACH_POSITION,
 	    XmNleftPosition, 1, NULL);
+    XmStringFree(s1);
     XtAddCallback(primaryBtn, XmNactivateCallback, primaryBrowseCB, fd);
 
     fd->primaryW = XtVaCreateManagedWidget("primary", xmTextWidgetClass,
@@ -3158,6 +3159,7 @@ void ChooseFonts(WindowInfo *window, int forWindow)
 	    XmNtopOffset, BTN_TEXT_OFFSET,
 	    XmNleftAttachment, XmATTACH_POSITION,
 	    XmNleftPosition, 1, NULL);
+    XmStringFree(s1);
     XtAddCallback(fd->fillW, XmNactivateCallback, fillFromPrimaryCB, fd);
 
     italicLbl = XtVaCreateManagedWidget("italicLbl", xmLabelGadgetClass,
@@ -3195,6 +3197,7 @@ void ChooseFonts(WindowInfo *window, int forWindow)
 	    XmNtopOffset, BTN_TEXT_OFFSET,
 	    XmNleftAttachment, XmATTACH_POSITION,
 	    XmNleftPosition, 1, NULL);
+    XmStringFree(s1);
     XtAddCallback(italicBtn, XmNactivateCallback, italicBrowseCB, fd);
 
     fd->italicW = XtVaCreateManagedWidget("italic", xmTextWidgetClass,
@@ -3245,6 +3248,7 @@ void ChooseFonts(WindowInfo *window, int forWindow)
 	    XmNtopOffset, BTN_TEXT_OFFSET,
 	    XmNleftAttachment, XmATTACH_POSITION,
 	    XmNleftPosition, 1, NULL);
+    XmStringFree(s1);
     XtAddCallback(boldBtn, XmNactivateCallback, boldBrowseCB, fd);
 
     fd->boldW = XtVaCreateManagedWidget("bold", xmTextWidgetClass,
@@ -3295,6 +3299,7 @@ void ChooseFonts(WindowInfo *window, int forWindow)
 	    XmNtopOffset, BTN_TEXT_OFFSET,
 	    XmNleftAttachment, XmATTACH_POSITION,
 	    XmNleftPosition, 1, NULL);
+    XmStringFree(s1);
     XtAddCallback(boldItalicBtn, XmNactivateCallback, boldItalicBrowseCB, fd);
 
     fd->boldItalicW = XtVaCreateManagedWidget("boldItalic",
