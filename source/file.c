@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: file.c,v 1.24 2001/08/14 08:37:16 jlous Exp $";
+static const char CVSID[] = "$Id: file.c,v 1.24.2.1 2001/09/27 12:41:01 edg Exp $";
 /*******************************************************************************
 *									       *
 * file.c -- Nirvana Editor file i/o					       *
@@ -1047,6 +1047,12 @@ void PrintString(const char *string, int length, Widget parent, const char *jobN
     int fd;
 
     /* Generate a temporary file name */
+    /*  If the glibc is used, the linker issues a warning at this point. This is
+	very thoughtful of him, but does not apply to NEdit. The recommended
+	replacement mkstemp(3) uses the same algorithm as NEdit, namely
+	    1. Create a filename
+	    2. Open the file with the O_CREAT|O_EXCL flags
+	So all an attacker can do is a DoS on the print function. */
     tmpnam(tmpFileName);
 
     /* open the temporary file */
