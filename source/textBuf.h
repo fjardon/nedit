@@ -1,4 +1,4 @@
-/* $Id: textBuf.h,v 1.14 2003/05/02 18:18:47 edg Exp $ */
+/* $Id: textBuf.h,v 1.14.2.1 2003/06/18 09:54:49 edg Exp $ */
 
 #ifndef NEDIT_TEXTBUF_H_INCLUDED
 #define NEDIT_TEXTBUF_H_INCLUDED
@@ -114,6 +114,8 @@ int BufGetHighlightPos(textBuffer *buf, int *start, int *end,
         int *isRect, int *rectStart, int *rectEnd);
 char *BufGetHighlightText(textBuffer *buf);
 void BufAddModifyCB(textBuffer *buf, bufModifyCallbackProc bufModifiedCB,
+	void *cbArg);
+void BufAddHighPriorityModifyCB(textBuffer *buf, bufModifyCallbackProc bufModifiedCB,
 	void *cbArg);
 void BufRemoveModifyCB(textBuffer *buf, bufModifyCallbackProc bufModifiedCB,
 	void *cbArg);

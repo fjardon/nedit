@@ -1,4 +1,4 @@
-/* $Id: rangeset.c,v 1.7 2003/06/06 18:04:17 edg Exp $ */
+/* $Id: rangeset.c,v 1.7.2.1 2003/06/18 09:54:48 edg Exp $ */
 /*******************************************************************************
 *									       *
 * rangeset.c	 -- Nirvana Editor rangest functions			       *
@@ -750,7 +750,9 @@ RangesetTable *RangesetTableAlloc(textBuffer *buffer)
     }
 
     table->n_set = 0;
-    BufAddModifyCB(buffer, RangesetBufModifiedCB, table);
+    /* Range sets must be updated before the text display callbacks are
+       called to avoid highlighted ranges getting out of sync. */
+    BufAddHighPriorityModifyCB(buffer, RangesetBufModifiedCB, table);
     return table;
 }
 
