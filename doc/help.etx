@@ -1,4 +1,4 @@
-.. $Id: help.etx,v 1.49.2.4 2003/08/07 04:42:28 slobasso Exp $
+.. $Id: help.etx,v 1.49.2.5 2003/08/21 06:41:32 n8gray Exp $
 .. NOTE: Remember to supply 'version' variable on setext command line.
 ..       For example,  setext -m -v "version=NEdit Version 6.0".
 ..
@@ -4575,12 +4575,12 @@ NEdit Command Line
 
 **-background color (or -bg color)**
   User interface background color. (Background color for text can be set
-  separately with  -xrm "nedit.textFgColor: color" or using the Preferences ->
+  separately with -xrm "nedit.textBgColor: color" or using the Preferences ->
   Colors dialog).
 
 **-foreground color (or -fg color)**
   User interface foreground color. (Foreground color for text can be set
-  separately with -xrm "nedit*text.textBgColor: color" or using the Preferences
+  separately with -xrm "nedit.textFgColor: color" or using the Preferences
   -> Colors dialog).
 
 **-xrm resourcestring** 
