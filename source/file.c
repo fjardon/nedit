@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: file.c,v 1.66.2.2 2003/08/21 10:50:59 edg Exp $";
+static const char CVSID[] = "$Id: file.c,v 1.66.2.3 2003/08/22 16:24:28 edg Exp $";
 /*******************************************************************************
 *									       *
 * file.c -- Nirvana Editor file i/o					       *
@@ -375,16 +375,20 @@ static int doOpen(WindowInfo *window, const char *name, const char *path,
     if (fstat(fileno(fp), &statbuf) != 0)
     {
         fclose(fp);
+        window->filenameSet = FALSE; /* Temp. prevent check for changes. */
         DialogF(DF_ERR, window->shell, 1, "Error opening File",
                 "Error opening %s", "Dismiss", name);
+        window->filenameSet = TRUE;
         return FALSE;
     }
 
     if (S_ISDIR(statbuf.st_mode))
     {
         fclose(fp);
+        window->filenameSet = FALSE; /* Temp. prevent check for changes. */
         DialogF(DF_ERR, window->shell, 1, "Error opening File",
                 "Can't open directory %s", "Dismiss", name);
+        window->filenameSet = TRUE;
         return FALSE;
     }
 
@@ -392,8 +396,10 @@ static int doOpen(WindowInfo *window, const char *name, const char *path,
     if (S_ISBLK(statbuf.st_mode))
     {
         fclose(fp);
+        window->filenameSet = FALSE; /* Temp. prevent check for changes. */
         DialogF(DF_ERR, window->shell, 1, "Error opening File",
                 "Can't open block device %s", "Dismiss", name);
+        window->filenameSet = TRUE;
         return FALSE;
     }
 #endif
@@ -404,8 +410,10 @@ static int doOpen(WindowInfo *window, const char *name, const char *path,
     if (fileString == NULL)
     {
         fclose(fp);
+        window->filenameSet = FALSE; /* Temp. prevent check for changes. */
         DialogF(DF_ERR, window->shell, 1, "Error while opening File",
                 "File is too large to edit", "Dismiss");
+        window->filenameSet = TRUE;
         return FALSE;
     }
 
@@ -414,8 +422,10 @@ static int doOpen(WindowInfo *window, const char *name, const char *path,
     if (ferror(fp))
     {
         fclose(fp);
+        window->filenameSet = FALSE; /* Temp. prevent check for changes. */
         DialogF(DF_ERR, window->shell, 1, "Error while opening File",
                 "Error reading %s:\n%s", "Dismiss", name, errorString());
+        window->filenameSet = TRUE;
         free(fileString);
         return FALSE;
     }
