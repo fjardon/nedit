@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: file.c,v 1.66 2003/05/09 16:40:55 edg Exp $";
+static const char CVSID[] = "$Id: file.c,v 1.66.2.1 2003/08/13 16:01:26 edg Exp $";
 /*******************************************************************************
 *									       *
 * file.c -- Nirvana Editor file i/o					       *
@@ -615,13 +615,16 @@ int CloseFileAndWindow(WindowInfo *window, int preResponse)
     /* Make sure that the window is not in iconified state */
     RaiseShellWindow(window->shell);
 
-    /* if window is a normal & unmodified file or an empty new file then
+    /* If the window is a normal & unmodified file or an empty new file, 
+       or if the user wants to ignore external modifications then
        just close it.  Otherwise ask for confirmation first. */
     if (!window->fileChanged && 
             /* Normal File */
             ((!window->fileMissing && window->lastModTime > 0) || 
             /* New File*/
-             (window->fileMissing && window->lastModTime == 0)))
+             (window->fileMissing && window->lastModTime == 0) ||
+            /* File deleted/modified externally, ignored by user. */
+            !GetPrefWarnFileMods()))
     {
         CloseWindow(window);
         /* up-to-date windows don't have outstanding backup files to close */
@@ -1484,6 +1487,10 @@ void CheckForChangesToFile(WindowInfo *window)
            The filename is now invalid */
         window->fileMissing = TRUE;
         window->lastModTime = 1;
+        /* A missing file can't be read-only. */
+        SET_PERM_LOCKED(window->lockReasons, False);
+        UpdateWindowTitle(window);
+        UpdateWindowReadOnly(window);
         /* Warn the user, if they like to be warned (Maybe this should be its
             own preference setting: GetPrefWarnFileDeleted() ) */
         if (GetPrefWarnFileMods()) {
