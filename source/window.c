@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: window.c,v 1.48.2.2 2002/03/21 08:41:08 edg Exp $";
+static const char CVSID[] = "$Id: window.c,v 1.48.2.3 2002/04/13 20:24:47 edg Exp $";
 /*******************************************************************************
 *									       *
 * window.c -- Nirvana Editor window creation/deletion			       *
@@ -1448,11 +1448,12 @@ void MakeSelectionVisible(WindowInfo *window, Widget textPane)
        reqested position to be vertically on screen) */
     if (    TextPosToXY(textPane, left, &leftX, &y) &&
     	    TextPosToXY(textPane, right, &rightX, &y) && leftX <= rightX) {
+	textDisp *textD = ((TextWidget)textPane)->text.textD;
     	TextGetScroll(textPane, &topLineNum, &horizOffset);
     	XtVaGetValues(textPane, XmNwidth, &width, textNmarginWidth, &margin,
 		NULL);
-    	if (leftX < margin)
-    	    horizOffset -= margin - leftX;
+    	if (leftX < margin + textD->lineNumLeft + textD->lineNumWidth)
+    	    horizOffset -= margin + textD->lineNumLeft + textD->lineNumWidth - leftX;
     	else if (rightX > width - margin)
     	    horizOffset += rightX - (width - margin);
     	TextSetScroll(textPane, topLineNum, horizOffset);
