@@ -1,10 +1,11 @@
 # Makefile for NEdit text editor documentation
 #
-#  $Id: Makefile,v 1.4.2.1 2003/10/14 10:54:23 edg Exp $
+#  $Id: Makefile,v 1.4.2.2 2003/10/20 08:25:39 edg Exp $
 #
 #  NEdit help documentation and internal help code using one common
 #  source, help.etx, a Structure Enhanced TEXT document.
 #
+.SUFFIXES: .man .pod
 
 instructions:
 	@ echo ""
@@ -68,7 +69,9 @@ nedit.doc: .version help.etx setext
 	@ echo "Creating NEdit plain text documenation..."
 	@ ./setext -c NEDITDOC -v version="`cat .version`" help.etx nedit.doc
 
-%.man: .version %.pod
+nc.man: .version
+nedit.man: .version
+.pod.man:
 	@ echo "Creating $* man page..."
 	@ which pod2man > /dev/null 2>&1 || ( echo "Sorry, you need pod2man." && exit 1 )
 	@ pod2man --release="`cat .version`" --center="NEdit documentation" $*.pod > $@ 
