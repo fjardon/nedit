@@ -1,4 +1,4 @@
-.. $Id: help.etx,v 1.49.2.3 2003/08/04 22:32:01 slobasso Exp $
+.. $Id: help.etx,v 1.49.2.4 2003/08/07 04:42:28 slobasso Exp $
 .. NOTE: Remember to supply 'version' variable on setext command line.
 ..       For example,  setext -m -v "version=NEdit Version 6.0".
 ..
@@ -2802,23 +2802,46 @@ Highlighting Information
   Note that if any of the functions is used while in Plain mode or while syntax
   highlighting is off, the behaviour is undefined.
 
-**get_pattern( pos [, "position"] )**
-**get_pattern( pattern_name [, "name"] )**
+**get_pattern_by_name( pattern_name )**
+  Returns an array containing the pattern attributes for pattern 'pattern_name'.
+  The elements in this array are:
+
+* **style** -- Highlight style name
+
+  If 'pattern_name' is invalid, an empty array is returned.
+
+**get_pattern_at_pos( pos )**
   Returns an array containing the pattern attributes of the character at
-  position 'pos' or for pattern 'pattern_name'. The elements in this array are:
+  position 'pos'. The elements in this array are:
 
 * **pattern** -- Highlight pattern name
 * **style** -- Highlight style name
-* **extension** -- The length in the text which uses the same highlighting pattern. NOTE: This element is not set if the function's parameter is a pattern name.
+* **extension** -- The length in the text which uses the same highlighting pattern.
 
-  If 'position' or 'pattern_name' is invalid, an empty array is returned.
-  If the optional argument of "position" or "name" is not supplied, the first
-  argument is used as a position if it is a valid integer, otherwise as a name.
+  If 'position' is invalid, an empty array is returned.
 
-**get_style( pos [, "position"] )**
-**get_style( style_name [, "name"] )**
+**get_style_by_name( style_name )**
+  Returns an array containing the style attributes for style 'style_name'.
+  The elements in this array are:
+
+* **bold** -- '1' if style is bold, '0' otherwise
+* **italic** -- '1' if style is italic, '0' otherwise
+* **color** -- Name of the style's color
+* **rgb** -- Color's RGB values ('#rrggbb')
+* **background** -- Name of the background color, if any
+* **back_rgb** -- Background color's RGB values ('#rrggbb')
+
+  There are two things to consider with regard to the colors: First, the values
+  for 'color' and/or 'background' are empty if the color values are specified
+  using RGB values. Second, the values for 'rgb' and 'back_rgb' do contain the
+  actual color values as allocated by the X server. This may not be the value
+  listed for your color in rgb.txt.
+
+  If 'style_name' is invalid, an empty array is returned.
+
+**get_style_at_pos( pos )**
   Returns an array containing the style attributes of the character at
-  position 'pos' or for style 'style_name'. The elements in this array are:
+  position 'pos'. The elements in this array are:
 
 * **style** -- Name of the highlight style
 * **bold** -- '1' if style is bold, '0' otherwise
@@ -2834,9 +2857,7 @@ Highlighting Information
   actual color values as allocated by the X server. This may not be the value
   listed for your color in rgb.txt.
 
-  If 'position' or 'style_name' is invalid, an empty array is returned.
-  If the optional argument of "position" or "name" is not supplied, the first
-  argument is used as a position if it is a valid integer, otherwise as a name.
+  If 'position' is invalid, an empty array is returned.
 
    ----------------------------------------------------------------------
 

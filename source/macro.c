@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: macro.c,v 1.71.2.1 2003/07/29 17:54:49 slobasso Exp $";
+static const char CVSID[] = "$Id: macro.c,v 1.71.2.2 2003/08/07 04:42:29 slobasso Exp $";
 /*******************************************************************************
 *                                                                              *
 * macro.c -- Macro file processing, learn/replay, and built-in macro           *
@@ -368,10 +368,21 @@ static int rangesetSetNameMS(WindowInfo *window, DataValue *argList,
 static int rangesetSetModeMS(WindowInfo *window, DataValue *argList,
       int nArgs, DataValue *result, char **errMsg);
 
-static int getPatternMS(WindowInfo *window, DataValue *argList,
-      int nArgs, DataValue *result, char **errMsg);
-static int getStyleMS(WindowInfo *window, DataValue *argList,
-      int nArgs, DataValue *result, char **errMsg);
+static int fillPatternResult(DataValue *result, char **errMsg, WindowInfo *window,
+        char *patternName, Boolean preallocatedPatternName, Boolean includeName,
+        char *styleName, Boolean extensionRequired, int bufferPos);
+static int getPatternByNameMS(WindowInfo *window, DataValue *argList, int nArgs,
+        DataValue *result, char **errMsg);
+static int getPatternAtPosMS(WindowInfo *window, DataValue *argList, int nArgs,
+        DataValue *result, char **errMsg);
+
+static int fillStyleResult(DataValue *result, char **errMsg,
+        WindowInfo *window, char *styleName, Boolean preallocatedStyleName,
+        Boolean includeName, int styleCode);
+static int getStyleByNameMS(WindowInfo *window, DataValue *argList, int nArgs,
+        DataValue *result, char **errMsg);
+static int getStyleAtPosMS(WindowInfo *window, DataValue *argList, int nArgs,
+        DataValue *result, char **errMsg);
 
 /* Built-in subroutines and variables for the macro language */
 static BuiltInSubr MacroSubrs[] = {lengthMS, getRangeMS, tPrintMS,
@@ -389,7 +400,8 @@ static BuiltInSubr MacroSubrs[] = {lengthMS, getRangeMS, tPrintMS,
         rangesetInfoMS, rangesetRangeMS, rangesetIncludesPosMS, 
         rangesetSetColorMS, rangesetSetNameMS, rangesetSetModeMS,
         rangesetGetByNameMS,
-        getPatternMS, getStyleMS
+        getPatternByNameMS, getPatternAtPosMS,
+        getStyleByNameMS, getStyleAtPosMS
     };
 #define N_MACRO_SUBRS (sizeof MacroSubrs/sizeof *MacroSubrs)
 static const char *MacroSubrNames[N_MACRO_SUBRS] = {"length", "get_range", "t_print",
@@ -407,7 +419,8 @@ static const char *MacroSubrNames[N_MACRO_SUBRS] = {"length", "get_range", "t_pr
         "rangeset_info", "rangeset_range", "rangeset_includes",
         "rangeset_set_color", "rangeset_set_name", "rangeset_set_mode",
         "rangeset_get_by_name",
-        "get_pattern", "get_style"
+        "get_pattern_by_name", "get_pattern_at_pos",
+        "get_style_by_name", "get_style_at_pos"
     };
 static BuiltInSubr SpecialVars[] = {cursorMV, lineMV, columnMV,
         fileNameMV, filePathMV, lengthMV, selectionStartMV, selectionEndMV,
@@ -4896,113 +4909,33 @@ static int rangesetSetModeMS(WindowInfo *window, DataValue *argList,
 ** Routines to get details directly from the window.
 */
 
-/*
-**  Returns an array containing information about the style of position $1
-**  or name $1.
-**      ["style"]       Name of style
-**      ["color"]       Color of style
-**      ["rgb"]         RGB representation of color of style
-**      ["bold"]        '1' if style is bold, '0' otherwise
-**      ["italic"]      '1' if style is italic, '0' otherwise 
-**      ["background"]  Background color of style if specified
-**      ["back_rgb"]    RGB representation of background color of style
-**
-*/
-static int getStyleMS(WindowInfo *window, DataValue *argList, int nArgs,
-        DataValue *result, char **errMsg)
+static int fillStyleResult(DataValue *result, char **errMsg,
+        WindowInfo *window, char *styleName, Boolean preallocatedStyleName,
+        Boolean includeName, int styleCode)
 {
-    char stringStorage[2][TYPE_INT_STR_SIZE(int)];
-    int arg1IsName = 1;
-    char *paramType;
-    int styleCode=0;
-    char *styleName;
-    int cursorPos;
-
     DataValue DV;
-
     char colorValue[20];
     int r, g, b;
-
-    /* Validate number of arguments */
-    if (!(nArgs >= 1 && nArgs <= 2)) {
-        return wrongNArgsErr(errMsg);
-    }
     
-    if (nArgs > 1) {
-        if (!readStringArg(argList[1], &paramType, stringStorage[1], errMsg)) {
-            M_FAILURE("Second parameter is not a string in %s");
-        }
-        if (strcmp(paramType, "name") == 0) {
-            arg1IsName = 1;
-        }
-        else if (strcmp(paramType, "position") == 0) {
-            arg1IsName = 0;
-        }
-        else {
-            M_FAILURE("Second parameter is not a valid value in %s");
-        }
-    }
-    else {
-        if (readIntArg(argList[0], &cursorPos, errMsg)) {
-            arg1IsName = 0;
-        }
-    }
-
-    /* Prepare result */
-    result->tag = ARRAY_TAG;
-    result->val.arrayPtr = NULL;
-
-    /* Convert argument to whatever its type is */
-    if (arg1IsName) {
-        char *inStyleName;
-        if (!readStringArg(argList[0], &inStyleName, stringStorage[0], errMsg)) {
-            M_FAILURE("First parameter is not a string in %s");
-        }
-        if (!NamedStyleExists(inStyleName)) {
-            /* if the given name is invalid we just return an empty array. */
-            return True;
-        }
-        if (argList[0].tag == STRING_TAG) {
-            styleName = argList[0].val.str;
-        }
-        else {
-            styleName = AllocStringCpy(inStyleName);
-        }
-    }
-    else {
-        textBuffer *buf = window->buffer;
-
-        if (!readIntArg(argList[0], &cursorPos, errMsg)) {
-            return False;
-        }
-
-        /*  Verify sane cursor position */
-        if ((cursorPos < 0) || (cursorPos >= buf->length)) {
-            /*  If the position is not legal, we cannot guess anything about
-                the style, so we return an empty array. */
-            return True;
-        }
-
-        /* Determine style name */
-        styleCode = HighlightCodeOfPos(window, cursorPos);
-        if (styleCode == 0) {
-            /* if there is no style we just return an empty array. */
-            return True;
-        }
-        styleName = AllocStringCpy(HighlightStyleOfCode(window, styleCode));
-    }
-
     /* initialize array */
+    result->tag = ARRAY_TAG;
     result->val.arrayPtr = ArrayNew();
 
     /* the following array entries will be strings */
     DV.tag = STRING_TAG;
 
-    /* insert style name */
-    DV.val.str = styleName;
-    M_STR_ALLOC_ASSERT(DV);
-    if (!ArrayInsert(result, PERM_ALLOC_STR("style"), &DV)) {
-        M_ARRAY_INSERT_FAILURE();
+    if (includeName) {
+        /* insert style name */
+        if (preallocatedStyleName) {
+            DV.val.str = styleName;
+        }
+        else {
+            DV.val.str = AllocStringCpy(styleName);
+        }
+        M_STR_ALLOC_ASSERT(DV);
+        if (!ArrayInsert(result, PERM_ALLOC_STR("style"), &DV)) {
+            M_ARRAY_INSERT_FAILURE();
+        }
     }
 
     /* insert color name */
@@ -5056,145 +4989,228 @@ static int getStyleMS(WindowInfo *window, DataValue *argList, int nArgs,
 }
 
 /*
-**  Returns an array containing information about a highligting pattern. The
-**  single parameter contains the position this information is requested for.
-**  The returned array looks like this:
-**      ["pattern"]     Name of pattern
-**      ["style"]       Name of style
-**      ["extension"]   Distance this style continues
+**  Returns an array containing information about the style of name $1
+**      ["color"]       Color of style
+**      ["rgb"]         RGB representation of color of style
+**      ["bold"]        '1' if style is bold, '0' otherwise
+**      ["italic"]      '1' if style is italic, '0' otherwise 
+**      ["background"]  Background color of style if specified
+**      ["back_rgb"]    RGB representation of background color of style
 **
-**  A second option is to call get_pattern() with a pattern name, to learn
-**  about a patterns style. In this case, the 'extension' element is not set.
 */
-static int getPatternMS(WindowInfo *window, DataValue *argList, int nArgs,
+static int getStyleByNameMS(WindowInfo *window, DataValue *argList, int nArgs,
         DataValue *result, char **errMsg)
 {
-    char stringStorage[2][TYPE_INT_STR_SIZE(int)];
-    int arg1IsName = 1;
-    char *paramType;
-    int cursorPos = -1;
-    textBuffer *buffer = window->buffer;
-    
+    char stringStorage[1][TYPE_INT_STR_SIZE(int)];
     int styleCode = 0;
-    char* styleName = NULL;
-    char* patternName = NULL;
-    highlightPattern* pattern = NULL;
-    
-    Boolean extensionRequired = True;
-    DataValue DV;
-    int checkCode;
-    
-    /* Begin of building the result. */
-    result->tag = ARRAY_TAG;
-    result->val.arrayPtr = NULL;
+    char *styleName;
 
     /* Validate number of arguments */
-    if (!(nArgs >= 1 && nArgs <= 2)) {
+    if (nArgs != 1) {
         return wrongNArgsErr(errMsg);
     }
     
-    if (nArgs > 1) {
-        if (!readStringArg(argList[1], &paramType, stringStorage[1], errMsg)) {
-            M_FAILURE("Second parameter is not a string in %s");
-        }
-        if (strcmp(paramType, "name") == 0) {
-            arg1IsName = 1;
-        }
-        else if (strcmp(paramType, "position") == 0) {
-            arg1IsName = 0;
-        }
-        else {
-            M_FAILURE("Second parameter is not a valid value in %s");
-        }
-    }
-    else {
-        if (readIntArg(argList[0], &cursorPos, errMsg)) {
-            arg1IsName = 0;
-        }
+    /* Prepare result */
+    result->tag = ARRAY_TAG;
+    result->val.arrayPtr = NULL;
+
+    if (!readStringArg(argList[0], &styleName, stringStorage[0], errMsg)) {
+        M_FAILURE("First parameter is not a string in %s");
     }
 
-    /*  Convert argument to whatever its type is and set styleName and
-        patternName accordingly. */
-    if (arg1IsName) {
-        char *inPatternName;
-        /*  This is used to learn about a pattern's style. */
-        if (!readStringArg(argList[0], &inPatternName, stringStorage[0], errMsg)) {
-            M_FAILURE("First parameter is not a string in %s");
-        }
-        pattern = FindPatternOfWindow(window, inPatternName);
-        if (pattern == NULL) {
-            /* The pattern's name is unknown. */
-            return True;
-        }
-        if (argList[0].tag == STRING_TAG) {
-            patternName = argList[0].val.str;
-        }
-        else {
-            patternName = AllocStringCpy(inPatternName);
-        }
-        styleName = AllocStringCpy(pattern->style);
-        extensionRequired = False;  /* no position -> no extension */
+    if (!NamedStyleExists(styleName)) {
+        /* if the given name is invalid we just return an empty array. */
+        return True;
     }
-    else {
-        /* The most straightforward case: Get a pattern, style and extension
-           for a cursor position. */
-        if (!readIntArg(argList[0], &cursorPos, errMsg)) {
-            return False;
-        }
+    
+    return fillStyleResult(result, errMsg, window,
+        styleName, (argList[0].tag == STRING_TAG), False, styleCode);
+}
 
-        /*  Verify sane cursor position
-         *  You would expect that buffer->length would be among the sane
-         *  positions, but we have n characters and n+1 cursor positions. */
-        if ((cursorPos < 0) || (cursorPos >= buffer->length)) {
-            /*  If the position is not legal, we cannot guess anything about
-                the style, so we return an empty array. */
-            return True;
-        }
+/*
+**  Returns an array containing information about the style of position $1
+**      ["style"]       Name of style
+**      ["color"]       Color of style
+**      ["rgb"]         RGB representation of color of style
+**      ["bold"]        '1' if style is bold, '0' otherwise
+**      ["italic"]      '1' if style is italic, '0' otherwise 
+**      ["background"]  Background color of style if specified
+**      ["back_rgb"]    RGB representation of background color of style
+**
+*/
+static int getStyleAtPosMS(WindowInfo *window, DataValue *argList, int nArgs,
+        DataValue *result, char **errMsg)
+{
+    int styleCode;
+    int bufferPos;
+    textBuffer *buf = window->buffer;
 
-        /* Determine style name */
-        styleCode = HighlightCodeOfPos(window, cursorPos);
-        if (styleCode == 0) {
-            /* if there is no style we just return an empty array. */
-            return True;
-        }
-
-        styleName = AllocStringCpy(HighlightStyleOfCode(window, styleCode));
-        patternName = AllocStringCpy(HighlightNameOfCode(window, styleCode));
+    /* Validate number of arguments */
+    if (nArgs != 1) {
+        return wrongNArgsErr(errMsg);
     }
+    
+    /* Prepare result */
+    result->tag = ARRAY_TAG;
+    result->val.arrayPtr = NULL;
+
+    if (!readIntArg(argList[0], &bufferPos, errMsg)) {
+        return False;
+    }
+
+    /*  Verify sane buffer position */
+    if ((bufferPos < 0) || (bufferPos >= buf->length)) {
+        /*  If the position is not legal, we cannot guess anything about
+            the style, so we return an empty array. */
+        return True;
+    }
+
+    /* Determine style code */
+    styleCode = HighlightCodeOfPos(window, bufferPos);
+    if (styleCode == 0) {
+        /* if there is no style we just return an empty array. */
+        return True;
+    }
+
+    return fillStyleResult(result, errMsg, window,
+        HighlightStyleOfCode(window, styleCode), False, True, styleCode);
+}
+
+static int fillPatternResult(DataValue *result, char **errMsg, WindowInfo *window,
+        char *patternName, Boolean preallocatedPatternName, Boolean includeName,
+        char *styleName, Boolean extensionRequired, int bufferPos)
+{
+    DataValue DV;
 
     /* initialize array */
+    result->tag = ARRAY_TAG;
     result->val.arrayPtr = ArrayNew();
 
     /* the following array entries will be strings */
     DV.tag = STRING_TAG;
 
-    /* insert pattern name */
-    DV.val.str = patternName;
-    M_STR_ALLOC_ASSERT(DV);
-    if (!ArrayInsert(result, PERM_ALLOC_STR("pattern"), &DV)) {
-        M_ARRAY_INSERT_FAILURE();
+    if (includeName) {
+        /* insert pattern name */
+        if (preallocatedPatternName) {
+            DV.val.str = patternName;
+        }
+        else {
+            DV.val.str = AllocStringCpy(patternName);
+        }
+        M_STR_ALLOC_ASSERT(DV);
+        if (!ArrayInsert(result, PERM_ALLOC_STR("pattern"), &DV)) {
+            M_ARRAY_INSERT_FAILURE();
+        }
     }
 
     /* insert style name */
-    DV.val.str = styleName;
+    DV.val.str = AllocStringCpy(styleName);
     M_STR_ALLOC_ASSERT(DV);
     if (!ArrayInsert(result, PERM_ALLOC_STR("style"), &DV)) {
         M_ARRAY_INSERT_FAILURE();
     }
 
-    /* the following array entry will be integer */
+    /* the following array entries will be integers */
     DV.tag = INT_TAG;
 
-    /* insert extent */
     if (extensionRequired) {
-        checkCode = 0;
-        DV.val.n = HighlightLengthOfCodeFromPos(window, cursorPos, &checkCode);
+        /* insert extent */
+        int checkCode = 0;
+        DV.val.n = HighlightLengthOfCodeFromPos(window, bufferPos, &checkCode);
         if (!ArrayInsert(result, PERM_ALLOC_STR("extension"), &DV)) {
             M_ARRAY_INSERT_FAILURE();
         }
     }
 
     return True;
+}
+
+/*
+**  Returns an array containing information about a highligting pattern. The
+**  single parameter contains the pattern name this information is requested for.
+**  The returned array looks like this:
+**      ["style"]       Name of style
+*/
+static int getPatternByNameMS(WindowInfo *window, DataValue *argList, int nArgs,
+        DataValue *result, char **errMsg)
+{
+    char stringStorage[1][TYPE_INT_STR_SIZE(int)];
+    char *patternName = NULL;
+    highlightPattern *pattern = NULL;
+    
+    /* Begin of building the result. */
+    result->tag = ARRAY_TAG;
+    result->val.arrayPtr = NULL;
+
+    /* Validate number of arguments */
+    if (nArgs != 1) {
+        return wrongNArgsErr(errMsg);
+    }
+    
+    if (!readStringArg(argList[0], &patternName, stringStorage[0], errMsg)) {
+        M_FAILURE("First parameter is not a string in %s");
+    }
+    
+    pattern = FindPatternOfWindow(window, patternName);
+    if (pattern == NULL) {
+        /* The pattern's name is unknown. */
+        return True;
+    }
+
+    return fillPatternResult(result, errMsg, window,
+        patternName, (argList[0].tag == STRING_TAG), False,
+        pattern->style, False, 0);
+}
+
+/*
+**  Returns an array containing information about a highligting pattern. The
+**  single parameter contains the position this information is requested for.
+**  The returned array looks like this:
+**      ["pattern"]     Name of pattern
+**      ["style"]       Name of style
+**      ["extension"]   Distance this style continues
+*/
+static int getPatternAtPosMS(WindowInfo *window, DataValue *argList, int nArgs,
+        DataValue *result, char **errMsg)
+{
+    int bufferPos = -1;
+    textBuffer *buffer = window->buffer;
+    int styleCode = 0;
+    
+    /* Begin of building the result. */
+    result->tag = ARRAY_TAG;
+    result->val.arrayPtr = NULL;
+
+    /* Validate number of arguments */
+    if (nArgs != 1) {
+        return wrongNArgsErr(errMsg);
+    }
+    
+    /* The most straightforward case: Get a pattern, style and extension
+       for a buffer position. */
+    if (!readIntArg(argList[0], &bufferPos, errMsg)) {
+        return False;
+    }
+
+    /*  Verify sane buffer position
+     *  You would expect that buffer->length would be among the sane
+     *  positions, but we have n characters and n+1 buffer positions. */
+    if ((bufferPos < 0) || (bufferPos >= buffer->length)) {
+        /*  If the position is not legal, we cannot guess anything about
+            the style, so we return an empty array. */
+        return True;
+    }
+
+    /* Determine style name */
+    styleCode = HighlightCodeOfPos(window, bufferPos);
+    if (styleCode == 0) {
+        /* if there is no style we just return an empty array. */
+        return True;
+    }
+
+    return fillPatternResult(result, errMsg, window,
+        HighlightNameOfCode(window, styleCode), False, True,
+        HighlightStyleOfCode(window, styleCode), True, bufferPos);
 }
 
 static int wrongNArgsErr(char **errMsg)
