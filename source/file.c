@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: file.c,v 1.66.2.3 2003/08/22 16:24:28 edg Exp $";
+static const char CVSID[] = "$Id: file.c,v 1.66.2.4 2003/09/28 14:18:12 edg Exp $";
 /*******************************************************************************
 *									       *
 * file.c -- Nirvana Editor file i/o					       *
@@ -297,9 +297,12 @@ static int doOpen(WindowInfo *window, const char *name, const char *path,
     strcat(fullname, name);
     
     /* Open the file */
-#ifdef USE_ACCESS  /* The only advantage of this is if you use clearcase,
+#ifndef DONT_USE_ACCESS  
+                   /* The only advantage of this is if you use clearcase,
     	    	      which messes up the mtime of files opened with r+,
-		      even if they're never actually written. */
+		      even if they're never actually written.
+		      To avoid requiring special builds for clearcase users,
+		      this is now the default. */
     {
 	if ((fp = fopen(fullname, "r")) != NULL) {
     	    if(access(fullname, W_OK) != 0)
@@ -1536,7 +1539,7 @@ void CheckForChangesToFile(WindowInfo *window)
         if ((fp = fopen(fullname, "r")) != NULL) {
             int readOnly;
             fclose(fp);
-#ifdef USE_ACCESS
+#ifndef DONT_USE_ACCESS 
             readOnly = access(fullname, W_OK) != 0;
 #else
             if (((fp = fopen(fullname, "r+")) != NULL)) {
