@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: fontsel.c,v 1.10 2001/08/14 08:37:16 jlous Exp $";
+static const char CVSID[] = "$Id: fontsel.c,v 1.10.2.1 2001/08/24 08:28:11 amai Exp $";
 /*******************************************************************************
 *									       *
 * fontsel.c -- Nirvana Font Selector			       *
@@ -28,6 +28,7 @@ static const char CVSID[] = "$Id: fontsel.c,v 1.10 2001/08/14 08:37:16 jlous Exp
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include <X11/Intrinsic.h>
 #include <Xm/Xm.h>
 #include <Xm/Form.h>
@@ -38,6 +39,7 @@ static const char CVSID[] = "$Id: fontsel.c,v 1.10 2001/08/14 08:37:16 jlous Exp
 #include <Xm/ToggleB.h>
 #include <Xm/MessageB.h>
 #include <Xm/DialogS.h>
+
 #include "DialogF.h"
 #include "misc.h"
 #include "fontsel.h"
@@ -85,16 +87,16 @@ typedef struct
 
 /*	local function prototypes */		
 
-static void	getStringComponent(char *inStr, int pos, char *outStr);
+static void	getStringComponent(const char *inStr, int pos, char *outStr);
 static void	setupScrollLists(int dontChange, xfselControlBlkType ctrlBlk);
-static int	notPropFont(char *font);
-static int	styleMatch(xfselControlBlkType *ctrlBlk, char *font);
-static int	sizeMatch(xfselControlBlkType *ctrlBlk, char *font);
-static int	fontMatch(xfselControlBlkType *ctrlBlk, char *font);
-static void	addItemToList(char **buf, char *item, int *count);
-static void	getFontPart(char *font, char *buff1);
-static void	getStylePart(char *font, char *buff1);
-static void	getSizePart(char *font, char *buff1, int inPixels);
+static int	notPropFont(const char *font);
+static int	styleMatch(xfselControlBlkType *ctrlBlk, const char *font);
+static int	sizeMatch(xfselControlBlkType *ctrlBlk, const char *font);
+static int	fontMatch(xfselControlBlkType *ctrlBlk, const char *font);
+static void	addItemToList(char **buf, const char *item, int *count);
+static void	getFontPart(const char *font, char *buff1);
+static void	getStylePart(const char *font, char *buff1);
+static void	getSizePart(const char *font, char *buff1, int inPixels);
 static void	propFontToggleAction(Widget widget, 
 				     xfselControlBlkType *ctrlBlk, 
 				     XmToggleButtonCallbackStruct *call_data);
@@ -113,7 +115,7 @@ static void	cancelAction(Widget widget, xfselControlBlkType *ctrlBlk,
 				 XmListCallbackStruct *call_data);
 static void	okAction(Widget widget, xfselControlBlkType *ctrlBlk,
 				 XmPushButtonCallbackStruct *call_data);
-static void	startupFont(xfselControlBlkType *ctrlBlk, char *font);
+static void	startupFont(xfselControlBlkType *ctrlBlk, const char *font);
 static void 	setFocus(Widget w, xfselControlBlkType *ctrlBlk, XEvent *event, 
 						Boolean *continueToDispatch);
 static void	FindBigFont(xfselControlBlkType *ctrlBlk, char *bigFont);
@@ -159,7 +161,7 @@ static void	FindBigFont(xfselControlBlkType *ctrlBlk, char *bigFont);
 *                                                                              *
 *******************************************************************************/
 
-char 	*FontSel(Widget parent, int showPropFonts, char *currFont)
+char 	*FontSel(Widget parent, int showPropFonts, const char *currFont)
 {
 	Widget			dialog, form, okButton, cancelButton;
 	Widget			styleList, sizeList, fontName, fontList;
@@ -488,7 +490,7 @@ char 	*FontSel(Widget parent, int showPropFonts, char *currFont)
 
 /*	gets a specific substring from a string */
 
-static void	getStringComponent(char *inStr, int pos, char *outStr)
+static void	getStringComponent(const char *inStr, int pos, char *outStr)
 {
 	int	i, j;
 
@@ -635,7 +637,7 @@ static void	setupScrollLists(int dontChange, xfselControlBlkType ctrlBlk)
 
 /*	returns TRUE if argument is not name of a proportional font */
 
-static int	notPropFont(char *font)
+static int	notPropFont(const char *font)
 {
 	char	buff1[TEMP_BUF_SIZE];
 
@@ -650,7 +652,7 @@ static int	notPropFont(char *font)
 /*	returns TRUE if the style portion of the font matches the currently
 	selected style */
 
-static int	styleMatch(xfselControlBlkType *ctrlBlk, char *font)
+static int	styleMatch(xfselControlBlkType *ctrlBlk, const char *font)
 {
 	char	buff[TEMP_BUF_SIZE];
 
@@ -669,7 +671,7 @@ static int	styleMatch(xfselControlBlkType *ctrlBlk, char *font)
 /*	returns TRUE if the size portion of the font matches the currently
 	selected size */
 
-static int	sizeMatch(xfselControlBlkType *ctrlBlk, char *font)
+static int	sizeMatch(xfselControlBlkType *ctrlBlk, const char *font)
 {
 	char	buff[TEMP_BUF_SIZE];
 
@@ -687,7 +689,7 @@ static int	sizeMatch(xfselControlBlkType *ctrlBlk, char *font)
 /*	returns TRUE if the font portion of the font matches the currently
 	selected font */
 
-static int	fontMatch(xfselControlBlkType *ctrlBlk, char *font)
+static int	fontMatch(xfselControlBlkType *ctrlBlk, const char *font)
 {
 	char	buff[TEMP_BUF_SIZE];
 
@@ -704,7 +706,7 @@ static int	fontMatch(xfselControlBlkType *ctrlBlk, char *font)
 
 /*	inserts a string into correct sorted position in a list */
 
-static void	addItemToList(char **buf, char *item, int *count)
+static void	addItemToList(char **buf, const char *item, int *count)
 {
 	int	i, j;
 
@@ -734,7 +736,7 @@ static void	addItemToList(char **buf, char *item, int *count)
 /*	given a font name this function returns the part used in the first 
 	scroll list */
 
-static void	getFontPart(char *font, char *buff1)
+static void	getFontPart(const char *font, char *buff1)
 {
 	char	buff2[TEMP_BUF_SIZE], buff3[TEMP_BUF_SIZE];
 	char	buff4[TEMP_BUF_SIZE];
@@ -761,7 +763,7 @@ static void	getFontPart(char *font, char *buff1)
 /*	given a font name this function returns the part used in the second 
 	scroll list */
 
-static void	getStylePart(char *font, char *buff1)
+static void	getStylePart(const char *font, char *buff1)
 {
 	char	buff2[TEMP_BUF_SIZE], buff3[TEMP_BUF_SIZE];
 
@@ -796,7 +798,7 @@ static void	getStylePart(char *font, char *buff1)
 /*	given a font name this function returns the part used in the third 
 	scroll list */
 
-static void	getSizePart(char *font, char *buff1, int inPixels)
+static void	getSizePart(const char *font, char *buff1, int inPixels)
 {
 	int	size;
 	float	temp;
@@ -810,9 +812,8 @@ static void	getSizePart(char *font, char *buff1, int inPixels)
 	else
 	{
 		getStringComponent(font, 8, buff1);
-		size = atoi(buff1);
-		temp = (float)size / 10.0;
-		size = temp;
+		size = atoi(buff1)/10;
+		temp = (float)size;
 		if (buff1[strlen(buff1) - 1] == '0')
 			sprintf(buff1, "%2d", size);
 		else
@@ -1184,7 +1185,7 @@ static void	okAction(Widget widget, xfselControlBlkType *ctrlBlk,
 /*	if current font is passed as an argument then this function is
 	invoked and sets up initial entries */
 
-static void	startupFont(xfselControlBlkType *ctrlBlk, char *font)
+static void	startupFont(xfselControlBlkType *ctrlBlk, const char *font)
 {
 	int		i;
 	char		**fontName;
