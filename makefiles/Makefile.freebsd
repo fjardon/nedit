@@ -1,4 +1,4 @@
-# $Id: Makefile.freebsd,v 1.5 2003/05/20 00:27:56 n8gray Exp $
+# $Id: Makefile.freebsd,v 1.5.2.1 2003/09/28 15:03:10 edg Exp $
 CC=cc
 AR=ar
 
@@ -15,4 +15,4 @@ LIBS= ${MOTIFLIB} -L${PREFIX}/lib -lm -lXpm -lXext -lXt -lSM -lICE -lX11
 
 include Makefile.common
 
-verify_config:
+verify_config: check_tif_rule
