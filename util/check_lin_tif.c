@@ -132,11 +132,11 @@ char* get_lesstif_rev(char *vs) {
 /* Check to see if the user has overridden our warnings.  If they haven't,
     tell them how to do so if they're brave (or foolish :-). */
 void finish(int exitcode, char *tif) {
-    char buf[2];
     
     good_versions();
     if (exitcode == 1) {
 #ifdef BUILD_BROKEN_NEDIT
+        char buf[2];
         fprintf(stderr,
             "\n========================== WARNING ===========================\n"
             "You have chosen to build NEdit with a known-bad version of %s,\n"
@@ -156,6 +156,7 @@ void finish(int exitcode, char *tif) {
 #endif
     } else if (exitcode == 2) {
 #ifdef BUILD_UNTESTED_NEDIT
+        char buf[2];
         fprintf(stderr,
             "\n========================== WARNING ===========================\n"
             "You have chosen to build NEdit with an untested version of %s.\n"
@@ -175,10 +176,12 @@ void finish(int exitcode, char *tif) {
 }
 
 int main() {
-    char *vs = XmVERSION_STRING, *tif, **v_good, **v_bad, *lesstif_rev;
-    int i, force_bad = 0;  /* This is just for debugging */
-    
+    char *vs = XmVERSION_STRING, *tif;
+    int force_bad = 0;  /* This is just for debugging */
 #ifdef LESSTIF_VERSION
+    char **v_good, **v_bad, *lesstif_rev;
+    int i;
+    
     fprintf(stderr, "LessTif detected.\n");
     fprintf(stderr, "%s\n", vs);
     tif = "LessTif";
