@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: window.c,v 1.33 2001/08/21 14:29:37 tringali Exp $";
+static const char CVSID[] = "$Id: window.c,v 1.48.2.1 2002/03/16 20:40:57 edg Exp $";
 /*******************************************************************************
 *									       *
 * window.c -- Nirvana Editor window creation/deletion			       *
@@ -37,6 +37,7 @@ static const char CVSID[] = "$Id: window.c,v 1.33 2001/08/21 14:29:37 tringali E
 #endif /*VMS*/
 #include <limits.h>
 #include <math.h>
+#include <ctype.h>
 
 #include <X11/Intrinsic.h>
 #include <X11/Shell.h>
@@ -81,6 +82,9 @@ static const char CVSID[] = "$Id: window.c,v 1.33 2001/08/21 14:29:37 tringali E
 #include "userCmds.h"
 #include "nedit.bm"
 #include "n.bm"
+#include "../util/utils.h"
+#include "../util/clearcase.h"
+#include "windowTitle.h"
 
 /* Initial minimum height of a pane.  Just a fallback in case setPaneMinHeight
    (which may break in a future release) is not available */
@@ -114,11 +118,14 @@ static void setPaneMinHeight(Widget w, int min);
 static void addWindowIcon(Widget shell);
 static void wmSizeUpdateProc(XtPointer clientData, XtIntervalId *id);
 static void getGeometryString(WindowInfo *window, char *geomString);
-static char *getClearCaseViewTag(void);
 #ifdef ROWCOLPATCH
 static void patchRowCol(Widget w);
 static void patchedRemoveChild(Widget child);
 #endif
+static unsigned char* sanitizeVirtualKeyBindings();
+static int sortAlphabetical(const void* k1, const void* k2);
+static int virtKeyBindingsAreInvalid(const unsigned char* bindings);
+static void restoreInsaneVirtualKeyBindings(unsigned char* bindings);
 
 /*
 ** Create a new editor window
@@ -138,7 +145,15 @@ WindowInfo *CreateWindow(const char *name, char *geometry, int iconic)
     unsigned int rows, cols;
     int x, y, bitmask;
     static Atom wmpAtom, syAtom = 0;
+    static int firstTime = True;
+    unsigned char* invalidBindings = NULL;
 
+    if (firstTime) 
+    {
+        invalidBindings = sanitizeVirtualKeyBindings();
+        firstTime = False;
+    }
+    
     /* Allocate some memory for the new window data structure */
     window = (WindowInfo *)XtMalloc(sizeof(WindowInfo));
     
@@ -185,6 +200,7 @@ WindowInfo *CreateWindow(const char *name, char *geometry, int iconic)
     window->wrapMode = GetPrefWrap(PLAIN_LANGUAGE_MODE);
     window->overstrike = False;
     window->showMatchingStyle = GetPrefShowMatching();
+    window->matchSyntaxBased = GetPrefMatchSyntaxBased();
     window->showStats = GetPrefStatsLine();
     window->showISearchLine = GetPrefISearchLine();
     window->showLineNumbers = GetPrefLineNums();
@@ -407,7 +423,6 @@ WindowInfo *CreateWindow(const char *name, char *geometry, int iconic)
     	    XmNeditable, False,
     	    XmNtraversalOn, False,
     	    XmNcursorPositionVisible, False,
-    	    XmNfontList, window->fontList,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNleftOffset, STAT_SHADOW_THICKNESS,
 	    XmNtopAttachment, window->showISearchLine ?
@@ -505,6 +520,8 @@ WindowInfo *CreateWindow(const char *name, char *geometry, int iconic)
     
     /* Set the minimum pane height for the initial text pane */
     UpdateMinPaneHeights(window);
+    
+    restoreInsaneVirtualKeyBindings(invalidBindings);
     
     return window;
 }
@@ -806,7 +823,7 @@ void ShowLineNumbers(WindowInfo *window, int state)
     window->showLineNumbers = state;
     
     /* Just setting window->showLineNumbers is sufficient to tell
-       UpdataLineNumDisp to expand the line number areas and the window
+       UpdateLineNumDisp to expand the line number areas and the window
        size for the number of lines required.  To hide the line number
        display, set the width to zero, and contract the window width. */
     if (state) {
@@ -814,7 +831,6 @@ void ShowLineNumbers(WindowInfo *window, int state)
     } else {
 	XtVaGetValues(window->shell, XmNwidth, &windowWidth, NULL);
 	XtVaGetValues(window->textArea, textNmarginWidth, &marginWidth, NULL);
-	XtVaSetValues(window->shell, XmNwidthInc, 1, NULL);
 	XtVaSetValues(window->shell, XmNwidth,
 		windowWidth - textD->left + marginWidth, NULL);
 	for (i=0; i<=window->nPanes; i++) {
@@ -839,16 +855,20 @@ void SetTabDist(WindowInfo *window, int tabDist)
         
         for (paneIndex = 0; paneIndex <= window->nPanes; ++paneIndex) {
             Widget w = GetPaneByIndex(window, paneIndex);
+            textDisp *textD = ((TextWidget)w)->text.textD;
 
             TextGetScroll(w, &saveVScrollPositions[paneIndex], &saveHScrollPositions[paneIndex]);
             saveCursorPositions[paneIndex] = TextGetCursorPos(w);
+            textD->modifyingTabDist = 1;
         }
         
         BufSetTabDistance(window->buffer, tabDist);
 
         for (paneIndex = 0; paneIndex <= window->nPanes; ++paneIndex) {
             Widget w = GetPaneByIndex(window, paneIndex);
-
+            textDisp *textD = ((TextWidget)w)->text.textD;
+            
+            textD->modifyingTabDist = 0;
             TextSetCursorPos(w, saveCursorPositions[paneIndex]);
             TextSetScroll(w, saveVScrollPositions[paneIndex], saveHScrollPositions[paneIndex]);
         }
@@ -1153,6 +1173,13 @@ void SetFonts(WindowInfo *window, const char *fontName, const char *italicName,
     if (window->highlightData != NULL)
     	UpdateHighlightStyles(window);
         
+    /* Change the window manager size hints. 
+       Note: this has to be done _before_ we set the new sizes. ICCCM2
+       compliant window managers (such as fvwm2) would otherwise resize
+       the window twice: once because of the new sizes requested, and once
+       because of the new size increments, resulting in an overshoot. */
+    UpdateWMSizeHints(window);
+    
     /* Use the information from the old window to re-size the window to a
        size appropriate for the new font */
     fontWidth = GetDefaultFontStruct(window->fontList)->max_bounds.width;
@@ -1162,8 +1189,7 @@ void SetFonts(WindowInfo *window, const char *fontName, const char *italicName,
     XtVaSetValues(window->shell, XmNwidth, newWindowWidth, XmNheight,
     	    newWindowHeight, NULL);
     
-    /* Change the window manager size hints and the minimum pane height */
-    UpdateWMSizeHints(window);
+    /* Change the minimum pane height */
     UpdateMinPaneHeights(window);
 }
 
@@ -1254,31 +1280,20 @@ void SetWindowModified(WindowInfo *window, int modified)
 ** Update the window title to reflect the filename, read-only, and modified
 ** status of the window data structure
 */
-void UpdateWindowTitle(WindowInfo *window)
+void UpdateWindowTitle(const WindowInfo *window)
 {
-    char *title, *iconTitle;
-    char *serverName = IsServer ? GetPrefServerName() : "";
-    
-    title = XtMalloc(strlen(window->filename) + strlen(getClearCaseViewTag()) +
-    	    strlen(serverName) + 26); /*strlen(" -- (read only, modified)")+1 */
-    iconTitle = XtMalloc(strlen(window->filename) + 2); /* strlen("*")+1 */
+    char *title = FormatWindowTitle(window->filename,
+                                    window->path,
+                                    GetClearCaseViewTag(),
+                                    GetPrefServerName(),
+                                    IsServer,
+                                    window->filenameSet,
+                                    window->lockReasons,
+                                    window->fileChanged,
+                                    GetPrefTitleFormat());
+                   
+    char *iconTitle = XtMalloc(strlen(window->filename) + 2); /* strlen("*")+1 */
 
-    /* Set the window title, adding annotations for "modified" or "read-only",
-       and possibly a server name and/or ClearCase view tag. */
-    strcpy(title, getClearCaseViewTag());
-    if (serverName[0] != '\0')
-	sprintf(&title[strlen(title)], "-%s- ", serverName);
-    strcat(title, window->filename);
-    if (IS_ANY_LOCKED_IGNORING_USER(window->lockReasons) && window->fileChanged)
-    	strcat(title, " (read only, modified)");
-    else if (IS_ANY_LOCKED_IGNORING_USER(window->lockReasons))
-    	strcat(title, " (read only)");
-    else if (IS_USER_LOCKED(window->lockReasons) && window->fileChanged)
-    	strcat(title, " (locked, modified)");
-    else if (IS_USER_LOCKED(window->lockReasons))
-    	strcat(title, " (locked)");
-    else if (window->fileChanged)
-    	strcat(title, " (modified)");
     strcpy(iconTitle, window->filename);
     if (window->fileChanged)
     	strcat(iconTitle, "*");
@@ -1294,7 +1309,6 @@ void UpdateWindowTitle(WindowInfo *window)
     	sprintf(title, "Replace (in %s)", window->filename);
     	XtVaSetValues(XtParent(window->replaceDlog), XmNtitle, title, NULL);
     }
-    XtFree(title);
     XtFree(iconTitle);
 
     /* Update the Windows menus with the new name */
@@ -1546,13 +1560,20 @@ static void modifiedCB(int pos, int nInserted, int nDeleted, int nRestyled,
     	XtSetSensitive(window->printSelItem, selected);
     	XtSetSensitive(window->cutItem, selected);
     	XtSetSensitive(window->copyItem, selected);
+        XtSetSensitive(window->delItem, selected);
+        /* Note we don't change the selection for items like
+           "Open Selected" and "Find Selected".  That's because
+           it works on selections in external applications.
+           Desensitizing it if there's no NEdit selection 
+           disables this feature. */
 #ifndef VMS
-    	XtSetSensitive(window->filterItem, selected);
+        XtSetSensitive(window->filterItem, selected);
 #endif
 
-	DimSelectionDepUserMenuItems(window, selected);
-	if (window->replaceDlog != NULL) {
-    	    UpdateReplaceActionButtons(window);
+        DimSelectionDepUserMenuItems(window, selected);
+        if (window->replaceDlog != NULL)
+        {
+            UpdateReplaceActionButtons(window);
         }
     }
     
@@ -1809,7 +1830,6 @@ void UpdateLineNumDisp(WindowInfo *window)
 	oldWidth = textD->left - marginWidth;
 	newWidth = reqCols * fontWidth + marginWidth;
 	XtVaGetValues(window->shell, XmNwidth, &windowWidth, NULL);
-	XtVaSetValues(window->shell, XmNwidthInc, 1, NULL);
 	XtVaSetValues(window->shell, XmNwidth,
 		windowWidth + newWidth-oldWidth, NULL);
 	UpdateWMSizeHints(window);
@@ -2057,54 +2077,6 @@ static void wmSizeUpdateProc(XtPointer clientData, XtIntervalId *id)
     UpdateWMSizeHints((WindowInfo *)clientData);
 }
 
-/*
-** Return a string showing the clearcase view name, pre-formated for the
-** window title.  If clearcase is not in use, or a view is not set, or the
-** view name is identical to the server name, an empty string is returned.
-** The returned string is statically allocated.  (Obviously, this is not a
-** general purpose routine, it is tailored just for the window title.)
-**
-** If user has ClearCase and is in a view, CLEARCASE_ROOT will be set and
-** the view name can be extracted.  This check is safe and efficient enough
-** that it doesn't impact non-clearcase users, so it is not conditionally
-** compiled. (Thanks to Max Vohlken)
-*/
-static char *getClearCaseViewTag(void)
-{
-    static char *viewTag = NULL;
-    char *envPtr;
-    char *tagPtr;
-
-    if (viewTag != NULL)
-        return viewTag;
-
-    /* Extract the view name from the CLEARCASE_ROOT environment variable */
-    envPtr = getenv("CLEARCASE_ROOT");
-    if (envPtr == NULL) {
-	viewTag = "";
-	return viewTag;
-    }
-    tagPtr = strrchr(envPtr, '/');
-    if (tagPtr == NULL) {
-	viewTag = "";
-	return viewTag;
-    }
-    tagPtr++;
-    
-    /* Don't put the name in the title if it's the same as the server name,
-       because that's how clearcase views are normally handled in server
-       mode, and server-mode users would always see the view name twice. */
-    if (IsServer && !strcmp(GetPrefServerName(), tagPtr)) {
-	viewTag = "";
-	return viewTag;
-    }
-    
-    /* Format the string for the window title */
-    viewTag = XtMalloc(strlen(tagPtr) + 4);
-    sprintf(viewTag, "{%s} ", tagPtr);
-    return viewTag;
-}
-
 #ifdef ROWCOLPATCH
 /*
 ** There is a bad memory reference in the delete_child method of the
@@ -2130,3 +2102,146 @@ static void patchedRemoveChild(Widget child)
                 delete_child) (child);
 }
 #endif /* ROWCOLPATCH */
+
+static int sortAlphabetical(const void* k1, const void* k2)
+{
+    const char* key1 = *(const char**)k1;
+    const char* key2 = *(const char**)k2;
+    return strcmp(key1, key2);
+}
+
+/*
+ * Checks whether a given virtual key binding string is invalid. 
+ * A binding is considered invalid if there are duplicate key entries.
+ */
+static int virtKeyBindingsAreInvalid(const unsigned char* bindings)
+{
+    int maxCount = 1, i, count;
+    const char  *pos = (const char*)bindings;
+    char *copy;
+    char *pos2, *pos3;
+    char **keys;
+    /* First count the number of bindings; bindings are separated by \n
+       strings. The number of bindings equals the number of \n + 1.
+       Beware of leading and trailing \n; the number is actually an
+       upper bound on the number of entries. */
+    while ((pos = strstr(pos, "\n"))) { ++pos; ++maxCount; }
+    
+    if (maxCount == 1) return False; /* One binding is always ok */
+    
+    keys = (char**)malloc(maxCount*sizeof(char*));
+    copy = strdup((const char*)bindings);
+    i = 0;
+    pos2 = copy;
+    
+    count = 0;
+    while (i<maxCount && pos2 && *pos2)
+    {
+	while (isspace(*pos2) || *pos2 == '\n') ++pos2;
+        
+        if (*pos2)
+        {
+	    keys[i++] = pos2;
+            ++count;
+	    pos3 = strstr(pos2, ":");
+	    if (pos3) 
+	    {
+                *pos3++ = 0; /* Cut the string and jump to the next entry */
+                pos2 = pos3;
+	    }
+    	    pos2 = strstr(pos2, "\n");
+        }
+    }
+    
+    if (count <= 1)
+    {
+       free(keys);
+       free(copy);
+       return False; /* No conflict */
+    }
+    
+    /* Sort the keys and look for duplicates */
+    qsort((void*)keys, count, sizeof(const char*), sortAlphabetical);
+    for (i=1; i<count; ++i)
+    {
+	if (!strcmp(keys[i-1], keys[i]))
+	{
+            /* Duplicate detected */
+	    free(keys);
+	    free(copy);
+	    return True;
+	}
+    }
+    free(keys);
+    free(copy);
+    return False;
+}
+
+/*
+ * Optionally sanitizes the Motif default virtual key bindings. 
+ * Some applications install invalid bindings (attached to the root window),
+ * which cause certain keys to malfunction in NEdit.
+ * Through an X-resource, users can choose whether they want
+ *   - to always keep the existing bindings
+ *   - to override the bindings only if they are invalid
+ *   - to always override the existing bindings.
+ */
+
+static Atom virtKeyAtom;
+
+static unsigned char* sanitizeVirtualKeyBindings()
+{
+    int overrideBindings = GetPrefOverrideVirtKeyBindings();
+    Window rootWindow;
+    const char *virtKeyPropName = "_MOTIF_DEFAULT_BINDINGS";
+    Atom dummyAtom;
+    int getFmt;
+    unsigned long dummyULong, nItems;
+    unsigned char *insaneVirtKeyBindings = NULL;
+    
+    if (overrideBindings == VIRT_KEY_OVERRIDE_NEVER) return NULL;
+    
+    virtKeyAtom =  XInternAtom(TheDisplay, virtKeyPropName, False);
+    rootWindow = RootWindow(TheDisplay, DefaultScreen(TheDisplay));
+
+    /* Remove the property, if it exists; we'll restore it later again */
+    if (XGetWindowProperty(TheDisplay, rootWindow, virtKeyAtom, 0, INT_MAX, 
+                           True, XA_STRING, &dummyAtom, &getFmt, &nItems, 
+                           &dummyULong, &insaneVirtKeyBindings) != Success 
+        || nItems == 0) 
+    {
+        return NULL; /* No binding yet; nothing to do */
+    }
+    
+    if (overrideBindings == VIRT_KEY_OVERRIDE_AUTO)
+    {   
+	if (!virtKeyBindingsAreInvalid(insaneVirtKeyBindings))
+        {
+            /* Restore the property immediately; it seems valid */
+            XChangeProperty(TheDisplay, rootWindow, virtKeyAtom, XA_STRING, 8,
+                            PropModeReplace, insaneVirtKeyBindings, 
+                            strlen((const char*)insaneVirtKeyBindings));
+            XFree((char*)insaneVirtKeyBindings);
+            return NULL; /* Prevent restoration */
+        }
+    }
+    return insaneVirtKeyBindings;
+}
+
+/*
+ * NEdit should not mess with the bindings installed by other apps, so we
+ * just restore whatever was installed, if necessary
+ */
+static void restoreInsaneVirtualKeyBindings(unsigned char *insaneVirtKeyBindings)
+{
+   if (insaneVirtKeyBindings)
+   {
+      Window rootWindow = RootWindow(TheDisplay, DefaultScreen(TheDisplay));
+      /* Restore the root window atom, such that we don't affect 
+         other apps. */
+      XChangeProperty(TheDisplay, rootWindow, virtKeyAtom, XA_STRING, 8,
+                      PropModeReplace, insaneVirtKeyBindings, 
+                      strlen((const char*)insaneVirtKeyBindings));
+      XFree((char*)insaneVirtKeyBindings);
+   }
+}
