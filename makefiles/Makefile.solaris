@@ -1,4 +1,4 @@
-# $Id: Makefile.solaris,v 1.4 2001/08/17 23:02:55 edg Exp $
+# $Id: Makefile.solaris,v 1.4.2.1 2001/08/24 18:34:00 amai Exp $
 #CC=gcc
 CC=/opt/SUNWspro/bin/cc
 AR=ar
@@ -11,9 +11,9 @@ AR=ar
 # To evaluate an alternative layout for the Replace/Find dialog, add
 # -DREPLACE_SCOPE to the CFLAGS. See the README file for more information.
 #
-CFLAGS=-g -I/usr/openwin/include -I/usr/dt/include \
+#CFLAGS=-g -I/usr/openwin/include -I/usr/dt/include \
     	-DUSE_DIRENT -DROWCOLPATCH -DNO_XMIM -DUSE_ACCESS
-#CFLAGS=-O -I/usr/openwin/include -I/opt/SUNWmotif/include -DUSE_DIRENT
+CFLAGS=-O -I/usr/openwin/include -I/opt/SUNWmotif/include -DUSE_DIRENT
 ARFLAGS=-urs
 LIBS= -L/usr/lib -L/usr/openwin/lib -L/usr/dt/lib -lm -lXm -lXt -lX11 \
     	-lsocket -lnsl  -R /usr/openwin/lib -R /usr/dt/lib -R /usr/ucblib
