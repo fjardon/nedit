@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: preferences.c,v 1.98.2.1 2003/06/11 02:45:46 tksoh Exp $";
+static const char CVSID[] = "$Id: preferences.c,v 1.98.2.2 2003/06/16 08:56:28 edg Exp $";
 /*******************************************************************************
 *									       *
 * preferences.c -- Nirvana Editor preferences processing		       *
@@ -1148,13 +1148,10 @@ void RestoreNEditPrefs(XrmDatabase prefDB, XrmDatabase appDB)
            message even if there's no explicit call to upgrade. */
         fprintf(stderr, "NEdit: Converting .nedit file to 5.4 version.\n"
                 "    To keep, use Preferences -> Save Defaults\n");
+        migrateColorResources(prefDB, appDB);
+        updateShellCmdsTo5dot4();
+        updatePatternsTo5dot4();
     }
-    /* XXX: When 5.4 is released we should move the following lines into 
-       the above if stmt.  It's here now for developers who have been using CVS
-       versions and want their colors and patterns migrated. */
-    migrateColorResources(prefDB, appDB);
-    updateShellCmdsTo5dot4();
-    updatePatternsTo5dot4();
    
     /* Do further parsing on resource types which RestorePreferences does
        not understand and reads as strings, to put them in the final form
