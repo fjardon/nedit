@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: help.c,v 1.76.2.4 2002/03/18 23:15:37 edg Exp $";
+static const char CVSID[] = "$Id: help.c,v 1.76.2.5 2002/03/19 21:39:26 edg Exp $";
 /*******************************************************************************
 *									       *
 * help.c -- Nirvana Editor help display					       *
@@ -875,7 +875,14 @@ static void helpButtonActionAP(Widget w, XEvent *event, String *args,
       	return; /* Shouldn't happen */
 
     /* Compose the button widget name */    
-    snprintf(buf, 79, "helpForm.%s", args[0]);
+    strcpy(&buf[0], "helpForm.");
+    if (strlen(args[0]) <= 70) {
+	strcat(&buf[0], args[0]);
+    }
+    else {
+	fprintf(stderr, "help-button-action: argument too long");
+	return;
+    }
     
     btn=XtNameToWidget(HelpWindows[topic], buf);
     if(btn) {
