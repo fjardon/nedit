@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: shell.c,v 1.18.2.2 2002/03/23 17:04:04 edg Exp $";
+static const char CVSID[] = "$Id: shell.c,v 1.18.2.3 2002/05/02 00:01:55 slobasso Exp $";
 /*******************************************************************************
 *									       *
 * shell.c -- Nirvana Editor shell command execution			       *
@@ -68,8 +68,6 @@ static const char CVSID[] = "$Id: shell.c,v 1.18.2.2 2002/03/23 17:04:04 edg Exp
 
 /* Tuning parameters */
 #define IO_BUF_SIZE 4096	/* size of buffers for collecting cmd output */
-#define MAX_SHELL_CMD_LEN 1024	/* max length of a shell command (should be
-				   eliminated, but substitutePercent needs) */
 #define MAX_OUT_DIALOG_ROWS 30	/* max height of dialog for command output */
 #define MAX_OUT_DIALOG_COLS 80	/* max width of dialog for command output */
 #define OUTPUT_FLUSH_FREQ 1000	/* how often (msec) to flush output buffers
@@ -128,12 +126,14 @@ static void destroyOutDialogCB(Widget w, XtPointer callback, XtPointer closure);
 static void measureText(char *text, int wrapWidth, int *rows, int *cols,
 	int *wrapped);
 static void truncateString(char *string, int length);
-static int substitutePercent(char *outStr, const char *inStr, const char *fileStr,
-	const char *lineStr, int outLen);
 static void bannerTimeoutProc(XtPointer clientData, XtIntervalId *id);
 static void flushTimeoutProc(XtPointer clientData, XtIntervalId *id);
 static void safeBufReplace(textBuffer *buf, int *start, int *end, 
 	const char *text);
+static char *shellCommandSubstitutes(const char *inStr, const char *fileStr,
+	const char *lineStr);
+static int shellSubstituter(char *outStr, const char *inStr, const char *fileStr,
+	const char *lineStr, int outLen, int predictOnly);
 
 /*
 ** Filter the current selection through shell command "command".  The selection
@@ -177,7 +177,7 @@ void FilterSelection(WindowInfo *window, const char *command, int fromMacro)
 void ExecShellCommand(WindowInfo *window, const char *command, int fromMacro)
 {
     int left, right, flags = 0;
-    char subsCommand[MAX_SHELL_CMD_LEN], fullName[MAXPATHLEN];
+    char *subsCommand, fullName[MAXPATHLEN];
     int pos, line, column;
     char lineNumber[11];
 
@@ -201,8 +201,8 @@ void ExecShellCommand(WindowInfo *window, const char *command, int fromMacro)
     TextPosToLineAndCol(window->lastFocus, pos, &line, &column);
     sprintf(lineNumber, "%d", line);
     
-    if (!substitutePercent(subsCommand, command, fullName, lineNumber,
-    	    MAX_SHELL_CMD_LEN)) {
+    subsCommand = shellCommandSubstitutes(command, fullName, lineNumber);
+    if (subsCommand == NULL) {
     	DialogF(DF_ERR, window->shell, 1,
 	   "Shell command is too long due to\nfilename substitutions with '%%' or\n" \
 	   "line number substitutions with '#'",
@@ -213,6 +213,7 @@ void ExecShellCommand(WindowInfo *window, const char *command, int fromMacro)
     /* issue the command */
     issueCommand(window, subsCommand, NULL, 0, flags, window->lastFocus, left,
 	    right, fromMacro);
+    free(subsCommand);
 }
 
 /*
@@ -241,7 +242,7 @@ void ExecCursorLine(WindowInfo *window, int fromMacro)
 {
     char *cmdText;
     int left, right, insertPos;
-    char subsCommand[MAX_SHELL_CMD_LEN], fullName[MAXPATHLEN];
+    char *subsCommand, fullName[MAXPATHLEN];
     int pos, line, column;
     char lineNumber[11];
 
@@ -273,8 +274,8 @@ void ExecCursorLine(WindowInfo *window, int fromMacro)
     TextPosToLineAndCol(window->lastFocus, pos, &line, &column);
     sprintf(lineNumber, "%d", line);
     
-    if (!substitutePercent(subsCommand, cmdText, fullName, lineNumber,
-    	    MAX_SHELL_CMD_LEN)) {
+    subsCommand = shellCommandSubstitutes(cmdText, fullName, lineNumber);
+    if (subsCommand == NULL) {
     	DialogF(DF_ERR, window->shell, 1,
 	   "Shell command is too long due to\nfilename substitutions with '%%' or\n" \
 	   "line number substitutions with '#'",
@@ -285,6 +286,7 @@ void ExecCursorLine(WindowInfo *window, int fromMacro)
     /* issue the command */
     issueCommand(window, subsCommand, NULL, 0, 0, window->lastFocus, insertPos+1,
 	    insertPos+1, fromMacro);
+    free(subsCommand);
     XtFree(cmdText);
 }
 
@@ -299,7 +301,7 @@ void DoShellMenuCmd(WindowInfo *window, const char *command,
 {
     int flags = 0;
     char *text;
-    char subsCommand[MAX_SHELL_CMD_LEN], fullName[MAXPATHLEN];
+    char *subsCommand, fullName[MAXPATHLEN];
     int left, right, textLen;
     int pos, line, column;
     char lineNumber[11];
@@ -320,8 +322,8 @@ void DoShellMenuCmd(WindowInfo *window, const char *command,
     TextPosToLineAndCol(window->lastFocus, pos, &line, &column);
     sprintf(lineNumber, "%d", line);
     
-    if (!substitutePercent(subsCommand, command, fullName, lineNumber,
-    	    MAX_SHELL_CMD_LEN)) {
+    subsCommand = shellCommandSubstitutes(command, fullName, lineNumber);
+    if (subsCommand == NULL) {
     	DialogF(DF_ERR, window->shell, 1,
 	   "Shell command is too long due to\nfilename substitutions with '%%' or\n" \
 	   "line number substitutions with '#'",
@@ -335,6 +337,7 @@ void DoShellMenuCmd(WindowInfo *window, const char *command,
 	text = BufGetSelectionText(window->buffer);
 	if (*text == '\0') {
     	    XtFree(text);
+            free(subsCommand);
     	    XBell(TheDisplay, 0);
     	    return;
     	}
@@ -402,6 +405,7 @@ void DoShellMenuCmd(WindowInfo *window, const char *command,
     	if (!SaveWindow(window)) {
     	    if (input != FROM_NONE)
     		XtFree(text);
+            free(subsCommand);
     	    return;
 	}
     }
@@ -414,6 +418,7 @@ void DoShellMenuCmd(WindowInfo *window, const char *command,
     /* issue the command */
     issueCommand(inWindow, subsCommand, text, textLen, flags, outWidget, left,
 	    right, fromMacro);
+    free(subsCommand);
 }
 
 /*
@@ -1204,59 +1209,103 @@ static void truncateString(char *string, int length)
 /*
 ** Substitute the string fileStr in inStr wherever % appears and
 ** lineStr in inStr wherever # appears, storing the
-** result in outStr.  Returns False if the resulting string would be
-** longer than outLen
+** result in outStr. If predictOnly is non-zero, the result string length
+** is predicted without creating the string. Returns the length of the result
+** string or -1 in case of an error.
+**
 */
-static int substitutePercent(char *outStr, const char *inStr, const char *fileStr,
-	const char *lineStr, int outLen)
+static int shellSubstituter(char *outStr, const char *inStr, const char *fileStr,
+        const char *lineStr, int outLen, int predictOnly)
 {
-    const char *inChar, *c;
+    const char *inChar;
     char *outChar;
     int outWritten = 0;
     int fileLen, lineLen;
-    
+
     inChar = inStr;
-    outChar = outStr;
+    if (!predictOnly) {
+        outChar = outStr;
+    }
     fileLen = strlen(fileStr);
     lineLen = strlen(lineStr);
-    
+
     while (*inChar != '\0') {
-    	
-	if (outWritten >= outLen)
-	   return False;
-	   
-	if (*inChar == '%') {
-    	    if (*(inChar+1) == '%') {
-    	    	inChar += 2;
-    	    	*outChar++ = '%';
-		outWritten++;
-    	    } else  {
-    		if (outWritten + fileLen >= outLen)
-		   return False;
-		for (c=fileStr; *c!='\0'; c++)
-    	    	    *outChar++ = *c;
+
+        if (!predictOnly && outWritten >= outLen) {
+            return(-1);
+        }
+
+        if (*inChar == '%') {
+            if (*(inChar + 1) == '%') {
+                inChar += 2;
+                if (!predictOnly) {
+                    *outChar++ = '%';
+                }
+                outWritten++;
+            } else  {
+                if (!predictOnly) {
+                    if (outWritten + fileLen >= outLen) {
+                        return(-1);
+                    }
+                    strncpy(outChar, fileStr, fileLen);
+                    outChar += fileLen;
+                }
                 outWritten += fileLen;
-    		inChar++;
-    	    }
-	} else if (*inChar == '#') {
-    	    if (*(inChar+1) == '#') {
-    	    	inChar += 2;
-    	    	*outChar++ = '#';
-		outWritten++;
-    	    } else  {
-    		if (outWritten + lineLen >= outLen)
-		   return False;
-    		for (c=lineStr; *c!='\0'; c++)
-    	    	    *outChar++ = *c;
-		outWritten += lineLen;
-    		inChar++;
-    	    }
-    	} else {
-    	    *outChar++ = *inChar++;
-	    outWritten++;
-	}
+                inChar++;
+            }
+        } else if (*inChar == '#') {
+            if (*(inChar + 1) == '#') {
+                inChar += 2;
+                if (!predictOnly) {
+                    *outChar++ = '#';
+                }
+                outWritten++;
+            } else  {
+                if (!predictOnly) {
+                    if (outWritten + lineLen >= outLen) {
+                        return(-1);
+                    }
+                    strncpy(outChar, lineStr, lineLen);
+                    outChar += lineLen;
+                }
+                outWritten += lineLen;
+                inChar++;
+            }
+        } else {
+            if (!predictOnly) {
+                *outChar++ = *inChar;
+            }
+            inChar++;
+            outWritten++;
+        }
     }
 
-    *outChar = '\0';
-    return True;
+    if (!predictOnly) {
+        if (outWritten >= outLen) {
+            return(-1);
+        }
+        *outChar = '\0';
+    }
+    ++outWritten;
+    return(outWritten);
+}
+
+static char *shellCommandSubstitutes(const char *inStr, const char *fileStr,
+        const char *lineStr)
+{
+    int cmdLen;
+    char *subsCmdStr = NULL;
+
+    cmdLen = shellSubstituter(NULL, inStr, fileStr, lineStr, 0, 1);
+    if (cmdLen >= 0) {
+        subsCmdStr = malloc(cmdLen);
+        if (subsCmdStr) {
+            cmdLen = shellSubstituter(subsCmdStr, inStr, fileStr, lineStr, cmdLen, 0);
+            if (cmdLen < 0) {
+                free(subsCmdStr);
+                subsCmdStr = NULL;
+            }
+        }
+    }
+    return(subsCmdStr);
 }
