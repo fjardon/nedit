@@ -1,4 +1,4 @@
-.. $Id: help.etx,v 1.49.2.2 2003/07/29 17:54:49 slobasso Exp $
+.. $Id: help.etx,v 1.49.2.3 2003/08/04 22:32:01 slobasso Exp $
 .. NOTE: Remember to supply 'version' variable on setext command line.
 ..       For example,  setext -m -v "version=NEdit Version 6.0".
 ..
@@ -2741,7 +2741,7 @@ Range Sets
   Changes the range set r so that it contains all ranges not in r. Does not
   return a value.
 
-**rangeset_get_by_name( r, name )**
+**rangeset_get_by_name( name )**
   Returns an array of active rangeset identifiers, with integer keys starting at 0,
   whose name matches name.
 
