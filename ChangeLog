@@ -1,3 +1,101 @@
+2003-10-20 08:29  edg
+
+	* doc/nc.man, doc/nedit.man, source/help_data.h,
+	source/help_topic.h (BETA-5-4.[2,2,6,5]): Regenerated for 5.4RC2.
+
+2003-10-20 08:25  edg
+
+	* doc/Makefile (BETA-5-4.2): Use double suffix rule for man page
+	generation iso. GNU make extension.
+
+2003-10-15 23:08  yooden
+
+	* doc/help.etx, source/help_data.h, source/help_topic.h,
+	source/nc.c (BETA-5-4.[6,5,4,4]): New documentation for nc.
+
+2003-10-14 10:56  edg
+
+	* doc/: nc.man, nedit.man (BETA-5-4.[1,1]): Regenerated.
+
+2003-10-14 10:54  edg
+
+	* doc/nedit.pod (1.1): file nedit.pod was initially added on branch
+	BETA-5-4.
+
+2003-10-14 10:54  edg
+
+	* doc/nc.pod (1.1): file nc.pod was initially added on branch
+	BETA-5-4.
+
+2003-10-14 10:54  edg
+
+	* doc/: Makefile, nc.pod, nedit.pod (BETA-5-4.[1,1,1]): Added man
+	pages in pod format and automatic pod to man page translation.
+
+2003-10-09 15:29  tringali
+
+	* util/system.h (BETA-5-4.1): Recognize ia64, cygwin, x86-64,
+	win32, unixware.
+
+2003-10-09 09:23  edg
+
+	* source/nc.c (BETA-5-4.3): Fix for SF #820491: nc -ask hangs when
+	the user cancels the server startup.
+
+2003-10-02 07:27  edg
+
+	* doc/setext (BETA-5-4.2): More HTML generation improvements
+	(Steven Haehn).
+
+2003-10-01 11:34  edg
+
+	* doc/setext (BETA-5-4.1): Bug fixes in HTML generation (Andrew
+	Hood).
+
+2003-09-28 15:05  edg
+
+	* Makefile, README, ReleaseNotes (BETA-5-4.[4,5,4]): 5.4RC2
+	updates.
+
+2003-09-28 15:03  edg
+
+	* doc/NEdit.ad (BETA-5-4.2): Removed trailing whitespace.
+
+2003-09-28 15:03  edg
+
+	* makefiles/: Makefile.bsdi, Makefile.freebsd, Makefile.netbsd,
+	Makefile.openbsd (BETA-5-4.[1,1,1,1]): Added Motif/Lesstif version
+	check.
+
+2003-09-28 14:18  edg
+
+	* makefiles/Makefile.ccur, makefiles/Makefile.generic,
+	makefiles/Makefile.solaris, source/file.c (BETA-5-4.[1,1,1,4]):
+	Made USE_ACCESS the default (there's no security risk in the way we
+	use access()). See also SF #782518.
+
+2003-09-28 14:11  edg
+
+	* doc/NEdit.ad (BETA-5-4.1): Updated resources to 5.4.
+
+2003-09-28 14:10  edg
+
+	* source/nc.c (BETA-5-4.2): Typo fix: noAsk -> noask.
+
+2003-09-26 19:45  yooden
+
+	* source/menu.c (BETA-5-4.3): Removes some references to the old
+	NEdit file history file name.
+
+2003-09-12 18:24  tringali
+
+	* README (BETA-5-4.4): Updates for 5.4
+
+2003-09-08 17:08  edg
+
+	* ChangeLog (BETA-5-4.1): Regenerated (cvs2cl.pl -b -r -t --accum
+	--gmt).
+
 2003-09-08 17:03  edg
 
 	* source/rangeset.c (BETA-5-4.5): Fixed integer overflow that
