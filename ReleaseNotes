@@ -1,7 +1,7 @@
-          Release Notes for NEdit Version 5.4BETA, June 2003
+          Release Notes for NEdit Version 5.4RC2, October 2003
 
 
-$Id: ReleaseNotes,v 1.22.2.3 2003/06/21 03:02:19 tringali Exp $
+$Id: ReleaseNotes,v 1.22.2.4 2003/09/28 15:05:31 edg Exp $
 
 This file contains last minute notes to users about the release, which are not
 included in the documentation or README files included with the distribution
@@ -126,11 +126,42 @@ Bugs Fixed in 5.4
   - Newline macro inserting a string caused a crash when triggered
     through smart indent
 
-  - Help text foreground was hard-coded to black (SF #723096)
+  - Help text foreground was hard-coded to black (SF bug #723096)
  
-  - System default colors from CDE Style Manager were ignored (#544053)
+  - System default colors from CDE Style Manager were ignored (SF bug #544053)
+  
+Changes since 5.4RC1
 
+  - Panes didn't inherit the right colors (SF bug #780267)
+   
+  - Fixed Rangeset API usability issues and bugs.
+ 
+  - Plain KP Enter now inserts a newline, not <CR> (SF bug #779439).
+ 
+  - Enabled Motif version checking for xBSD.
+ 
+  - SGI: compilation problem (SF bug #780841)
+ 
+  - File modification issues (SF bug #782513, SF bug #784442)
+ 
+  - Documentation updates.
+   
+  - Color dialog button resize problem.
+   
+  - undoModifiesSelection is no longer saved in .nedit/nedit.rc
+ 
+  - Workaround for Lesstif's 'frozen windows' bug.
+ 
+  - Fixed calltip parsing problem (SF bug #779681)
+ 
+  - Macro language HL pattern updates.
+   
+  - nc -do ... no longer creates unwanted windows (SF bug #785738).
 
+  - Improved color resource migration.
+  
+  - File accessibility is now determined with access() (SF bug #782518)
+ 
 New Features in 5.3
 
   This is mainly a bug fix release. The list of new features is therefore 
