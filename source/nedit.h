@@ -1,4 +1,4 @@
-/* $Id: nedit.h,v 1.39 2003/05/24 19:15:20 tringali Exp $ */
+/* $Id: nedit.h,v 1.39.2.1 2003/08/13 23:34:39 slobasso Exp $ */
 
 #ifndef NEDIT_NEDIT_H_INCLUDED
 #define NEDIT_NEDIT_H_INCLUDED
@@ -78,7 +78,7 @@
 #define UNDO_OP_TRIMTO 200	  /* size undo list is normally trimmed to
 				     when it exceeds UNDO_OP_TRIMTO in length */
 #ifdef SGI_CUSTOM
-#define MAX_SHORTENED_ITEMS 40    /* max. number of items excluded in short- */
+#define MAX_SHORTENED_ITEMS 80    /* max. number of items excluded in short- */
 #endif	    	    	    	  /*     menus mode */
 
 enum indentStyle {NO_AUTO_INDENT, AUTO_INDENT, SMART_INDENT};
