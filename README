@@ -1,6 +1,6 @@
                     NEdit Version 5.4BETA,  June 2003
 
-$Id: README,v 1.31.2.2 2003/06/16 09:12:31 edg Exp $
+$Id: README,v 1.31.2.3 2003/06/21 03:02:19 tringali Exp $
 	     
 
 NEdit is a multi-purpose text editor for the X Window System, which combines a
@@ -242,6 +242,12 @@ Known bugs which might show off in NEdit linked with LessTif include:
 
 
 Linux Systems
+
+Red Hat Linux, as of version 8.0, no longer automatically reads X resources out
+of the ~/.Xdefaults file.  Instead, it reads a file named ~/.Xresource.  Any
+customizations stored in ~/.Xdefaults will not be honored, for all X
+applications.  To fix this, copy the resources into ~/.Xdefaults, or link the
+files together.
 
 The default key bindings for arrow keys in fvwm interfere with some of the
 arrow key bindings in NEdit, particularly, Ctrl+Arrow and Alt+Arrow.  You
