@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: misc.c,v 1.57 2003/06/06 17:13:16 edg Exp $";
+static const char CVSID[] = "$Id: misc.c,v 1.57.2.1 2003/06/27 07:24:04 edg Exp $";
 /*******************************************************************************
 *									       *
 * misc.c -- Miscelaneous Motif convenience functions			       *
@@ -2111,7 +2111,7 @@ void RadioButtonChangeStateNotified(Widget widget, Boolean state)
    */
 #ifndef LESSTIF_VERSION
 #if XmVersion >= 2000
-    if (state)
+    if (state && XtIsRealized(widget))
     {
         /* 
            Simulate a mouse button click.
