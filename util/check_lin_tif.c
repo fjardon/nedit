@@ -123,7 +123,7 @@ char *bad_lesstif_2_1_versions[] = {
 void good_versions() {
     int i;
     fprintf(stderr, "\nNEdit is known to work with LessTif versions:\n");
-    for(i=0; good_lesstif_2_1_versions[i]; i++) {
+    for (i=0; good_lesstif_2_1_versions[i]; i++) {
         fprintf(stderr, "\t%s\n", good_lesstif_2_1_versions[i]);
     }
     fprintf(stderr, 
@@ -198,7 +198,6 @@ void finish(int exitcode, char *tif) {
 
 int main() {
     char *vs = XmVERSION_STRING, *tif;
-    int force_bad = 0;  /* This is just for debugging */
 #ifdef LESSTIF_VERSION
     char **v_good, **v_bad, *lesstif_rev;
     int i;
@@ -221,13 +220,14 @@ int main() {
     } */
     
     /* Check for known good LessTif versions */
-    for(i=0; v_good[i]; i++) {
-        if(!strcmp(lesstif_rev, v_good[i]))
+    for (i=0; v_good[i]; i++) {
+        if (!strcmp(lesstif_rev, v_good[i])) {
             exit(0);
+        }
     }
     /* Check for known bad LessTif versions */
-    for(i=0; v_bad[i]; i++) {
-        if(!strcmp(lesstif_rev, v_bad[i])) {
+    for (i=0; v_bad[i]; i++) {
+        if (!strcmp(lesstif_rev, v_bad[i])) {
             fprintf(stderr,
                 "\nYou are attempting to compile NEdit with a version of "
                 "LessTif that\nis known to interact badly with NEdit.  "
@@ -236,28 +236,32 @@ int main() {
         }
     }
 #else
+    {
+        int force_bad = 0;  /* This is just for debugging */
 
-    fprintf(stderr, "Open Motif or OSF Motif detected.\n");
-    fprintf(stderr, "%s\n", vs);
-    tif = "Open Motif";
-    
-    /* Check for Open Motif 2.1 */
-    if (!force_bad && XmVERSION == 2 && XmREVISION == 1)
-        exit(0);
-    
-    /* Check for the dreaded Open Motif 2.2.2 */
-    if (force_bad || 
-            (XmVERSION == 2 && XmREVISION == 2 && XmUPDATE_LEVEL <= 3)) {
-        fprintf(stderr, "ERROR:  Bad Open Motif Version:\n\t%s\n", vs);
-        fprintf(stderr, 
-            "\nThis version of Open Motif is known to be broken and is\n"
-            "thus unsupported by the NEdit developers.  It will probably\n"
-            "cause NEdit to crash frequently.  Check these pages for a more\n"
-            "detailed description of the problems with this version:\n"
-            "\thttp://www.motifdeveloper.com/tips/tip22.html\n"
-            "\thttp://www.motifdeveloper.com/tips/Motif22Review.pdf\n");
-        finish(1, tif);
-    }    
+        fprintf(stderr, "Open Motif or OSF Motif detected.\n");
+        fprintf(stderr, "%s\n", vs);
+        tif = "Open Motif";
+
+        /* Check for Open Motif 2.1 */
+        if (!force_bad && XmVERSION == 2 && XmREVISION == 1) {
+            exit(0);
+        }
+
+        /* Check for the dreaded Open Motif 2.2.2 */
+        if (force_bad || 
+                (XmVERSION == 2 && XmREVISION == 2 && XmUPDATE_LEVEL <= 3)) {
+            fprintf(stderr, "ERROR:  Bad Open Motif Version:\n\t%s\n", vs);
+            fprintf(stderr, 
+                "\nThis version of Open Motif is known to be broken and is\n"
+                "thus unsupported by the NEdit developers.  It will probably\n"
+                "cause NEdit to crash frequently.  Check these pages for a more\n"
+                "detailed description of the problems with this version:\n"
+                "\thttp://www.motifdeveloper.com/tips/tip22.html\n"
+                "\thttp://www.motifdeveloper.com/tips/Motif22Review.pdf\n");
+            finish(1, tif);
+        }    
+    }
 #endif
     
     /* This version is neither known-good nor known-bad */

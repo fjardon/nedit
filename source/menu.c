@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: menu.c,v 1.79.2.1 2003/06/20 21:43:51 slobasso Exp $";
+static const char CVSID[] = "$Id: menu.c,v 1.79.2.2 2003/08/14 22:06:20 slobasso Exp $";
 /*******************************************************************************
 *                                                                              *
 * menu.c -- Nirvana Editor menus                                               *
@@ -116,7 +116,6 @@ static void noWrapCB(Widget w, WindowInfo *window, caddr_t callData);
 static void continuousWrapCB(Widget w, WindowInfo *window, caddr_t callData);
 static void wrapMarginCB(Widget w, WindowInfo *window, caddr_t callData);
 static void fontCB(Widget w, WindowInfo *window, caddr_t callData);
-static void colorCB(Widget w, WindowInfo *window, caddr_t callData);
 static void tabsCB(Widget w, WindowInfo *window, caddr_t callData);
 static void backlightCharsCB(Widget w, WindowInfo *window, caddr_t callData);
 static void showMatchingOffCB(Widget w, WindowInfo *window, caddr_t callData);
@@ -1545,11 +1544,6 @@ static void matchSyntaxBasedCB(Widget w, WindowInfo *window, caddr_t callData)
 static void fontCB(Widget w, WindowInfo *window, caddr_t callData)
 {
     ChooseFonts(window, True);
-}
-
-static void colorCB(Widget w, WindowInfo *window, caddr_t callData)
-{
-    ChooseColors(window, True);
 }
 
 static void noWrapCB(Widget w, WindowInfo *window, caddr_t callData)
