@@ -6,7 +6,7 @@ eval 'exec perl -S $0 ${1+"$@"}'
 #
 # setext.pl -- Structure Enhanced Text Converter (to HTML or simple text)
 # 
-# $Id: setext,v 1.10 2002/11/15 12:21:14 edg Exp $
+# $Id: setext,v 1.10.2.1 2003/10/01 11:34:02 edg Exp $
 # 
 # Copyright (c) 2000 Steven Haehn
 # 
@@ -539,7 +539,17 @@ sub parse_setext
         
         $fold = 0;  # no more empty lines
 
-        /$line_tt/ && do { &$do_line_tt(); next; };
+        /$line_tt/ && do { 
+           #----------------------------------------
+           # Don't put <HR> in <PRE> section (html).
+           #----------------------------------------
+           if ( $crnt_state eq $PRE_FMT )
+           {
+              &to_state( $FMT );
+           }
+           &$do_line_tt(); 
+           next; 
+        };
         
         #------------------
         # State transitions
@@ -1041,7 +1051,7 @@ sub check_target_reference
     }
 
     if( $target ) {
-        print CONVERT "<A NAME=\"$target\"</A>\n";
+        print CONVERT "<A NAME=\"$target\"></A>\n";
         
         # only one target-tt reference of this kind allowed per file.
         ($index = is_member( $target, \@nm_ref )) 
@@ -1711,8 +1721,8 @@ sub html_title
                     $converted_file = "$association.html";
                     open  CONVERT, ">$converted_file" or die "Can't create $converted_file, $OS_ERROR";
                     print CONVERT "<HTML>\n<HEAD>\n";
-                    print CONVERT "</HEAD>\n";
                     print CONVERT "<TITLE>$savedTitle</TITLE>\n";
+                    print CONVERT "</HEAD>\n";
                     print CONVERT "<BODY>\n";
                     
                     #--------------------------------------------
