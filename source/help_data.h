@@ -2,7 +2,7 @@
 *                                                                              *
 * help_data.h --  Nirvana Editor help module data                              *
 *                                                                              *
-                 Generated on Mar 12, 2002 (Do NOT edit!)
+                 Generated on Mar 19, 2002 (Do NOT edit!)
                  Source of content from file help.etx
 *                                                                              *
 * Copyright (c) 1999-2002 Mark Edel                                            *
@@ -4812,4 +4812,4 @@ Href H_R [] =
     { NULL,       5699, HELP_BASICSYNTAX,         "Alternation", "alternation" }
 };
 
-static const char * NEditVersion = "NEdit 5.3RC1\nMar 12, 2002\n";
+static const char * NEditVersion = "NEdit 5.3RC1\nMar 19, 2002\n";
