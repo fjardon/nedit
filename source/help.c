@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: help.c,v 1.76.2.5 2002/03/19 21:39:26 edg Exp $";
+static const char CVSID[] = "$Id: help.c,v 1.76.2.6 2002/04/12 17:50:20 edg Exp $";
 /*******************************************************************************
 *									       *
 * help.c -- Nirvana Editor help display					       *
@@ -454,6 +454,22 @@ static Widget createHelpPanel(Widget parent, int topic)
     XmString st1;
     char * helpText  = NULL;
     char * styleData = NULL;
+    static XFontStruct *defaultFont = NULL;
+    
+    if (defaultFont == NULL) {
+        defaultFont = XLoadQueryFont(XtDisplay(parent),
+				     GetPrefHelpFontName(HELP_FONT));
+	if (defaultFont == NULL) {
+	    fprintf(stderr, "NEdit: help font, %s, not available\n",
+		    GetPrefHelpFontName(HELP_FONT));
+	    defaultFont = XLoadQueryFont(XtDisplay(parent), "fixed");
+	    if (defaultFont == NULL) {
+		fprintf(stderr, "NEdit: fallback help font, \"fixed\", not "
+		        "available, cannot continue\n");
+		exit(EXIT_FAILURE);
+	    }
+	}
+    }
   
     ac = 0;
     XtSetArg(al[ac], XmNdeleteResponse, XmDO_NOTHING); ac++;
@@ -581,7 +597,8 @@ static Widget createHelpPanel(Widget parent, int topic)
 	    textWidgetClass, sw, textNrows, 30, textNcolumns, 65,
     	    textNhScrollBar, hScrollBar, textNvScrollBar, vScrollBar,
 	    textNreadOnly, True, textNcontinuousWrap, True,
-	    textNautoShowInsertPos, True, NULL);
+	    textNautoShowInsertPos, True, 
+	    textNfont, defaultFont, NULL);
     XtVaSetValues(sw, XmNworkWindow, HelpTextPanes[topic],
 	    XmNhorizontalScrollBar, hScrollBar,
     	    XmNverticalScrollBar, vScrollBar, NULL);
