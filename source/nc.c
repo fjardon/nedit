@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: nc.c,v 1.34.2.1 2003/07/24 00:21:43 tringali Exp $";
+static const char CVSID[] = "$Id: nc.c,v 1.34.2.2 2003/09/28 14:10:04 edg Exp $";
 /*******************************************************************************
 *									       *
 * nc.c -- Nirvana Editor client program for nedit server processes	       *
@@ -651,7 +651,7 @@ static void parseCommandLine(int argc, char **argv, CommandLine *commandLine)
     		fprintf(stderr, "nc: argument to + should be a number\n");
     	    else
     	    	lineNum = lineArg;
-    	} else if (opts && (!strcmp(argv[i], "-ask") || !strcmp(argv[i], "-noAsk"))) {
+    	} else if (opts && (!strcmp(argv[i], "-ask") || !strcmp(argv[i], "-noask"))) {
     	    ; /* Ignore resource-based arguments which are processed later */
     	} else if (opts && (!strcmp(argv[i], "-svrname") || 
 		            !strcmp(argv[i], "-svrcmd"))) {
