@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: macro.c,v 1.71.2.2 2003/08/07 04:42:29 slobasso Exp $";
+static const char CVSID[] = "$Id: macro.c,v 1.71.2.3 2003/11/03 16:31:02 edg Exp $";
 /*******************************************************************************
 *                                                                              *
 * macro.c -- Macro file processing, learn/replay, and built-in macro           *
@@ -370,7 +370,7 @@ static int rangesetSetModeMS(WindowInfo *window, DataValue *argList,
 
 static int fillPatternResult(DataValue *result, char **errMsg, WindowInfo *window,
         char *patternName, Boolean preallocatedPatternName, Boolean includeName,
-        char *styleName, Boolean extensionRequired, int bufferPos);
+        char *styleName, Boolean extentRequired, int bufferPos);
 static int getPatternByNameMS(WindowInfo *window, DataValue *argList, int nArgs,
         DataValue *result, char **errMsg);
 static int getPatternAtPosMS(WindowInfo *window, DataValue *argList, int nArgs,
@@ -378,7 +378,7 @@ static int getPatternAtPosMS(WindowInfo *window, DataValue *argList, int nArgs,
 
 static int fillStyleResult(DataValue *result, char **errMsg,
         WindowInfo *window, char *styleName, Boolean preallocatedStyleName,
-        Boolean includeName, int styleCode);
+        Boolean includeName, int styleCode, Boolean extentRequired, int bufferPos);
 static int getStyleByNameMS(WindowInfo *window, DataValue *argList, int nArgs,
         DataValue *result, char **errMsg);
 static int getStyleAtPosMS(WindowInfo *window, DataValue *argList, int nArgs,
@@ -4911,7 +4911,8 @@ static int rangesetSetModeMS(WindowInfo *window, DataValue *argList,
 
 static int fillStyleResult(DataValue *result, char **errMsg,
         WindowInfo *window, char *styleName, Boolean preallocatedStyleName,
-        Boolean includeName, int styleCode)
+        Boolean includeName, int styleCode, Boolean extentRequired, 
+        int bufferPos)
 {
     DataValue DV;
     char colorValue[20];
@@ -4985,6 +4986,15 @@ static int fillStyleResult(DataValue *result, char **errMsg,
         M_ARRAY_INSERT_FAILURE();
     }
 
+    if (extentRequired) {
+        /* insert extent */
+        const char *styleNameNotUsed = NULL;
+        DV.val.n = StyleLengthOfCodeFromPos(window, bufferPos, &styleNameNotUsed);
+        if (!ArrayInsert(result, PERM_ALLOC_STR("extent"), &DV)) {
+            M_ARRAY_INSERT_FAILURE();
+        }
+    }
+
     return True;
 }
 
@@ -5024,7 +5034,7 @@ static int getStyleByNameMS(WindowInfo *window, DataValue *argList, int nArgs,
     }
     
     return fillStyleResult(result, errMsg, window,
-        styleName, (argList[0].tag == STRING_TAG), False, styleCode);
+        styleName, (argList[0].tag == STRING_TAG), False, styleCode, False, 0);
 }
 
 /*
@@ -5036,6 +5046,7 @@ static int getStyleByNameMS(WindowInfo *window, DataValue *argList, int nArgs,
 **      ["italic"]      '1' if style is italic, '0' otherwise 
 **      ["background"]  Background color of style if specified
 **      ["back_rgb"]    RGB representation of background color of style
+**      ["extent"]      Distance this style continues
 **
 */
 static int getStyleAtPosMS(WindowInfo *window, DataValue *argList, int nArgs,
@@ -5073,12 +5084,13 @@ static int getStyleAtPosMS(WindowInfo *window, DataValue *argList, int nArgs,
     }
 
     return fillStyleResult(result, errMsg, window,
-        HighlightStyleOfCode(window, styleCode), False, True, styleCode);
+        HighlightStyleOfCode(window, styleCode), False, True, styleCode, 
+        True, bufferPos);
 }
 
 static int fillPatternResult(DataValue *result, char **errMsg, WindowInfo *window,
         char *patternName, Boolean preallocatedPatternName, Boolean includeName,
-        char *styleName, Boolean extensionRequired, int bufferPos)
+        char *styleName, Boolean extentRequired, int bufferPos)
 {
     DataValue DV;
 
@@ -5113,11 +5125,11 @@ static int fillPatternResult(DataValue *result, char **errMsg, WindowInfo *windo
     /* the following array entries will be integers */
     DV.tag = INT_TAG;
 
-    if (extensionRequired) {
+    if (extentRequired) {
         /* insert extent */
         int checkCode = 0;
         DV.val.n = HighlightLengthOfCodeFromPos(window, bufferPos, &checkCode);
-        if (!ArrayInsert(result, PERM_ALLOC_STR("extension"), &DV)) {
+        if (!ArrayInsert(result, PERM_ALLOC_STR("extent"), &DV)) {
             M_ARRAY_INSERT_FAILURE();
         }
     }
@@ -5168,7 +5180,7 @@ static int getPatternByNameMS(WindowInfo *window, DataValue *argList, int nArgs,
 **  The returned array looks like this:
 **      ["pattern"]     Name of pattern
 **      ["style"]       Name of style
-**      ["extension"]   Distance this style continues
+**      ["extent"]      Distance this style continues
 */
 static int getPatternAtPosMS(WindowInfo *window, DataValue *argList, int nArgs,
         DataValue *result, char **errMsg)

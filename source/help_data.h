@@ -2,7 +2,7 @@
 *                                                                              *
 * help_data.h --  Nirvana Editor help module data                              *
 *                                                                              *
-                 Generated on Oct 20, 2003 (Do NOT edit!)
+                 Generated on Nov 3, 2003 (Do NOT edit!)
                  Source of content from file help.etx
 *                                                                              *
 * Copyright (c) 1999-2003 Mark Edel                                            *
@@ -2625,7 +2625,7 @@ static char * htxt_hiliteInfo [] = {
 "\n\n",
 "    * \01Jpattern\01I -- Highlight pattern name\n",
 "    * \01Jstyle\01I -- Highlight style name\n",
-"    * \01Jextension\01I -- The length in the text which uses the same highlighting pattern.\n",
+"    * \01Jextent\01I -- The length in the text which uses the same highlighting pattern.\n",
 "\n",
 "If 'position' is invalid, an empty array is returned. ",
 "\n\n",
@@ -2659,6 +2659,7 @@ static char * htxt_hiliteInfo [] = {
 "    * \01Jrgb\01I -- Color's RGB values ('#rrggbb')\n",
 "    * \01Jbackground\01I -- Name of the background color, if any\n",
 "    * \01Jback_rgb\01I -- Background color's RGB values ('#rrggbb')\n",
+"    * \01Jextent\01I -- The length in the text which uses the same highlight style.\n",
 "\n",
 "There are two things to consider with regard to the colors: First, the values ",
 "for 'color' and/or 'background' are empty if the color values are specified ",
@@ -3431,7 +3432,7 @@ static char * htxt_preferences [] = {
 "\01A\01BPopups Under Pointer\01A\n",
 "\01IDisplay pop-up dialogs centered on the current mouse position, as opposed to ",
 "centered on the parent window.  This generally speeds interaction, and is ",
-"essential for users who users who set their window managers so keyboard focus ",
+"essential for users who set their window managers so keyboard focus ",
 "follows the mouse. ",
 "\n\n",
 "\01A\01BWarnings\01A\n",
@@ -5347,4 +5348,4 @@ Href H_R [] =
     { NULL,       5699, HELP_BASICSYNTAX,         "Alternation", "alternation" }
 };
 
-static const char * NEditVersion = "NEdit 5.4RC2\nOct 20, 2003\n";
+static const char * NEditVersion = "NEdit release of Nov  3, 2003\n";

@@ -1,4 +1,4 @@
-.. $Id: help.etx,v 1.49.2.7 2003/10/24 15:29:25 edg Exp $
+.. $Id: help.etx,v 1.49.2.8 2003/11/03 16:31:00 edg Exp $
 .. NOTE: Remember to supply 'version' variable on setext command line.
 ..       For example,  setext -m -v "version=NEdit Version 6.0".
 ..
@@ -2816,7 +2816,7 @@ Highlighting Information
 
 * **pattern** -- Highlight pattern name
 * **style** -- Highlight style name
-* **extension** -- The length in the text which uses the same highlighting pattern.
+* **extent** -- The length in the text which uses the same highlighting pattern.
 
   If 'position' is invalid, an empty array is returned.
 
@@ -2850,6 +2850,7 @@ Highlighting Information
 * **rgb** -- Color's RGB values ('#rrggbb')
 * **background** -- Name of the background color, if any
 * **back_rgb** -- Background color's RGB values ('#rrggbb')
+* **extent** -- The length in the text which uses the same highlight style.
 
   There are two things to consider with regard to the colors: First, the values
   for 'color' and/or 'background' are empty if the color values are specified
