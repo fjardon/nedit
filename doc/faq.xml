@@ -2,7 +2,7 @@
 
 <!DOCTYPE faq SYSTEM "faq.dtd" >
 
-<!-- $Header: /home/bertw/cvsroot/nedit/nedit/doc/faq.xml,v 1.2.2.4 2001/09/12 20:14:33 amai Exp $ -->
+<!-- $Header: /home/bertw/cvsroot/nedit/nedit/doc/faq.xml,v 1.2.2.5 2001/10/02 07:16:25 amai Exp $ -->
 
 
 <!--
@@ -94,7 +94,7 @@ clear. A clearer and better definition is needed.
 
 <title>NEdit Frequently Asked Questions</title>
 
-<version>20010912</version>
+<version>2001/10/01</version>
 
 
 <maintainers>
@@ -193,9 +193,19 @@ discuss@nedit.org. This information is also available from:</p>
 
 <blockquote><p><site>http://nedit.org</site></p></blockquote>
 
+<p>and it is mirrored in Australia at:</p>
+
+<blockquote><p><site>http://www.au.nedit.org/</site></p></blockquote>
+
+
 <p>The primary ftp site for NEdit is:</p>
 
 <blockquote><p><site>ftp://ftp.nedit.org/pub</site></p></blockquote>
+
+<p>which has a mirror in The Netherlands:</p>
+
+<blockquote><p><site>ftp://ftp.nl.nedit.org/pub/mirror/NEdit</site></p></blockquote>
+
 
 <p>The NEdit ftp site has executables for most Unix and VMS
 systems, sources, documentation, and contributed software.</p>
@@ -300,7 +310,7 @@ section</link> in the NEdit site.</p>
 
 
 <qna id="N44">
-<q>Where could I get binaries / executables for machines other than
+<q>Where can I get binaries / executables for machines other than
 those available at NEdit site?</q>
 
 <a>
@@ -351,12 +361,15 @@ to an ongoing development project, we'd love to hear from you.</p>
 
 <a>
 
-<p>If you have a problem which is not covered in the on-line help, in
-this FAQ, or in the README file specific to your system, and want to
-report it to <email>discuss@nedit.org</email> or,
-<email>develop@nedit.org</email>, below are some
-suggestions for information you can provide to help in diagnosing
-your problem.</p>
+<p>If you have a problem which is not covered in the on-line help, in this FAQ,
+or in the README file specific to your system, you can report it to
+<email>discuss@nedit.org</email> (usage questions) or,
+<email>develop@nedit.org</email> (error reports). Note that these lists only
+allow members to post, and if you are not a member, your post will probably de
+delayed in reaching the list. Alternatively you can use the bug tracker on
+Sourceforge (<site>http://sourceforge.net/projects/nedit/</site>) to report
+bugs and make feature requests. Below are some suggestions for information you
+can provide to help in diagnosing your problem.</p>
 
 <p>Because NEdit runs on a large number of different platforms and environments,
 many problems are platform-specific.  It's always helpful to know what kind of
@@ -364,17 +377,13 @@ system it's being run on.  Sometimes, strange behavior can also be traced to
 the X server software or window manager, so you may want to include information
 on these as well.</p>
 
-<p>The origin of the NEdit executable is often important,
-particularly, whether it came from the NEdit site
-(<site>nedit.org</site>), was built locally, or came from some
-other ftp server or freeware distribution CD.  Despite the fact that
-Motif appears on almost all Unix platforms, the Motif libraries still
-vary from one machine to another.  Be sure to mention whether you're
-using LessTif or Motif. Running</p>
-<pre>
-   nedit -version
-</pre>
-should tell you those details.
+<p>The origin of the NEdit executable is often important, particularly, whether
+it came from the NEdit site (<site>http://www.nedit.org</site>), was built
+locally, or came from some other ftp server or freeware distribution CD. 
+Despite the fact that Motif appears on almost all Unix platforms, the Motif
+libraries still vary from one machine to another.  Be sure to mention whether
+you're using Lesstif or Motif. As of version 5.2 a summary with build
+information is present under 'Version' in the Help menu.</p>
 
 
 <p>If you are having configuration or appearance problems, you should probably
@@ -515,6 +524,63 @@ you can get pre-built, statically linked, executables from
 <site>ftp://ftp.nedit.org/pub/</site>&lt;current-version&gt;/executables.</p>
 
 </a>
+</qna>
+
+
+
+<qna id='tmpnam'>
+<author><name>Thorsten Haude</name></author>
+
+<q> While compiling NEdit on Linux, I get a warning about
+<code>tmpnam</code> being dangerous. </q>
+
+<long-q>
+<p>While compiling NEdit on Linux, I get the following warning:</p>
+
+<pre>
+    file.o: In function `PrintString':
+    file.o(.text+0x17b7): the use of `tmpnam' is dangerous, better use `mkstemp'
+</pre>
+
+<p>Is NEdit insecure?</p>
+
+</long-q>
+
+<a>
+
+<p>Not if you are using the glibc. The algorithm of mkstemp(3) consists of
+two parts: the first part is the one used in tmpnam(3) -- this is what
+NEdit accomplishes by calling tmpnam(3); the second part is done directly
+in NEdit. </p>
+</a>
+</qna>
+
+
+
+<qna id='Xp'>
+<author><name>Joor Loohuis</name></author>
+
+<q>NEdit fails to build on Linux, with messages about `XpGetDocumentData'</q>
+
+<long-q>
+<p>NEdit fails to build on Linux, with messages</p>
+
+<pre>
+   undefined reference to `XpGetDocumentData'
+   undefined reference to `XpGetPageDimensions'
+   ...
+</pre>
+
+</long-q>
+
+<a>
+
+<p>Edit makefiles/Makefile.Linux, and add '-lXp' to the line starting with
+'LIB', right before '-lXext'. At this time we are not sure whether libXp
+(the X print library) is installed on all Linux systems.</p>
+
+</a>
+
 </qna>
 
 </section>
@@ -702,10 +768,6 @@ don't have to worry about clashes between simultaneous ispell sessions:</p>
   ispell -S /tmp/ispell.$$; cat /tmp/ispell.$$; rm /tmp/ispell.$$
 </pre>
 
-<p>Also, if your copy of NEdit is older than version 4.0.1, you should upgrade,
-otherwise you get the annoying "Waiting for shell command to complete"
-dialog interfering with the ispell window.</p>
-
 </a>
 </qna>
 
@@ -740,12 +802,12 @@ to the file selection box widget.</p>
 
 <qna id="N437">
 
-<q>Why, in the 'save file as' dialog, there is no text field where to
+<q>Why, in the 'open file' dialog, there is no text field where to
 type in the file name?</q>
 
 <long-q>
 <p>Most Motif applications allow you to type in the file name in a separate
-text field (as in the 'save file as' dialog).  Why doesn't NEdit?  Can
+text field (as in the 'open file' dialog).  Why doesn't NEdit?  Can
 I make it do that?</p>
 </long-q>
 
@@ -769,15 +831,15 @@ bar to a block.  I seem to lose it sometimes in my text.</p>
 
 <a>
 
-<p>The block cursor in NEdit is used to indicate overstrike mode, but in NEdit
-4.0 and beyond, you can turn on a resource to make the cursor thicker:</p>
+<p>The block cursor in NEdit is used to indicate overstrike mode, but
+you can turn on a resource to make the cursor thicker:</p>
 
 <blockquote>
   <p><tt>nedit*text.heavyCursor: true</tt></p>
 </blockquote>
 
 <p>The only way to get a permanent block cursor, though is to hack the source
-code.  This shouldn't be too dificult, since the code for drawing a block
+code.  This shouldn't be too difficult, since the code for drawing a block
 cursor is already there.</p>
 
 </a>
@@ -951,17 +1013,16 @@ is compatible with all of your highlighting colors.</p>
 <title>Features</title>
 
 <qna id="N578">
-<q>Why NEdit does not support any more drag and drop?</q>
+<q>Why NEdit does not support drag and drop?</q>
 
 <long-q>
-<p>I'm a little confused about what happend to drag and drop.  Why was it lost
-between NEdit 3.1.1 and 4.0?  I thought drag-N-drop was supported by the
-Motif library.</p>
+<p>I'm a little confused about what happend to drag and drop.
+I thought drag-N-drop was supported by the Motif library.</p>
 </long-q>
 
 <a>
 
-<p>NEdit 4.0 no longer uses the Motif text widget, so all of the functionality
+<p>NEdit no longer uses the Motif text widget, so all of the functionality
 had to be duplicated in the new widget.  Drag and drop between windows got
 left off due to time pressure of getting out the new release, but it will
 be back some day.</p>
@@ -987,8 +1048,8 @@ don't particularly agree with.  Mostly, I want to do a lot of testing to
 make sure the changes are safe on all platforms, and I just don't have
 time right now.  (Mark Edel)</p>
 
-<p><strong>Update as of NEdit version 5.2RC1:</strong> The forthcoming NEdit version 5.2
-contains several functionalities of Max's patches.</p>
+<p><strong>Update as of NEdit version 5.2RC1:</strong> The forthcoming
+NEdit version 5.2 contains several functionalities of Max's patches.</p>
 
 </a>
 </qna>
@@ -1007,12 +1068,6 @@ instead of word or notepad.  Is this possible?</p>
 <p>There is an NT version of NEdit, available at
 <site>http://nedit.org/download/win32.shtml</site>. A mini-FAQ is also
 available.</p>
-
-<p>Another alternative to NEdit is PFE (the Programmer's File Editor) It's
-free, and it's not too bad.  There's a web page for it at:
-<site>http://www.lancs.ac.uk/people/cpaap/pfe/</site>.</p>
-
-<p>Another possibility is TextPad: <site>http://www.textpad.com</site>.</p>
 
 </a>
 </qna>
@@ -1117,7 +1172,7 @@ outside of the window.</q>
 
 <a>
 
-<p>NEdit version 4.0.2 introduced proportional auto-scrolling, where the
+<p>NEdit features proportional auto-scrolling, where the
 speed is controlled by how far your mouse is beyond the edge of the
 window.  If you want it to scroll slower, bring the mouse back closer
 to the text.</p>
@@ -1241,8 +1296,8 @@ hole?</p> </long-q>
 <p>Actually, NEdit does check who the user is.  When you use the su
 command, however, several Unix variants return the original user name
 in response to the standard C library calls for getting a user name,
-rather than the name to which you have su'd.  Starting with version 5.1, a different
-mechanism is used for getting this information, so you shouldn't
+rather than the name to which you have su'd.  Starting with version 5.1,
+a different mechanism is used for getting this information, so you shouldn't
 see this problem any more.</p>
 
 <p>In your case, my guess is that you used su to become root, then
@@ -1293,6 +1348,17 @@ between the cursor (or an existing selection) and the mouse.</p>
      the cursor and the mouse</li>
 </ul>
 
+<p>Alternatively, using only keyboard navigation:</p>
+
+<ul>
+  <li>Position the cursor at one end of the desired selection</li>
+  <li>Type Alt-m and a letter to mark the position</li>
+  <li>Use the keyboard to go to the other end of the desired selection</li>
+  <li>Type Shift-Alt-g and the letter you used to mark the first end
+  of the selection</li>
+</ul>
+
+
 </a>
 </qna>
 
@@ -1300,28 +1366,6 @@ between the cursor (or an existing selection) and the mouse.</p>
 <q>How can I select the text between two marks?</q>
 
 <a>
-
-<p>Before version 5.0, you had to:</p>
-
-<ul>
-	<li>
-     Make both marks without a selection (the Mark command records
-     both the cursor position, and the current selection).
-	</li>
-  
-  	<li>
-    Go to one of the marks and begin a selection.  It can be just
-    a single character.
-  	</li>
-	
-	<li>
-     Go to the other mark and shift-left-click on the cursor
-     position.
-	</li>
-</ul>
-
-<p>In 5.0 and beyond it's easier:</p>
-
 <ul>
 	<li>Go to the first mark (Goto Mark).</li>
 	<li>Hold the shift key while selecting Goto Mark or Alt+Shift+G to
@@ -1367,7 +1411,7 @@ overlooked something obvious?</p>
 <p>You haven't overlooked anything, it's a Motif design flaw.  Netscape
 painfully works around this and the Alt/Meta key reversal on Sun
 workstations by internally re-implementing the Motif menu accelerator
-mechanism.  NEdit will likely follow suit with the next major release.</p>
+mechanism.  NEdit will likely follow suit with the release of version 5.2.</p>
 
 <p>Another possibility (writes Peter Daifuku of SGI):</p>
 
@@ -1412,9 +1456,8 @@ You have probably NumLock or CapsLock ON. See the answer to
 But NEdit shortcuts don't work when NumLock is on.</q>
 
 <a>
-<p>The bug is not in NEdit, but in Motif. I believe there is a fix for it in
-the upcoming release, but that doesn't help you much right now. Older versions
-have the same problem.</p>
+<p>The bug is not in NEdit, but in Motif. This is fixed as of NEdit 5.2, but
+that might not help you much. Older versions have the same problem.</p>
 
 <p>Here's how you tell X to interpret the keypad keys as numbers without
 turning NumLock on. Create a file .Xmodmap in your home directory, and put the
@@ -1698,7 +1741,7 @@ Setting this to True will eliminate the delay completely.</p>
 
 <p>This should be working properly on most systems as of NEdit 5.1 or later.  If it's
 not, try re-building NEdit with -DNO_XMIM.  If it still doesn't work, send
-mail to develop@nedit.org</p>
+mail to <email>develop@nedit.org</email></p>
 
 </a>
 </qna>
@@ -1725,12 +1768,10 @@ mail to develop@nedit.org</p>
 
 <a>
 
-<p>There is another program called <code>nc</code>
-which is installed on some systems.
-In this case, <code>nc</code> is for <code>netcat</code>,
-some kind of network diagnostic tool.
-You can safely rename NEdit's <code>nc</code>
-to something else (we recommend ncl), or put it first in
+<p>There is another program called <code>nc</code> which is installed on
+some systems. In this case, <code>nc</code> is for <code>netcat</code>,
+some kind of network diagnostic tool. You can safely rename NEdit's
+<code>nc</code> to something else (we recommend ncl), or put it first in
 your path before <code>netcat</code>.</p>
 
 </a>

@@ -5,7 +5,7 @@ NEDIT FREQUENTLY ASKED QUESTIONS
 --------------------------------
 
 
-Version 20010912
+Version 2001/10/01
 
 NEdit is a popular GUI-style text editor for Unix and VMS systems. These
 are answers to the most frequently asked questions to discuss@nedit.org.
@@ -52,9 +52,17 @@ The NEdit web page is at:
 
     http://nedit.org
 
+and it is mirrored in Australia at:
+
+    http://www.au.nedit.org/
+
 The primary ftp site for NEdit is:
 
     ftp://ftp.nedit.org/pub
+
+which has a mirror in The Netherlands:
+
+    ftp://ftp.nl.nedit.org/pub/mirror/NEdit
 
 The NEdit ftp site has executables for most Unix and VMS systems, sources,
 documentation, and contributed software.
@@ -128,7 +136,7 @@ nedit_announce@fnal.gov) can be found on egroups.com:
 For more information about the mailing lists, refer to the mailing lists
 section (http://nedit.org/community/mailing.shtml) in the NEdit site.
 
-> Where could I get binaries / executables for machines other than those
+> Where can I get binaries / executables for machines other than those
 > available at NEdit site?
 
 In past versions, we separated "supported" and "unsupported" executables
@@ -155,9 +163,14 @@ DIAGNOSING AND REPORTING PROBLEMS
 > How do I report problems I've encountered using NEdit ?
 
 If you have a problem which is not covered in the on-line help, in this
-FAQ, or in the README file specific to your system, and want to report it
-to discuss@nedit.org or, develop@nedit.org, below are some suggestions for
-information you can provide to help in diagnosing your problem.
+FAQ, or in the README file specific to your system, you can report it to
+discuss@nedit.org (usage questions) or, develop@nedit.org (error reports).
+Note that these lists only allow members to post, and if you are not a
+member, your post will probably de delayed in reaching the list.
+Alternatively you can use the bug tracker on Sourceforge
+(http://sourceforge.net/projects/nedit/) to report bugs and make feature
+requests. Below are some suggestions for information you can provide to
+help in diagnosing your problem.
 
 Because NEdit runs on a large number of different platforms and
 environments, many problems are platform-specific. It's always helpful to
@@ -166,14 +179,13 @@ also be traced to the X server software or window manager, so you may want
 to include information on these as well.
 
 The origin of the NEdit executable is often important, particularly,
-whether it came from the NEdit site (nedit.org), was built locally, or came
-from some other ftp server or freeware distribution CD. Despite the fact
-that Motif appears on almost all Unix platforms, the Motif libraries still
-vary from one machine to another. Be sure to mention whether you're using
-LessTif or Motif. Running
+whether it came from the NEdit site (http://www.nedit.org), was built
+locally, or came from some other ftp server or freeware distribution CD.
+Despite the fact that Motif appears on almost all Unix platforms, the Motif
+libraries still vary from one machine to another. Be sure to mention
+whether you're using Lesstif or Motif. As of version 5.2 a summary with
+build information is present under 'Version' in the Help menu.
 
-   nedit -version
-should tell you those details.
 If you are having configuration or appearance problems, you should probably
 look at the output from the command:
 
@@ -248,6 +260,28 @@ upgrade it, before it will support NEdit reliably. To get the newest
 version, go to http://lesstif.org. Alternatively, you can get pre-built,
 statically linked, executables from
 ftp://ftp.nedit.org/pub/<current-version>/executables.
+
+> While compiling NEdit on Linux, I get the following warning:
+> 
+>     file.o: In function `PrintString':
+>     file.o(.text+0x17b7): the use of `tmpnam' is dangerous, better use `mkstemp'
+> 
+> Is NEdit insecure?
+
+Not if you are using the glibc. The algorithm of mkstemp(3) consists of two
+parts: the first part is the one used in tmpnam(3) -- this is what NEdit
+accomplishes by calling tmpnam(3); the second part is done directly in
+NEdit.
+
+> NEdit fails to build on Linux, with messages
+> 
+>    undefined reference to `XpGetDocumentData'
+>    undefined reference to `XpGetPageDimensions'
+>    ...
+
+Edit makefiles/Makefile.Linux, and add '-lXp' to the line starting with
+'LIB', right before '-lXext'. At this time we are not sure whether libXp
+(the X print library) is installed on all Linux systems.
 
 
 
@@ -364,10 +398,6 @@ you don't have to worry about clashes between simultaneous ispell sessions:
   cat > /tmp/ispell.$$; xterm -title "Spell Check" -e
   ispell -S /tmp/ispell.$$; cat /tmp/ispell.$$; rm /tmp/ispell.$$
 
-Also, if your copy of NEdit is older than version 4.0.1, you should
-upgrade, otherwise you get the annoying "Waiting for shell command to
-complete" dialog interfering with the ispell window.
-
 > How can the display of hidden (eg .login) files in dialog boxes be
 > suppressed? We use nedit with for teaching programming with very naive and
 > inexperienced students. The display of these in dialogs such as the "Save
@@ -385,8 +415,8 @@ change, involving creating a replacement file searching procedure to be
 spliced in to the file selection box widget.
 
 > Most Motif applications allow you to type in the file name in a separate
-> text field (as in the 'save file as' dialog). Why doesn't NEdit? Can I make
-> it do that?
+> text field (as in the 'open file' dialog). Why doesn't NEdit? Can I make it
+> do that?
 
 Set the X resource nedit.stdOpenDialog to True. The field is disabled by
 default to get new users accustomed to typing the file name directly in to
@@ -395,13 +425,13 @@ the list widget, which is not standard Motif behavior.
 > I would like to change NEdit's cursor from a bar to a block. I seem to lose
 > it sometimes in my text.
 
-The block cursor in NEdit is used to indicate overstrike mode, but in NEdit
-4.0 and beyond, you can turn on a resource to make the cursor thicker:
+The block cursor in NEdit is used to indicate overstrike mode, but you can
+turn on a resource to make the cursor thicker:
 
     nedit*text.heavyCursor: true
 
 The only way to get a permanent block cursor, though is to hack the source
-code. This shouldn't be too dificult, since the code for drawing a block
+code. This shouldn't be too difficult, since the code for drawing a block
 cursor is already there.
 
 > I'd like to see more than 8 files in the file selection dialogs (Open, Save
@@ -494,14 +524,13 @@ FEATURES
 --------
 
 
-> I'm a little confused about what happend to drag and drop. Why was it lost
-> between NEdit 3.1.1 and 4.0? I thought drag-N-drop was supported by the
-> Motif library.
+> I'm a little confused about what happend to drag and drop. I thought
+> drag-N-drop was supported by the Motif library.
 
-NEdit 4.0 no longer uses the Motif text widget, so all of the functionality
-had to be duplicated in the new widget. Drag and drop between windows got
-left off due to time pressure of getting out the new release, but it will
-be back some day.
+NEdit no longer uses the Motif text widget, so all of the functionality had
+to be duplicated in the new widget. Drag and drop between windows got left
+off due to time pressure of getting out the new release, but it will be
+back some day.
 
 > Why don't you integrate Max Vohlken's / Yunliang Yu's versions into the
 > official release of NEdit
@@ -526,12 +555,6 @@ contains several functionalities of Max's patches.
 
 There is an NT version of NEdit, available at
 http://nedit.org/download/win32.shtml. A mini-FAQ is also available.
-
-Another alternative to NEdit is PFE (the Programmer's File Editor) It's
-free, and it's not too bad. There's a web page for it at:
-http://www.lancs.ac.uk/people/cpaap/pfe/.
-
-Another possibility is TextPad: http://www.textpad.com.
 
 > A feature which is found in in some Macintosh and PC programs, which I
 > like, is to provide pre-entered default values in text fields. For example,
@@ -600,9 +623,9 @@ outside of NEdit.
 > NEdit scrolls too fast when I extend a selection by dragging the mouse
 > outside of the window.
 
-NEdit version 4.0.2 introduced proportional auto-scrolling, where the speed
-is controlled by how far your mouse is beyond the edge of the window. If
-you want it to scroll slower, bring the mouse back closer to the text.
+NEdit features proportional auto-scrolling, where the speed is controlled
+by how far your mouse is beyond the edge of the window. If you want it to
+scroll slower, bring the mouse back closer to the text.
 
 > Is there a special symbol (as % for filename in the shell commands) that
 > can be used to represent the text that is selected, which can then be used
@@ -697,19 +720,18 @@ text between the cursor (or an existing selection) and the mouse.
     * Shift+Click with the left mouse button to select the text between the
     cursor and the mouse
 
+Alternatively, using only keyboard navigation:
+
+    * Position the cursor at one end of the desired selection
+
+    * Type Alt-m and a letter to mark the position
+
+    * Use the keyboard to go to the other end of the desired selection
+
+    * Type Shift-Alt-g and the letter you used to mark the first end of the
+    selection
+
 > How can I select the text between two marks?
-
-Before version 5.0, you had to:
-
-    * Make both marks without a selection (the Mark command records both
-    the cursor position, and the current selection).
-
-    * Go to one of the marks and begin a selection. It can be just a single
-    character.
-
-    * Go to the other mark and shift-left-click on the cursor position.
-
-In 5.0 and beyond it's easier:
 
     * Go to the first mark (Goto Mark).
 
@@ -728,7 +750,7 @@ BUGS
 You haven't overlooked anything, it's a Motif design flaw. Netscape
 painfully works around this and the Alt/Meta key reversal on Sun
 workstations by internally re-implementing the Motif menu accelerator
-mechanism. NEdit will likely follow suit with the next major release.
+mechanism. NEdit will likely follow suit with the release of version 5.2.
 
 Another possibility (writes Peter Daifuku of SGI):
 
@@ -749,9 +771,8 @@ question.
 > I use the numeric keypad really often, so I keep NumLock on. But NEdit
 > shortcuts don't work when NumLock is on.
 
-The bug is not in NEdit, but in Motif. I believe there is a fix for it in
-the upcoming release, but that doesn't help you much right now. Older
-versions have the same problem.
+The bug is not in NEdit, but in Motif. This is fixed as of NEdit 5.2, but
+that might not help you much. Older versions have the same problem.
 
 Here's how you tell X to interpret the keypad keys as numbers without
 turning NumLock on. Create a file .Xmodmap in your home directory, and put
