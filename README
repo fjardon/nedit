@@ -1,6 +1,6 @@
-                    NEdit Version 5.2.0beta,  July 2001
+                    NEdit Version 5.2 (Release Candidate 1),  August 2001
 
-$Id: README,v 1.13 2001/08/18 11:48:37 jlous Exp $
+$Id: README,v 1.13.2.1 2001/08/22 15:41:14 amai Exp $
 	     
 NEdit is a multi-purpose text editor for the X Window System, which combines a
 standard, easy to use, graphical user interface with the thorough functionality
