@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: preferences.c,v 1.98 2003/06/04 15:34:30 slobasso Exp $";
+static const char CVSID[] = "$Id: preferences.c,v 1.98.2.1 2003/06/11 02:45:46 tksoh Exp $";
 /*******************************************************************************
 *									       *
 * preferences.c -- Nirvana Editor preferences processing		       *
@@ -1259,7 +1259,7 @@ void SaveNEditPrefs(Widget parent, int quietly)
     }
 
     if (!quietly) {
-        if (DialogF(DF_INF, parent, 2, "Save imported Settings",
+        if (DialogF(DF_INF, parent, 2, "Save Preferences",
                 ImportedFile == NULL ?
                 "Default preferences will be saved in the file:\n"
                 "%s\n"
