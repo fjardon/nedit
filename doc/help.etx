@@ -1,4 +1,4 @@
-.. $Id: help.etx,v 1.49.2.8 2003/11/03 16:31:00 edg Exp $
+.. $Id: help.etx,v 1.49.2.9 2003/11/07 17:27:01 edg Exp $
 .. NOTE: Remember to supply 'version' variable on setext command line.
 ..       For example,  setext -m -v "version=NEdit Version 6.0".
 ..
@@ -2816,9 +2816,12 @@ Highlighting Information
 
 * **pattern** -- Highlight pattern name
 * **style** -- Highlight style name
-* **extent** -- The length in the text which uses the same highlighting pattern.
+* **extent** -- The length in the text which uses the same highlighting pattern
 
-  If 'position' is invalid, an empty array is returned.
+  The 'extent' value is measured from position 'pos' going right/down (forward
+  in the file) only.
+
+  If 'pos' is invalid, an empty array is returned.
 
 **get_style_by_name( style_name )**
   Returns an array containing the style attributes for style 'style_name'.
@@ -2827,15 +2830,11 @@ Highlighting Information
 * **bold** -- '1' if style is bold, '0' otherwise
 * **italic** -- '1' if style is italic, '0' otherwise
 * **color** -- Name of the style's color
-* **rgb** -- Color's RGB values ('#rrggbb')
 * **background** -- Name of the background color, if any
-* **back_rgb** -- Background color's RGB values ('#rrggbb')
 
-  There are two things to consider with regard to the colors: First, the values
-  for 'color' and/or 'background' are empty if the color values are specified
-  using RGB values. Second, the values for 'rgb' and 'back_rgb' do contain the
-  actual color values as allocated by the X server. This may not be the value
-  listed for your color in rgb.txt.
+  The colors use the names specified in the color definitions for the style.
+  These will either be names matching those the X server recognises, or RGB
+  (red/green/black) specifications.
 
   If 'style_name' is invalid, an empty array is returned.
 
@@ -2850,15 +2849,19 @@ Highlighting Information
 * **rgb** -- Color's RGB values ('#rrggbb')
 * **background** -- Name of the background color, if any
 * **back_rgb** -- Background color's RGB values ('#rrggbb')
-* **extent** -- The length in the text which uses the same highlight style.
+* **extent** -- The length in the text which uses the same highlight style
 
-  There are two things to consider with regard to the colors: First, the values
-  for 'color' and/or 'background' are empty if the color values are specified
-  using RGB values. Second, the values for 'rgb' and 'back_rgb' do contain the
-  actual color values as allocated by the X server. This may not be the value
-  listed for your color in rgb.txt.
+  The colors use the names specified in the color definitions for the style.
+  These will either be names matching those the X server recognises, or RGB
+  specifications. The values for 'rgb' and 'back_rgb' contain the actual color
+  values allocated by the X server for the window. If the X server cannot
+  allocate the specified (named) color exactly, the RGB values in these
+  entries may not match the specified ones.
 
-  If 'position' is invalid, an empty array is returned.
+  The 'extent' value is measured from position 'pos' going right/down (forward
+  in the file) only.
+
+  If 'pos' is invalid, an empty array is returned.
 
    ----------------------------------------------------------------------
 

@@ -2,7 +2,7 @@
 *                                                                              *
 * help_data.h --  Nirvana Editor help module data                              *
 *                                                                              *
-                 Generated on Nov 3, 2003 (Do NOT edit!)
+                 Generated on Nov 7, 2003 (Do NOT edit!)
                  Source of content from file help.etx
 *                                                                              *
 * Copyright (c) 1999-2003 Mark Edel                                            *
@@ -2625,9 +2625,12 @@ static char * htxt_hiliteInfo [] = {
 "\n\n",
 "    * \01Jpattern\01I -- Highlight pattern name\n",
 "    * \01Jstyle\01I -- Highlight style name\n",
-"    * \01Jextent\01I -- The length in the text which uses the same highlighting pattern.\n",
+"    * \01Jextent\01I -- The length in the text which uses the same highlighting pattern\n",
 "\n",
-"If 'position' is invalid, an empty array is returned. ",
+"The 'extent' value is measured from position 'pos' going right/down (forward ",
+"in the file) only. ",
+"\n\n",
+"If 'pos' is invalid, an empty array is returned. ",
 "\n\n",
 "\01A\01Bget_style_by_name( style_name )\01A\n",
 "\01IReturns an array containing the style attributes for style 'style_name'. ",
@@ -2636,15 +2639,11 @@ static char * htxt_hiliteInfo [] = {
 "    * \01Jbold\01I -- '1' if style is bold, '0' otherwise\n",
 "    * \01Jitalic\01I -- '1' if style is italic, '0' otherwise\n",
 "    * \01Jcolor\01I -- Name of the style's color\n",
-"    * \01Jrgb\01I -- Color's RGB values ('#rrggbb')\n",
 "    * \01Jbackground\01I -- Name of the background color, if any\n",
-"    * \01Jback_rgb\01I -- Background color's RGB values ('#rrggbb')\n",
 "\n",
-"There are two things to consider with regard to the colors: First, the values ",
-"for 'color' and/or 'background' are empty if the color values are specified ",
-"using RGB values. Second, the values for 'rgb' and 'back_rgb' do contain the ",
-"actual color values as allocated by the X server. This may not be the value ",
-"listed for your color in rgb.txt. ",
+"The colors use the names specified in the color definitions for the style. ",
+"These will either be names matching those the X server recognises, or RGB ",
+"(red/green/black) specifications. ",
 "\n\n",
 "If 'style_name' is invalid, an empty array is returned. ",
 "\n\n",
@@ -2659,15 +2658,19 @@ static char * htxt_hiliteInfo [] = {
 "    * \01Jrgb\01I -- Color's RGB values ('#rrggbb')\n",
 "    * \01Jbackground\01I -- Name of the background color, if any\n",
 "    * \01Jback_rgb\01I -- Background color's RGB values ('#rrggbb')\n",
-"    * \01Jextent\01I -- The length in the text which uses the same highlight style.\n",
+"    * \01Jextent\01I -- The length in the text which uses the same highlight style\n",
 "\n",
-"There are two things to consider with regard to the colors: First, the values ",
-"for 'color' and/or 'background' are empty if the color values are specified ",
-"using RGB values. Second, the values for 'rgb' and 'back_rgb' do contain the ",
-"actual color values as allocated by the X server. This may not be the value ",
-"listed for your color in rgb.txt. ",
+"The colors use the names specified in the color definitions for the style. ",
+"These will either be names matching those the X server recognises, or RGB ",
+"specifications. The values for 'rgb' and 'back_rgb' contain the actual color ",
+"values allocated by the X server for the window. If the X server cannot ",
+"allocate the specified (named) color exactly, the RGB values in these ",
+"entries may not match the specified ones. ",
 "\n\n",
-"If 'position' is invalid, an empty array is returned. ",
+"The 'extent' value is measured from position 'pos' going right/down (forward ",
+"in the file) only. ",
+"\n\n",
+"If 'pos' is invalid, an empty array is returned. ",
 "\n\n",
 NULL
 };
@@ -5348,4 +5351,4 @@ Href H_R [] =
     { NULL,       5699, HELP_BASICSYNTAX,         "Alternation", "alternation" }
 };
 
-static const char * NEditVersion = "NEdit release of Nov  3, 2003\n";
+static const char * NEditVersion = "NEdit release of Nov  7, 2003\n";
