@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: windowTitle.c,v 1.3.2.3 2002/03/13 12:04:33 edg Exp $";
+static const char CVSID[] = "$Id: windowTitle.c,v 1.3.2.4 2002/03/14 15:33:08 edg Exp $";
 /*******************************************************************************
 *                                                                              *
 * windowTitle.c -- Nirvana Editor window title customization                   *
@@ -1024,7 +1024,6 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
     
     etDialog.fileW = XtVaCreateManagedWidget("file", 
     	    xmToggleButtonWidgetClass, selectBox,
-    	    XmNmarginHeight, 0,
 	    XmNleftAttachment, XmATTACH_POSITION,
 	    XmNleftPosition, RADIO_INDENT,
 	    XmNtopAttachment, XmATTACH_FORM,
@@ -1035,7 +1034,6 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
 
     etDialog.statusW = XtVaCreateManagedWidget("status", 
     	    xmToggleButtonWidgetClass, selectBox,
-    	    XmNmarginHeight, 0,
 	    XmNleftAttachment, XmATTACH_POSITION,
 	    XmNleftPosition, RADIO_INDENT,
 	    XmNtopAttachment, XmATTACH_WIDGET,
@@ -1047,7 +1045,6 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
 
     etDialog.shortStatusW = XtVaCreateManagedWidget("shortStatus", 
     	    xmToggleButtonWidgetClass, selectBox,
-    	    XmNmarginHeight, 0,
 	    XmNleftAttachment, XmATTACH_WIDGET,
 	    XmNleftWidget, etDialog.statusW,
 	    XmNtopAttachment, XmATTACH_WIDGET,
@@ -1059,7 +1056,6 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
 
     etDialog.ccW = XtVaCreateManagedWidget("ccView", 
     	    xmToggleButtonWidgetClass, selectBox,
-    	    XmNmarginHeight, 0,
 	    XmNleftAttachment, XmATTACH_POSITION,
 	    XmNleftPosition, RADIO_INDENT,
 	    XmNtopAttachment, XmATTACH_WIDGET,
@@ -1071,7 +1067,6 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
 
     etDialog.dirW = XtVaCreateManagedWidget("directory", 
     	    xmToggleButtonWidgetClass, selectBox,
-    	    XmNmarginHeight, 0,
 	    XmNleftAttachment, XmATTACH_POSITION,
 	    XmNleftPosition, RADIO_INDENT,
 	    XmNtopAttachment, XmATTACH_WIDGET,
@@ -1083,7 +1078,6 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
     
     etDialog.mdirW = XtVaCreateManagedWidget("componentLab", 
     	    xmLabelGadgetClass, selectBox,
-    	    XmNmarginHeight, 0,
 	    XmNheight, radioHeight,
 	    XmNleftAttachment, XmATTACH_WIDGET,
 	    XmNleftWidget, etDialog.dirW,
@@ -1097,7 +1091,6 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
     	    xmTextWidgetClass, selectBox,
    	    XmNcolumns, 1,
    	    XmNmaxLength, 1,
-            XmNmarginHeight, 0,
 	    XmNleftAttachment, XmATTACH_WIDGET,
 	    XmNleftWidget, etDialog.mdirW,
 	    XmNtopAttachment, XmATTACH_WIDGET,
@@ -1113,7 +1106,6 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
     
     etDialog.hostW = XtVaCreateManagedWidget("host", 
     	    xmToggleButtonWidgetClass, selectBox,
-    	    XmNmarginHeight, 0,
 	    XmNleftAttachment, XmATTACH_POSITION,
 	    XmNleftPosition, 50 + RADIO_INDENT,
 	    XmNtopAttachment, XmATTACH_FORM,
@@ -1124,7 +1116,6 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
 
     etDialog.nameW = XtVaCreateManagedWidget("name", 
     	    xmToggleButtonWidgetClass, selectBox,
-    	    XmNmarginHeight, 0,
 	    XmNleftAttachment, XmATTACH_POSITION,
 	    XmNleftPosition, 50 + RADIO_INDENT,
 	    XmNtopAttachment, XmATTACH_WIDGET,
@@ -1136,7 +1127,6 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
 
     etDialog.serverW = XtVaCreateManagedWidget("server", 
     	    xmToggleButtonWidgetClass, selectBox,
-    	    XmNmarginHeight, 0,
 	    XmNleftAttachment, XmATTACH_POSITION,
 	    XmNleftPosition, 50 + RADIO_INDENT,
 	    XmNtopAttachment, XmATTACH_WIDGET,
@@ -1237,7 +1227,6 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
 
     etDialog.oFileChangedW = XtVaCreateManagedWidget("fileChanged", 
     	    xmToggleButtonWidgetClass, previewBox,
-    	    XmNmarginHeight, 0,
 	    XmNleftAttachment, XmATTACH_POSITION,
 	    XmNleftPosition, RADIO_INDENT,
 	    XmNtopAttachment, XmATTACH_WIDGET,
@@ -1249,7 +1238,6 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
     
     etDialog.oFileReadOnlyW = XtVaCreateManagedWidget("fileReadOnly", 
     	    xmToggleButtonWidgetClass, previewBox,
-    	    XmNmarginHeight, 0,
 	    XmNleftAttachment, XmATTACH_WIDGET,
 	    XmNleftWidget, etDialog.oFileChangedW,
 	    XmNtopAttachment, XmATTACH_WIDGET,
@@ -1261,7 +1249,6 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
     
     etDialog.oFileLockedW = XtVaCreateManagedWidget("fileLocked", 
     	    xmToggleButtonWidgetClass, previewBox,
-    	    XmNmarginHeight, 0,
 	    XmNleftAttachment, XmATTACH_WIDGET,
 	    XmNleftWidget, etDialog.oFileReadOnlyW,
 	    XmNtopAttachment, XmATTACH_WIDGET,
@@ -1273,7 +1260,6 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
 
     etDialog.oServerNameW = XtVaCreateManagedWidget("servernameSet", 
     	    xmToggleButtonWidgetClass, previewBox,
-    	    XmNmarginHeight, 0,
 	    XmNleftAttachment, XmATTACH_POSITION,
 	    XmNleftPosition, RADIO_INDENT,
 	    XmNtopAttachment, XmATTACH_WIDGET,
@@ -1285,7 +1271,6 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
 
     etDialog.oCcViewTagW = XtVaCreateManagedWidget("ccViewTagSet", 
     	    xmToggleButtonWidgetClass, previewBox,
-    	    XmNmarginHeight, 0,
 	    XmNleftAttachment, XmATTACH_POSITION,
 	    XmNleftPosition, RADIO_INDENT,
 	    XmNtopAttachment, XmATTACH_WIDGET,
@@ -1298,7 +1283,6 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
 
     etDialog.oServerEqualViewW = XtVaCreateManagedWidget("serverEqualView", 
     	    xmToggleButtonWidgetClass, previewBox,
-    	    XmNmarginHeight, 0,
 	    XmNleftAttachment, XmATTACH_WIDGET,
     	    XmNleftWidget, etDialog.oCcViewTagW,
 	    XmNtopAttachment, XmATTACH_WIDGET,
@@ -1310,7 +1294,6 @@ static void createEditTitleDialog(Widget parent, WindowInfo *window)
 
     etDialog.oDirW = XtVaCreateManagedWidget("pathSet", 
     	    xmToggleButtonWidgetClass, previewBox,
-    	    XmNmarginHeight, 0,
 	    XmNleftAttachment, XmATTACH_POSITION,
 	    XmNleftPosition, RADIO_INDENT,
 	    XmNtopAttachment, XmATTACH_WIDGET,
