@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: search.c,v 1.33 2001/08/14 08:37:16 jlous Exp $";
+static const char CVSID[] = "$Id: search.c,v 1.33.2.1 2001/09/11 10:17:59 edg Exp $";
 /*******************************************************************************
 *									       *
 * search.c -- Nirvana Editor search and replace functions		       *
@@ -2210,7 +2210,7 @@ void UpdateReplaceActionButtons(WindowInfo* window)
 #else
     rSetActionButtons(window, searchText, searchText, searchText,
                       searchText, searchText && window->wasSelected,
-                      searchText && (window->nWritableWindows > 1));
+                      searchText && (countWritableWindows(window) > 1));
 #endif
 }
 
