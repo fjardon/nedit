@@ -5,7 +5,7 @@ NEDIT FREQUENTLY ASKED QUESTIONS
 --------------------------------
 
 
-Version 3/20/00
+Version 20010912
 
 NEdit is a popular GUI-style text editor for Unix and VMS systems. These
 are answers to the most frequently asked questions to discuss@nedit.org.
@@ -17,7 +17,7 @@ and from the NEdit web page at:
 
     http://nedit.org.
 
-FAQ Maintainers: Florian Xhumari (Florian.Xhumari@MailAndNews.com)
+FAQ Maintainers: Florian Xhumari (Florian.Xhumari@free.fr)
 
 
 
@@ -28,7 +28,7 @@ ABOUT THE NEDIT FAQ
 This FAQ is written in XML and translated to HTML using an XSL stylesheet.
 The XML source is processed using James Clark's (http://www.jclark.com/)
 XSLT processor XT (http://www.jclark.com/xml/xt.html) and XML parser XP
-(http://www.jclark.com/xml/xp.html).
+(http://www.jclark.com/xml/xp).
 
 The XSL stylesheet used to generate the HTML version is here (faq.xsl).
 
@@ -38,7 +38,7 @@ stylesheet (faq-txt-pass2.xsl) transforms the HTML into plain text. An awk
 script (faq-txt.awk) then performs the word wrapping.
 
 For any questions about or contributions to the FAQ, please send a mail to
-the maintainers (mailto:Florian.Xhumari@MailAndNews.com).
+the maintainers (mailto:Florian.Xhumari@free.fr).
 
 
 
@@ -98,7 +98,7 @@ general nedit user community, send the report to discuss@nedit.org. If it's
 something obvious and boring, like we misspelled "anemometer" in the
 on-line help, send it to develop@nedit.org.
 
-Please do not cross post to both lists.
+Please do not cross post to both lists!
 
 In order to subscribe to a list, send mail to majordomo@nedit.org with one
 or more of the following in the body of the message:
@@ -170,8 +170,10 @@ whether it came from the NEdit site (nedit.org), was built locally, or came
 from some other ftp server or freeware distribution CD. Despite the fact
 that Motif appears on almost all Unix platforms, the Motif libraries still
 vary from one machine to another. Be sure to mention whether you're using
-Lesstif or Motif.
+LessTif or Motif. Running
 
+   nedit -version
+should tell you those details.
 If you are having configuration or appearance problems, you should probably
 look at the output from the command:
 
@@ -209,14 +211,14 @@ same problem kindly contributed).
 
 Xm means Motif, which is an important part of NEdit's GUI interface. Motif
 is standard on commercial Unix workstations, but not on free Unix platforms
-like Linux and FreeBSD. On these systems, you can now use Lesstif, the GPL
+like Linux and FreeBSD. On these systems, you can now use LessTif, the GPL
 clone of Motif, or purchase a copy of Motif, which is usually relatively
 inexpensive, but not free. You can find a list of companies selling Motif
 for Linux at:
 
     http://www.cen.com/mw3/#providers
 
-As of this writing Lesstif is very close to being a fully reliable and
+As of this writing LessTif is very close to being a fully reliable and
 complete replacement for Motif, so it's definitely worth trying before
 shelling out any money for a commercial copy. Also remember that in most
 cases, you don't really need Motif libraries to use NEdit. There are plenty
@@ -238,10 +240,10 @@ allowing awk-style no-operator concatenation of strings.
 > I built NEdit on my Linux system, and it's full of bugs. What a horrible
 > editor!
 
-Several of the Linux distributions began including Lesstif (a free version
+Several of the Linux distributions began including LessTif (a free version
 of the Motif GUI library) before it was really ready for general use
 (particularly for something which needs to be as reliable as a text
-editor). If you have a version of Lesstif prior to .89.4, you have to
+editor). If you have a version of Lesstif prior to 0.92.26, you have to
 upgrade it, before it will support NEdit reliably. To get the newest
 version, go to http://lesstif.org. Alternatively, you can get pre-built,
 statically linked, executables from
@@ -516,21 +518,20 @@ particularly agree with. Mostly, I want to do a lot of testing to make sure
 the changes are safe on all platforms, and I just don't have time right
 now. (Mark Edel)
 
+Update as of NEdit version 5.2RC1: The forthcoming NEdit version 5.2
+contains several functionalities of Max's patches.
+
 > I really like nedit and it would be nice to use on windows 95 or NT instead
 > of word or notepad. Is this possible?
 
-There is an NT version of NEdit (one of Max Vohlken's versions) which
-requires a separate X server. The separate server application, of course,
-makes it kind of klunky, but if you need the server anyhow for other work
-with X systems, you might want to give it a try. It's available in:
+There is an NT version of NEdit, available at
+http://nedit.org/download/win32.shtml. A mini-FAQ is also available.
 
-    ftp://ftp.nedit.org/pub/v5_0_2/contrib/max/5.0.1/
+Another alternative to NEdit is PFE (the Programmer's File Editor) It's
+free, and it's not too bad. There's a web page for it at:
+http://www.lancs.ac.uk/people/cpaap/pfe/.
 
-For now, try PFE (the Programmer's File Editor). It's free, and it's not
-too bad. There's a web page for it at:
-http://www.lancs.ac.uk/people/cpaap/pfe/
-
-Another possibility is TextPad: http://www.textpad.com
+Another possibility is TextPad: http://www.textpad.com.
 
 > A feature which is found in in some Macintosh and PC programs, which I
 > like, is to provide pre-entered default values in text fields. For example,
@@ -662,8 +663,9 @@ it. Try the shell scripts in:
 Actually, NEdit does check who the user is. When you use the su command,
 however, several Unix variants return the original user name in response to
 the standard C library calls for getting a user name, rather than the name
-to which you have su'd. Version 5.1 uses a different mechanism for getting
-this information, so you shouldn't see this problem any more.
+to which you have su'd. Starting with version 5.1, a different mechanism is
+used for getting this information, so you shouldn't see this problem any
+more.
 
 In your case, my guess is that you used su to become root, then started an
 nedit server as root. On a system which returns the original user name,
@@ -674,7 +676,7 @@ and you as you.
 The security of an nedit session, depends upon the security of your X
 server. Only those with access to your screen can send commands to an nedit
 server, but they can also send keystrokes to any nedit, or a shell window,
-etc.. Anyhow, just upgrade to NEdit 5.1
+etc... Anyhow, just upgrade to the latest NEdit version.
 
 
 
@@ -740,7 +742,7 @@ Another possibility (writes Peter Daifuku of SGI):
     On SGI systems, this mechanism is support on IRIX 6.2 with X server
     patch 1574 or later, on IRIX 6.3 and IRIX 6.4 and all later releases.
 
-> Sometimes NEdit inserts <soh> instead of saving the file when I type ^S.
+> Sometimes NEdit inserts <dc3> instead of saving the file when I type ^S.
 > Other keyboard shortcuts (accelerator keys) don't work either.
 You have probably NumLock or CapsLock ON. See the answer to this (#N900)
 question.
@@ -814,7 +816,7 @@ Check the "Command Input" setting, in the Preferences->Shell Commands
 dialog for that menu item. If the shell command being executed does not
 take input, but "Command Input" is set to "selection" or "window", NEdit
 tries to write the input anyhow, and fails. Set "Command Input" to "none"
-to prevent this possibility. This is fixed in version 5.1
+to prevent this possibility. This is fixed in version 5.1 and later.
 
 > When NEdit starts up, I get errors:
 > 
@@ -916,9 +918,9 @@ completely.
 
 > I can't seem to enter accented characters on my system.
 
-This should be working properly on most systems as of NEdit 5.1. If it's
-not, try re-building NEdit with -DNO_XMIM. If it still doesn't work, send
-mail to develop@nedit.org
+This should be working properly on most systems as of NEdit 5.1 or later.
+If it's not, try re-building NEdit with -DNO_XMIM. If it still doesn't
+work, send mail to develop@nedit.org
 
 > When I try to use nc to start an nedit server, for instance using
 > 
