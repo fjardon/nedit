@@ -1,3 +1,115 @@
+2001-08-30 20:17  amai
+
+	* source/preferences.c (BETA-5-2.1): /bin/csh doesn't make sense on
+	OS/2 - even as a default value only
+
+2001-08-29 15:56  slobasso
+
+	* source/help.c (1.53): fixed mispellings
+
+2001-08-29 13:56  amai
+
+	* source/regularExp.c (1.10): Fix lint warning: octal constants
+	shouldn't carry a suffix like 'L'!?
+
+2001-08-29 08:27  amai
+
+	* util/: misc.c (1.32), misc.h (1.10): Second attempt to fix a
+	specific compiler warning and a 'const' addition
+
+2001-08-29 00:01  slobasso
+
+	* source/file.c (1.28): moved braces so nedit goto matching works
+
+2001-08-28 23:18  slobasso
+
+	* doc/nedit.doc (1.5), source/help.c (1.52): documentation cleanup
+
+2001-08-28 22:24  slobasso
+
+	* source/help.c (1.51): Array documentation cleanup.
+
+2001-08-28 11:41  amai
+
+	* source/tags.c (1.16): 'const' patch
+
+2001-08-28 11:29  amai
+
+	* source/file.c (1.27), source/highlight.c (1.19),
+	source/interpret.c (1.18), source/macro.c (1.36), source/menu.c
+	(1.37), source/preferences.c (1.33), source/preferences.h (1.13),
+	source/tags.c (1.15), source/text.c (1.17), util/misc.c (1.31): Fix
+	some more lclint warnings: type casts, make some things static (no,
+	not all unused ones, 'some'), etc.
+
+2001-08-27 18:45  slobasso
+
+	* source/macro.c (1.35): fixed static linkage of actionToString to
+	match declaration
+
+2001-08-27 09:08  amai
+
+	* source/nc.c (1.11): startServer() changes: has a return type now;
+	re-shuffle some code Also make another global var static and
+	replace a printf() by puts()
+
+2001-08-26 02:28  slobasso
+
+	* source/macro.c (1.34): removed unused variable
+
+2001-08-25 15:58  amai
+
+	* source/: file.c (1.26), highlightData.c (1.23), highlightData.h
+	(1.6), preferences.c (1.32), preferences.h (1.12), regexConvert.c
+	(1.5), regexConvert.h (1.3), server.h (1.3), shell.c (1.15),
+	shell.h (1.4), undo.c (1.7), undo.h (1.4): Another 'const' patch
+
+2001-08-25 15:24  amai
+
+	* source/: file.c (1.25), file.h (1.8), highlightData.c (1.22),
+	highlightData.h (1.5), macro.c (1.33), macro.h (1.3), regularExp.c
+	(1.9), regularExp.h (1.6), search.c (1.35), search.h (1.12):
+	Another 'const' patch
+
+2001-08-25 12:16  amai
+
+	* util/printUtils.c (1.12): The very last signed vs. unsigned
+	warning on my system ...
+
+2001-08-25 12:09  amai
+
+	* source/: highlightData.c (1.21), menu.c (1.36), preferences.c
+	(1.31), regularExp.c (1.8), shell.c (1.14), userCmds.c (1.18): Fix
+	a couple of "unsigned vs. int" compiler warnings. Using gcc on OS/2
+	this warning is now completly wiped out!
+
+2001-08-25 11:55  amai
+
+	* util/: DialogF.c (1.18), misc.c (1.30), prefFile.c (1.10): Fix
+	compiler warnings. Mostly unsigned vs. signed int issues
+
+2001-08-25 11:49  amai
+
+	* README (BETA-5-2.2): A couple of fixes, enhancements (see report
+	on mailinglist)
+
+2001-08-24 18:34  amai
+
+	* makefiles/Makefile.solaris (BETA-5-2.1): No debug build by
+	default. Patch from Thorsten Haude
+
+2001-08-24 08:33  amai
+
+	* util/: fontsel.c, fontsel.h, misc.c (BETA-5-2.[2,2,2]): Undo some
+	changes which I erroneously checked in ...
+
+2001-08-24 08:28  amai
+
+	* ChangeLog, util/fontsel.c, util/fontsel.h, util/misc.c
+	(BETA-5-2.[1,1,1,1]): Updated Changelog.  Includes whole history,
+	including new beta branch.  New options of cvs2cl used, listing
+	contains now revision/branch info, timestamps are in GMT, etc.
+
 2001-08-24 08:19  amai
 
 	* source/macro.c (1.32): Fix warnings, add 'const's, make func
