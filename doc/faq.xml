@@ -68,10 +68,8 @@ discuss@nedit.org. This information is also available from:</p>
     <p>This FAQ is written in XML and translated to HTML using
     an XSL stylesheet. The XML source is processed using
     <link href="http://www.jclark.com/">James Clark's</link> XSLT processor
-    <link href="http://www.jclark.com/xml/xt.html">XT</link>.
-    The XML parser
-    used is IBM's <link href="http://www.alphaworks.ibm.com/tech/xml4j">XML
-    Parser for Java</link>.
+    <link href="http://www.jclark.com/xml/xt.html">XT</link> and
+	XML parser <link href="http://www.jclark.com/xml/xp.html">XP</link>.
     </p>
     
 	<p>The XSL stylesheet used to generate the HTML version is
@@ -1304,7 +1302,7 @@ mechanism.  NEdit will likely follow suit with the next major release.</p>
 </qna>
 
 <qna id="NumLockBis">
-<q>Sometimes NEdit inserts &lt;soh&gt; instead of saving the
+<q>Sometimes NEdit inserts &lt;dc3&gt; instead of saving the
 file when I type ^S</q>
 
 <long-q>
@@ -1319,6 +1317,57 @@ You have probably NumLock or CapsLock ON. See the answer to
 </a>
 
 </qna>
+
+
+
+
+<qna id="Keypad">
+<author><name>Joor Loohuis</name></author>
+<q>I use the numeric keypad really often, so I keep NumLock on.
+But NEdit shortcuts don't work when NumLock is on.</q>
+
+<a>
+<p>The bug is not in NEdit, but in Motif. I believe there is a fix for it in
+the upcoming release, but that doesn't help you much right now. Older versions
+have the same problem.</p>
+
+<p>Here's how you tell X to interpret the keypad keys as numbers without
+turning NumLock on. Create a file .Xmodmap in your home directory, and put the
+following lines in it:</p>
+
+<pre>
+  keycode  79 = KP_7
+  keycode  80 = KP_8
+  keycode  81 = KP_9
+  keycode  83 = KP_4
+  keycode  84 = KP_5
+  keycode  85 = KP_6
+  keycode  87 = KP_1
+  keycode  88 = KP_2
+  keycode  89 = KP_3
+  keycode  90 = KP_0
+  keycode  91 = KP_Decimal
+</pre>
+
+<p>Then make sure the script that starts your X session parses this file with
+the command:</p>
+<pre>
+  xmodmap -merge ~/.Xmodmap
+</pre>
+
+<p>This script can be ~/.xinitrc (called by startx) or something like Xsession
+if you use xdm/kdm/gdm. Then again, it might be an entirely different script on
+some systems.</p>
+
+<p>Then turn off numlock, and just continue using the keypad. The only thing
+is, you loose the alternate set of functions (cursor/home/pgdown/etc).</p>
+
+
+</a>
+
+</qna>
+
+
 
 
 
