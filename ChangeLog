@@ -1,3 +1,94 @@
+2001-09-12 09:18  amai
+
+	* makefiles/Makefile.depend (BETA-5-2.1): Add CVS info line to
+	output. Makes life even more simple
+
+2001-09-11 11:24  amai
+
+	* doc/faq.xml (BETA-5-2.3): Add a non-visible CVS stamp and update
+	version/time stamp
+
+2001-09-11 10:17  edg
+
+	* source/search.c (BETA-5-2.1): Fixed a minor button sensitivity
+	bug (Multiple Files... button was grayed out after canceling
+	multi-file replace dialog and modifying search text).
+
+2001-09-10 15:28  amai
+
+	* util/system.h (BETA-5-2.2): Update/add/fix compiler info
+
+2001-09-10 13:42  amai
+
+	* source/help.c (BETA-5-2.5): Update timestamp
+
+2001-09-10 13:41  amai
+
+	* doc/faq.xml (BETA-5-2.2): Some updates WRT LessTif, mostly
+	cosmetics.
+
+2001-09-07 14:16  amai
+
+	* doc/NEdit.ad (BETA-5-2.1): Add a 5.1 app defaults file - needs to
+	be updated probably.  This contains only outcommented entries!
+
+2001-09-07 14:16  amai
+
+	* doc/NEdit.ad (1.1): file NEdit.ad was initially added on branch
+	BETA-5-2.
+
+2001-09-07 07:46  amai
+
+	* doc/nc.man, doc/nedit.doc, source/help.c (BETA-5-2.[1,2,4]): Fix
+	typos as reported on the list
+
+2001-09-07 07:39  amai
+
+	* source/help.c (BETA-5-2.3): Don't call XmRegisterConverters() for
+	Motif 2.1, add declaration for 2.0 and add a "helpful" comment on
+	all that
+
+2001-09-06 09:39  amai
+
+	* ChangeLog (1.9), source/help.c (1.55): ChangeLog update and a new
+	timestamp
+
+2001-09-06 09:37  amai
+
+	* source/: Makefile.dependencies (1.11), file.c (1.30), tags.c
+	(1.18), tags.h (1.6): Add missing #include and add some 'const'. 
+	Update dependencies
+
+2001-09-05 11:44  amai
+
+	* source/: file.c (1.29), help.c (1.54), preferences.c (1.34),
+	preferences.h (1.14), tags.c (1.17), tags.h (1.5): Patch for SF bug
+	[ #451997 ] bugs in tags.c/normalizePathname from Markus
+	Schwarzenberg
+
+2001-09-04 17:55  amai
+
+	* doc/nedit.doc, source/help.c (BETA-5-2.[1,2]): Fix typo reported
+	on the mailinglist
+
+2001-08-31 22:16  amai
+
+	* doc/faq.txt (1.1): file faq.txt was initially added on branch
+	BETA-5-2.
+
+2001-08-31 22:16  amai
+
+	* doc/: faq.txt, faq.xml (BETA-5-2.[1,1]): Update FAQ as sent from
+	Florian Xhumari.  Add plain text version of FAQ
+
+2001-08-30 21:04  tringali
+
+	* util/system.h (BETA-5-2.1): Fix for Solaris x86 "unknown"
+
+2001-08-30 20:19  amai
+
+	* ChangeLog (BETA-5-2.2): Update
+
 2001-08-30 20:17  amai
 
 	* source/preferences.c (BETA-5-2.1): /bin/csh doesn't make sense on
