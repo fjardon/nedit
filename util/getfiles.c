@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: getfiles.c,v 1.25 2003/05/02 19:19:03 edg Exp $";
+static const char CVSID[] = "$Id: getfiles.c,v 1.25.2.1 2003/07/27 21:37:34 edg Exp $";
 /*******************************************************************************
 *                                                                              *
 * Getfiles.c -- File Interface Routines                                        *
@@ -428,7 +428,12 @@ int HandleCustomExistFileSB(Widget existFileSB, char *filename)
 	XmStringFree(cFileString);
 	XtFree(fileString);
     }
-    XtDestroyWidget(existFileSB);
+    /* Destroy the dialog _shell_ iso. the dialog. Normally, this shouldn't
+       be necessary as the shell is destroyed automatically when the dialog
+       is. However, due to a bug in various Lesstif versions, the latter 
+       messes up the grab cascades and leaves new windows without grabs, such
+       that they appear to be frozen. */
+    XtDestroyWidget(XtParent(existFileSB));
     return SelectResult;
 }
 
