@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: preferences.c,v 1.98.2.3 2003/07/24 06:07:07 n8gray Exp $";
+static const char CVSID[] = "$Id: preferences.c,v 1.98.2.4 2003/07/25 14:12:48 tringali Exp $";
 /*******************************************************************************
 *									       *
 * preferences.c -- Nirvana Editor preferences processing		       *
@@ -927,7 +927,7 @@ static PrefDescripRec PrefDescrip[] = {
     {"titleFormat", "TitleFormat", PREF_STRING, "{%c} [%s] %f (%S) - %d",
 	PrefData.titleFormat, (void *)sizeof(PrefData.titleFormat), True},
     {"undoModifiesSelection", "UndoModifiesSelection", PREF_BOOLEAN,
-        "True", &PrefData.undoModifiesSelection, NULL, True},
+        "True", &PrefData.undoModifiesSelection, NULL, False},
 };
 
 static XrmOptionDescRec OpTable[] = {
