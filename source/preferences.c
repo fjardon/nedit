@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: preferences.c,v 1.30.2.2 2001/09/13 14:11:51 tringali Exp $";
+static const char CVSID[] = "$Id: preferences.c,v 1.30.2.3 2001/09/30 19:49:54 edg Exp $";
 /*******************************************************************************
 *									       *
 * preferences.c -- Nirvana Editor preferences processing		       *
@@ -864,7 +864,8 @@ static void lmFreeItemCB(void *item);
 static void freeLanguageModeRec(languageModeRec *lm);
 static int lmDialogEmpty(void);
 static void updatePatternsTo5dot1(void);
-static void spliceString(char **intoString, char *insertString, char *atExpr);
+static void updatePatternsTo5dot2(void);
+static void spliceString(char **intoString, const char *insertString, const char *atExpr);
 static int regexFind(const char *inString, const char *expr);
 static int regexReplace(char **inString, const char *expr,
 	const char *replaceWith);
@@ -902,11 +903,7 @@ void RestoreNEditPrefs(XrmDatabase prefDB, XrmDatabase appDB)
         atof(PrefData.fileVersion) < 5.2)) {
         fprintf(stderr, "NEdit: Converting .nedit file from pre-5.2 version.\n"
                 "    To keep, use Preferences -> Save Defaults\n");
-
-        spliceString(&TempStringPrefs.styles, ADD_5_2_STYLES, NULL);
-        
-        /* Note: we should really insert the XML, CSS, and Regex styles
-           into the master list here. */
+	updatePatternsTo5dot2();
     }
  
     /* Do further parsing on resource types which RestorePreferences does
@@ -4351,13 +4348,99 @@ static void updatePatternsTo5dot1(void)
     }
 }
 
+static void updatePatternsTo5dot2(void)
+{
+#ifdef VMS
+    const char *cppLm5dot1 =
+	"^[ \t]*C\\+\\+:\\.CC \\.HH \\.I::::::\"\\.,/\\\\`'!\\|@#%\\^&\\*\\(\\)-=\\+\\{\\}\\[\\]\"\":;\\<\\>\\?~\"";
+    const char *perlLm5dot1 =
+	"^[ \t]*Perl:\\.PL \\.PM \\.P5:\"\\^\\[ \\\\t\\]\\*#\\[ \\\\t\\]\\*!\\.\\*perl\":::::";
+    const char *psLm5dot1 =
+        "^[ \t]*PostScript:\\.ps \\.PS \\.eps \\.EPS \\.epsf \\.epsi:\"\\^%!\":::::\"/%\\(\\)\\{\\}\\[\\]\\<\\>\"";
+    const char *tclLm5dot1 = "^[ \t]*Tcl:\\.TCL::::::";
+
+    const char *cppLm5dot2 =
+        "C++:.CC .HH .C .H .I .CXX .HXX .CPP::::::\".,/\\`'!|@#%^&*()-=+{}[]\"\":;<>?~\"";
+    const char *perlLm5dot2 =
+        "Perl:.PL .PM .P5:\"^[ \\t]*#[ \\t]*!.*perl\":Auto:None:::\".,/\\\\`'!$@#%^&*()-=+{}[]\"\":;<>?~|\"";
+    const char *psLm5dot2 =
+        "PostScript:.ps .PS .eps .EPS .epsf .epsi:\"^%!\":::::\"/%(){}[]<>\"";
+    const char *tclLm5dot2 =
+        "Tcl:.TCL::Smart:None:::";
+#else
+    const char *cppLm5dot1 =
+	"^[ \t]*C\\+\\+:\\.cc \\.hh \\.C \\.H \\.i \\.cxx \\.hxx::::::\"\\.,/\\\\`'!\\|@#%\\^&\\*\\(\\)-=\\+\\{\\}\\[\\]\"\":;\\<\\>\\?~\"";
+    const char *perlLm5dot1 =
+	"^[ \t]*Perl:\\.pl \\.pm \\.p5:\"\\^\\[ \\\\t\\]\\*#\\[ \\\\t\\]\\*!\\.\\*perl\":::::";
+    const char *psLm5dot1 =
+        "^[ \t]*PostScript:\\.ps \\.PS \\.eps \\.EPS \\.epsf \\.epsi:\"\\^%!\":::::\"/%\\(\\)\\{\\}\\[\\]\\<\\>\"";
+    const char *shLm5dot1 =
+        "^[ \t]*Sh Ksh Bash:\\.sh \\.bash \\.ksh \\.profile:\"\\^\\[ \\\\t\\]\\*#\\[ \\\\t\\]\\*!\\[ \\\\t\\]\\*/bin/\\(sh\\|ksh\\|bash\\)\":::::";
+    const char *tclLm5dot1 = "^[ \t]*Tcl:\\.tcl::::::";
+
+    const char *cppLm5dot2 =
+        "C++:.cc .hh .C .H .i .cxx .hxx .cpp::::::\".,/\\`'!|@#%^&*()-=+{}[]\"\":;<>?~\"";
+    const char *perlLm5dot2 =
+        "Perl:.pl .pm .p5 .PL:\"^[ \\t]*#[ \\t]*!.*perl\":Auto:None:::\".,/\\\\`'!$@#%^&*()-=+{}[]\"\":;<>?~|\"";
+    const char *psLm5dot2 =
+        "PostScript:.ps .eps .epsf .epsi:\"^%!\":::::\"/%(){}[]<>\"";
+    const char *shLm5dot2 =
+        "Sh Ksh Bash:.sh .bash .ksh .profile .bashrc .bash_logout .bash_login .bash_profile:\"^[ \\t]*#[ \\t]*![ \\t]*/.*bin/(sh|ksh|bash)\":::::";
+    const char *tclLm5dot2 =
+        "Tcl:.tcl .tk .itcl .itk::Smart:None:::";
+#endif /* VMS */
+
+    const char *cssLm5dot2 =
+        "CSS:css::Auto:None:::\".,/\\`'!|@#%^&*()=+{}[]\"\":;<>?~\"";
+    const char *reLm5dot2 =
+        "Regex:.reg .regex:\"\\(\\?[:#=!iInN].+\\)\":None:Continuous:::";
+    const char *xmlLm5dot2 =
+        "XML:.xml .xsl .dtd:\"\\<(?i\\?xml|!doctype)\"::None:::\"<>/=\"\"'()+*?|\"";
+
+    const char *ptrStyle = "Pointer:#660000:Bold";
+    const char *reStyle = "Regex:#009944:Bold";
+    const char *wrnStyle = "Warning:brown2:Italic";
+
+    /* First upgrade modified language modes, only if the user hasn't
+       altered the default 5.1 definitions. */
+    if (regexFind(TempStringPrefs.language, cppLm5dot1))
+	regexReplace(&TempStringPrefs.language, cppLm5dot1, cppLm5dot2);
+    if (regexFind(TempStringPrefs.language, perlLm5dot1))
+	regexReplace(&TempStringPrefs.language, perlLm5dot1, perlLm5dot2);
+    if (regexFind(TempStringPrefs.language, psLm5dot1))
+	regexReplace(&TempStringPrefs.language, psLm5dot1, psLm5dot2);
+#ifndef VMS
+    if (regexFind(TempStringPrefs.language, shLm5dot1))
+	regexReplace(&TempStringPrefs.language, shLm5dot1, shLm5dot2);
+#endif
+    if (regexFind(TempStringPrefs.language, tclLm5dot1))
+	regexReplace(&TempStringPrefs.language, tclLm5dot1, tclLm5dot2);
+
+    /* Then insert the new modes, trying to keep them in alphabetical order */
+    if (!regexFind(TempStringPrefs.language, "^[ \t]*CSS:"))
+	spliceString(&TempStringPrefs.language, cssLm5dot2, "^[ \t]*Csh:");
+    if (!regexFind(TempStringPrefs.language, "^[ \t]*Regex:"))
+	spliceString(&TempStringPrefs.language, reLm5dot2, "^[ \t]*SGML HTML:");
+    if (!regexFind(TempStringPrefs.language, "^[ \t]*XML:"))
+	spliceString(&TempStringPrefs.language, xmlLm5dot2, "^[ \t]*Yacc:");
+
+    /* Finally, append the new highlight styles */
+
+    if (!regexFind(TempStringPrefs.styles, "^[ \t]*Warning:"))
+	spliceString(&TempStringPrefs.styles, wrnStyle, NULL);
+    if (!regexFind(TempStringPrefs.styles, "^[ \t]*Regex:"))
+	spliceString(&TempStringPrefs.styles, reStyle, "^[ \t]*Warning:");
+    if (!regexFind(TempStringPrefs.styles, "^[ \t]*Pointer:"))
+	spliceString(&TempStringPrefs.styles, ptrStyle, "^[ \t]*Regex:");
+}
+
 /*
 ** Inserts a string into intoString, reallocating it with XtMalloc.  If
 ** regular expression atExpr is found, inserts the string before atExpr
 ** followed by a newline.  If atExpr is not found, inserts insertString
 ** at the end, PRECEDED by a newline.
 */
-static void spliceString(char **intoString, char *insertString, char *atExpr)
+static void spliceString(char **intoString, const char *insertString, const char *atExpr)
 {
     int beginPos, endPos;
     int intoLen = strlen(*intoString);
