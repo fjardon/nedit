@@ -172,7 +172,8 @@ void finish(int exitcode, char *tif) {
         fprintf(stderr,
             "\nIf you really want to build a known-bad version of NEdit you\n"
             "can override this sanity check by adding -DBUILD_BROKEN_NEDIT\n"
-            "to the CFLAGS variable in makefiles/Makefile.linux\n");
+            "to the CFLAGS variable in your platform's Makefile (e.g.\n"    
+            "makefiles/Makefile.linux)\n");
         exit(1);
 #endif
     } else if (exitcode == 2) {
@@ -190,7 +191,8 @@ void finish(int exitcode, char *tif) {
         fprintf(stderr,
             "\nIf you really want to build an untested version of NEdit you\n"
             "can override this sanity check by adding -DBUILD_UNTESTED_NEDIT\n"
-            "to the CFLAGS variable in makefiles/Makefile.linux\n");
+            "to the CFLAGS variable in your platform's Makefile (e.g.\n"    
+            "makefiles/Makefile.linux)\n");
         exit(2);
 #endif
     }
@@ -270,8 +272,9 @@ int main() {
         "You are attempting to build NEdit with a version of %s that\n"
         "has not been verified to work well with NEdit.  This could be fine,\n"
         "but it could also lead to crashes and instability.  Historically, \n"
-        "older versions of Linux Motifs have quite often been more stable\n"
-        "than newer versions when used with NEdit.\n",
+        "older versions of Motif have quite often been more stable\n"
+        "than newer versions when used with NEdit, so don't assume newer\n"
+        "is better.\n",
             tif);
     finish(2, tif);
     return 1;
