@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: interpret.c,v 1.33 2003/05/05 16:25:55 edg Exp $";
+static const char CVSID[] = "$Id: interpret.c,v 1.33.2.1 2003/10/20 16:38:57 tringali Exp $";
 /*******************************************************************************
 *									       *
 * interpret.c -- Nirvana Editor macro interpreter			       *
@@ -363,7 +363,7 @@ Inst *GetPC(void)
 */
 void SwapCode(Inst *start, Inst *boundary, Inst *end)
 {
-    #define reverseCode(L, H) \
+#define reverseCode(L, H) \
     do { register Inst t, *l = L, *h = H - 1; \
          while (l < h) { t = *h; *h-- = *l; *l++ = t; } } while (0)
     /* double-reverse method: reverse elements of both parts then whole lot */
