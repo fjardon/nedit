@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: file.c,v 1.66.2.1 2003/08/13 16:01:26 edg Exp $";
+static const char CVSID[] = "$Id: file.c,v 1.66.2.2 2003/08/21 10:50:59 edg Exp $";
 /*******************************************************************************
 *									       *
 * file.c -- Nirvana Editor file i/o					       *
@@ -1487,10 +1487,6 @@ void CheckForChangesToFile(WindowInfo *window)
            The filename is now invalid */
         window->fileMissing = TRUE;
         window->lastModTime = 1;
-        /* A missing file can't be read-only. */
-        SET_PERM_LOCKED(window->lockReasons, False);
-        UpdateWindowTitle(window);
-        UpdateWindowReadOnly(window);
         /* Warn the user, if they like to be warned (Maybe this should be its
             own preference setting: GetPrefWarnFileDeleted() ) */
         if (GetPrefWarnFileMods()) {
@@ -1516,6 +1512,10 @@ void CheckForChangesToFile(WindowInfo *window)
             else if (resp == 2)
                 SaveWindowAs(window, NULL, 0);
         }
+        /* A missing or (re-)saved file can't be read-only. */
+        SET_PERM_LOCKED(window->lockReasons, False);
+        UpdateWindowTitle(window);
+        UpdateWindowReadOnly(window);
         return;
     }
     
