@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: highlight.c,v 1.25.2.1 2002/03/12 20:20:20 edg Exp $";
+static const char CVSID[] = "$Id: highlight.c,v 1.25.2.2 2002/03/18 23:41:02 edg Exp $";
 /*******************************************************************************
 *									       *
 * highlight.c -- Nirvana Editor syntax highlighting (text coloring and font    *
@@ -128,6 +128,7 @@ static patternSet *findPatternsForWindow(WindowInfo *window, int warn);
 static highlightDataRec *compilePatterns(Widget dialogParent,
     	highlightPattern *patternSrc, int nPatterns);
 static void freePatterns(highlightDataRec *patterns);
+static void handleUnparsedRegion(WindowInfo* win, textBuffer *buf, int pos);
 static void handleUnparsedRegionCB(textDisp *textD, int pos, void *cbArg);
 static void incrementalReparse(windowHighlightData *highlightData,
     	textBuffer *buf, int pos, int nInserted, const char *delimiters);
@@ -481,6 +482,13 @@ void* GetHighlightInfo(WindowInfo *window, int pos)
     
     /* Be careful with signed/unsigned conversions. NO conversion here! */
     style = (int)BufGetCharacter(highlightData->styleBuffer, pos);
+    
+    /* Beware of unparsed regions. */
+    if (style == UNFINISHED_STYLE) {
+	handleUnparsedRegion(window, highlightData->styleBuffer, pos);
+	style = (int)BufGetCharacter(highlightData->styleBuffer, pos);
+    }
+	    
     pattern = patternOfStyle(highlightData->pass1Patterns, style);
     if (!pattern)
     {
@@ -978,11 +986,10 @@ static void freePatterns(highlightDataRec *patterns)
 ** needs re-parsing.  This routine applies pass 2 patterns to a chunk of
 ** the buffer of size PASS_2_REPARSE_CHUNK_SIZE beyond pos.
 */
-static void handleUnparsedRegionCB(textDisp *textD, int pos, void *cbArg)
+static void handleUnparsedRegion(WindowInfo *window, textBuffer *styleBuf, 
+                                 int pos)
 {
-    WindowInfo *window = (WindowInfo *)cbArg;
     textBuffer *buf = window->buffer;
-    textBuffer *styleBuf = textD->styleBuffer;
     int beginParse, endParse, beginSafety, endSafety, p;
     windowHighlightData *highlightData =
     	    (windowHighlightData *)window->highlightData;
@@ -1051,6 +1058,14 @@ static void handleUnparsedRegionCB(textDisp *textD, int pos, void *cbArg)
     	    &styleString[beginParse-beginSafety]);
     XtFree(styleString);
     XtFree(string);    
+}
+
+/*
+** Callback wrapper around the above function.
+*/
+static void handleUnparsedRegionCB(textDisp *textD, int pos, void *cbArg)
+{
+    handleUnparsedRegion((WindowInfo*)cbArg, textD->styleBuffer, pos);
 }
 
 /*
