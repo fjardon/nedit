@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: preferences.c,v 1.30.2.4 2001/10/01 12:42:34 edg Exp $";
+static const char CVSID[] = "$Id: preferences.c,v 1.30.2.5 2001/10/11 13:19:41 edg Exp $";
 /*******************************************************************************
 *									       *
 * preferences.c -- Nirvana Editor preferences processing		       *
@@ -4396,7 +4396,11 @@ static void updatePatternsTo5dot2(void)
         "Regex:.reg .regex:\"\\(\\?[:#=!iInN].+\\)\":None:Continuous:::";
     const char *xmlLm5dot2 =
         "XML:.xml .xsl .dtd:\"\\<(?i\\?xml|!doctype)\"::None:::\"<>/=\"\"'()+*?|\"";
-
+    
+    const char *cssHl5dot2 = "CSS:Default";
+    const char *reHl5dot2 =  "Regex:Default";
+    const char *xmlHl5dot2 = "XML:Default";
+    
     const char *ptrStyle = "Pointer:#660000:Bold";
     const char *reStyle = "Regex:#009944:Bold";
     const char *wrnStyle = "Warning:brown2:Italic";
@@ -4424,6 +4428,15 @@ static void updatePatternsTo5dot2(void)
 	spliceString(&TempStringPrefs.language, reLm5dot2, NULL);
     if (!regexFind(TempStringPrefs.language, "^[ \t]*XML:"))
 	spliceString(&TempStringPrefs.language, xmlLm5dot2, NULL);
+    
+    /* Enable default highlighting patterns for these modes, unless already
+       present */
+    if (!regexFind(TempStringPrefs.highlight, "^[ \t]*CSS:"))
+	spliceString(&TempStringPrefs.highlight, cssHl5dot2, NULL);
+    if (!regexFind(TempStringPrefs.highlight, "^[ \t]*Regex:"))
+	spliceString(&TempStringPrefs.highlight, reHl5dot2, NULL);
+    if (!regexFind(TempStringPrefs.highlight, "^[ \t]*XML:"))
+	spliceString(&TempStringPrefs.highlight, xmlHl5dot2, NULL);
 
     /* Finally, append the new highlight styles */
 
