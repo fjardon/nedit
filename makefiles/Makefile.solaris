@@ -1,7 +1,11 @@
-# $Id: Makefile.solaris,v 1.4.2.1 2001/08/24 18:34:00 amai Exp $
+# $Id: Makefile.solaris,v 1.4.2.2 2001/10/04 11:02:26 amai Exp $
+#
+# You may have to select the ANSI C compiler here
 #CC=gcc
-CC=/opt/SUNWspro/bin/cc
+#CC=/opt/SUNWspro/bin/cc
+CC=cc
 AR=ar
+
 # For editres, add -DEDITRES to CFLAGS and -lXmu to LIBS
 # For Solaris 2.4, add -DDONT_USE_GLOB
 # On older Solaris systems, Motif may be in /opt/SUNWmotif or even in
