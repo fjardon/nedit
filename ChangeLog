@@ -1,3 +1,33 @@
+2001-10-12 21:34  tringali
+
+        * Makefile, source/help.c (BETA-5-2.[1,9]): Prep work for final 5.2
+        release
+
+2001-10-12 13:54  edg
+
+        * README (BETA-5-2.5): Minor updates.
+
+2001-10-12 12:36  edg
+
+        * README, ReleaseNotes (BETA-5-2.[4,2]): Updates in preparation of
+        the 5.2 release.
+
+2001-10-11 15:19  edg
+
+        * source/preferences.c (BETA-5-2.5): Fixed a bug in the 5.2
+        preferences upgrading routine: new language modes were added, but
+        the corresponding highlight patterns were not enabled.
+
+2001-10-10 20:32  edg
+
+        * source/shell.c (BETA-5-2.1): Fixed a bug that could cause NEdit
+        to crash or garble a file when the user modifies the buffer while
+        the output of an external command is being inserted.
+
+2001-10-08 09:29  amai
+
+        * ChangeLog (BETA-5-2.5): Update
+
 2001-10-06 13:09  amai
 
 	* ReleaseNotes (BETA-5-2.1): Some very minor changes towards the
