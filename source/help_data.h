@@ -5233,4 +5233,4 @@ Href H_R [] =
     { NULL,       5699, HELP_BASICSYNTAX,         "Alternation", "alternation" }
 };
 
-static const char * NEditVersion = "NEdit 5.4beta\nJun 16, 2003\n";
+static const char * NEditVersion = "NEdit 5.4BETA\nJun 16, 2003\n";
