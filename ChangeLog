@@ -1,3 +1,30 @@
+2001-09-19 12:11  amai
+
+	* makefiles/: Makefile.linux, Makefile.os2 (BETA-5-2.[1,1]):
+	Document -lXp flag (required when linking against a Motif 2.1
+	compatible libXm)
+
+2001-09-14 15:59  edg
+
+	* source/highlight.c (BETA-5-2.1): Fixes for SF bugs #459965 and
+	#460859 (they are related), including patch #460229.
+
+2001-09-13 14:11  tringali
+
+	* source/preferences.c (BETA-5-2.2): #458807: Automatically add 5.2
+	styles if .nedit file is pre-5.2
+
+2001-09-12 20:14  amai
+
+	* doc/: faq-txt.awk, faq-txt.dtd, faq-txt.xsl, faq.txt, faq.xml,
+	faq.xsl (BETA-5-2.[1,1,1,2,4,1]): Update as sent from Florian
+	Xhumari
+
+2001-09-12 09:45  amai
+
+	* ChangeLog (BETA-5-2.3): I forgot to update this file in this beta
+	branch ...
+
 2001-09-12 09:18  amai
 
 	* makefiles/Makefile.depend (BETA-5-2.1): Add CVS info line to
@@ -48,24 +75,6 @@
 	Motif 2.1, add declaration for 2.0 and add a "helpful" comment on
 	all that
 
-2001-09-06 09:39  amai
-
-	* ChangeLog (1.9), source/help.c (1.55): ChangeLog update and a new
-	timestamp
-
-2001-09-06 09:37  amai
-
-	* source/: Makefile.dependencies (1.11), file.c (1.30), tags.c
-	(1.18), tags.h (1.6): Add missing #include and add some 'const'. 
-	Update dependencies
-
-2001-09-05 11:44  amai
-
-	* source/: file.c (1.29), help.c (1.54), preferences.c (1.34),
-	preferences.h (1.14), tags.c (1.17), tags.h (1.5): Patch for SF bug
-	[ #451997 ] bugs in tags.c/normalizePathname from Markus
-	Schwarzenberg
-
 2001-09-04 17:55  amai
 
 	* doc/nedit.doc, source/help.c (BETA-5-2.[1,2]): Fix typo reported
@@ -94,91 +103,6 @@
 	* source/preferences.c (BETA-5-2.1): /bin/csh doesn't make sense on
 	OS/2 - even as a default value only
 
-2001-08-29 15:56  slobasso
-
-	* source/help.c (1.53): fixed mispellings
-
-2001-08-29 13:56  amai
-
-	* source/regularExp.c (1.10): Fix lint warning: octal constants
-	shouldn't carry a suffix like 'L'!?
-
-2001-08-29 08:27  amai
-
-	* util/: misc.c (1.32), misc.h (1.10): Second attempt to fix a
-	specific compiler warning and a 'const' addition
-
-2001-08-29 00:01  slobasso
-
-	* source/file.c (1.28): moved braces so nedit goto matching works
-
-2001-08-28 23:18  slobasso
-
-	* doc/nedit.doc (1.5), source/help.c (1.52): documentation cleanup
-
-2001-08-28 22:24  slobasso
-
-	* source/help.c (1.51): Array documentation cleanup.
-
-2001-08-28 11:41  amai
-
-	* source/tags.c (1.16): 'const' patch
-
-2001-08-28 11:29  amai
-
-	* source/file.c (1.27), source/highlight.c (1.19),
-	source/interpret.c (1.18), source/macro.c (1.36), source/menu.c
-	(1.37), source/preferences.c (1.33), source/preferences.h (1.13),
-	source/tags.c (1.15), source/text.c (1.17), util/misc.c (1.31): Fix
-	some more lclint warnings: type casts, make some things static (no,
-	not all unused ones, 'some'), etc.
-
-2001-08-27 18:45  slobasso
-
-	* source/macro.c (1.35): fixed static linkage of actionToString to
-	match declaration
-
-2001-08-27 09:08  amai
-
-	* source/nc.c (1.11): startServer() changes: has a return type now;
-	re-shuffle some code Also make another global var static and
-	replace a printf() by puts()
-
-2001-08-26 02:28  slobasso
-
-	* source/macro.c (1.34): removed unused variable
-
-2001-08-25 15:58  amai
-
-	* source/: file.c (1.26), highlightData.c (1.23), highlightData.h
-	(1.6), preferences.c (1.32), preferences.h (1.12), regexConvert.c
-	(1.5), regexConvert.h (1.3), server.h (1.3), shell.c (1.15),
-	shell.h (1.4), undo.c (1.7), undo.h (1.4): Another 'const' patch
-
-2001-08-25 15:24  amai
-
-	* source/: file.c (1.25), file.h (1.8), highlightData.c (1.22),
-	highlightData.h (1.5), macro.c (1.33), macro.h (1.3), regularExp.c
-	(1.9), regularExp.h (1.6), search.c (1.35), search.h (1.12):
-	Another 'const' patch
-
-2001-08-25 12:16  amai
-
-	* util/printUtils.c (1.12): The very last signed vs. unsigned
-	warning on my system ...
-
-2001-08-25 12:09  amai
-
-	* source/: highlightData.c (1.21), menu.c (1.36), preferences.c
-	(1.31), regularExp.c (1.8), shell.c (1.14), userCmds.c (1.18): Fix
-	a couple of "unsigned vs. int" compiler warnings. Using gcc on OS/2
-	this warning is now completly wiped out!
-
-2001-08-25 11:55  amai
-
-	* util/: DialogF.c (1.18), misc.c (1.30), prefFile.c (1.10): Fix
-	compiler warnings. Mostly unsigned vs. signed int issues
-
 2001-08-25 11:49  amai
 
 	* README (BETA-5-2.2): A couple of fixes, enhancements (see report
@@ -200,39 +124,6 @@
 	(BETA-5-2.[1,1,1,1]): Updated Changelog.  Includes whole history,
 	including new beta branch.  New options of cvs2cl used, listing
 	contains now revision/branch info, timestamps are in GMT, etc.
-
-2001-08-24 08:19  amai
-
-	* source/macro.c (1.32): Fix warnings, add 'const's, make func
-	static
-
-2001-08-23 17:57  amai
-
-	* source/selection.c (1.11): Try to fix two lint/compiler warnings
-
-2001-08-23 17:42  amai
-
-	* source/search.c (1.34): Fix wrong return type in function (in a
-	"dead" branch)
-
-2001-08-23 14:59  amai
-
-	* source/: highlightData.c (1.20), interpret.c (1.17), shift.c
-	(1.9), smartIndent.c (1.13): Make some more functions static
-
-2001-08-23 14:39  amai
-
-	* util/: misc.c (1.29), misc.h (1.9): Drop 'wrong' prototype for
-	standard function. Fix a function signature to avoid warnings
-
-2001-08-23 14:11  amai
-
-	* util/: fontsel.c (1.11), fontsel.h (1.4): Fix lint warning about
-	float to integer assignment and add some more 'const's
-
-2001-08-23 13:57  amai
-
-	* util/misc.c (1.28): Drop unused #include
 
 2001-08-22 15:41  amai
 
@@ -714,9 +605,8 @@
 
 2001-07-07 09:48  amai
 
-	* nc.man (1.4), nedit.doc (1.6), nedit.man (1.4), doc/nc.man (1.1),
-	doc/nedit.doc (1.1), doc/nedit.man (1.1): Move doc files to
-	separate subdirectory
+	* doc/: nc.man (1.1), nedit.doc (1.1), nedit.man (1.1): Move doc
+	files to separate subdirectory
 
 2001-07-04 09:42  uid30962
 
@@ -878,11 +768,6 @@
 
 	* util/DialogF.c (1.15): Added a fix to handle unexpected
 	destruction of dialogs gracefully.
-
-2001-04-25 19:03  amai
-
-	* nedit.doc (1.5): nedit.doc: fix some typos, convert some "nedit"
-	to "NEdit", drop some comment about pre 1.2 Motif
 
 2001-04-25 17:01  amai
 
@@ -1263,25 +1148,24 @@
 
 2001-02-26 23:38  edg
 
-	* Makefile (1.5), README (1.6), ReleaseNotes (1.4), nc.man (1.3),
-	nedit.doc (1.4), nedit.man (1.3), makefiles/Makefile.aix (1.3),
-	makefiles/Makefile.bsdi (1.2), makefiles/Makefile.ccur (1.2),
-	makefiles/Makefile.convex (1.2), makefiles/Makefile.cygwin (1.3),
-	makefiles/Makefile.dcosx (1.2), makefiles/Makefile.dec (1.2),
-	makefiles/Makefile.freebsd (1.2), makefiles/Makefile.generic (1.2),
-	makefiles/Makefile.hpux (1.2), makefiles/Makefile.linux (1.2),
-	makefiles/Makefile.lynx (1.2), makefiles/Makefile.m88k.svr4 (1.2),
-	makefiles/Makefile.netbsd (1.2), makefiles/Makefile.os2 (1.2),
-	makefiles/Makefile.osf (1.2), makefiles/Makefile.reliant (1.2),
-	makefiles/Makefile.sco (1.2), makefiles/Makefile.sgi (1.2),
-	makefiles/Makefile.solaris (1.2), makefiles/Makefile.sunos (1.2),
-	makefiles/Makefile.uhc (1.2), makefiles/Makefile.ultrix (1.2),
-	makefiles/Makefile.unicos (1.2), makefiles/Makefile.unixware (1.2),
-	source/Makefile.common (1.5), source/Makefile.dependencies (1.3),
-	source/comnedit.com (1.4), source/file.c (1.11), source/file.h
-	(1.4), source/help.c (1.16), source/help.h (1.3),
-	source/highlight.c (1.11), source/highlight.h (1.3),
-	source/highlightData.c (1.8), source/highlightData.h (1.3),
+	* Makefile (1.5), README (1.6), ReleaseNotes (1.4),
+	makefiles/Makefile.aix (1.3), makefiles/Makefile.bsdi (1.2),
+	makefiles/Makefile.ccur (1.2), makefiles/Makefile.convex (1.2),
+	makefiles/Makefile.cygwin (1.3), makefiles/Makefile.dcosx (1.2),
+	makefiles/Makefile.dec (1.2), makefiles/Makefile.freebsd (1.2),
+	makefiles/Makefile.generic (1.2), makefiles/Makefile.hpux (1.2),
+	makefiles/Makefile.linux (1.2), makefiles/Makefile.lynx (1.2),
+	makefiles/Makefile.m88k.svr4 (1.2), makefiles/Makefile.netbsd
+	(1.2), makefiles/Makefile.os2 (1.2), makefiles/Makefile.osf (1.2),
+	makefiles/Makefile.reliant (1.2), makefiles/Makefile.sco (1.2),
+	makefiles/Makefile.sgi (1.2), makefiles/Makefile.solaris (1.2),
+	makefiles/Makefile.sunos (1.2), makefiles/Makefile.uhc (1.2),
+	makefiles/Makefile.ultrix (1.2), makefiles/Makefile.unicos (1.2),
+	makefiles/Makefile.unixware (1.2), source/Makefile.common (1.5),
+	source/Makefile.dependencies (1.3), source/comnedit.com (1.4),
+	source/file.c (1.11), source/file.h (1.4), source/help.c (1.16),
+	source/help.h (1.3), source/highlight.c (1.11), source/highlight.h
+	(1.3), source/highlightData.c (1.8), source/highlightData.h (1.3),
 	source/interpret.c (1.7), source/interpret.h (1.3),
 	source/lnknedit.com (1.3), source/macro.c (1.10), source/macro.h
 	(1.2), source/menu.c (1.17), source/menu.h (1.5), source/n.bm
@@ -1620,12 +1504,6 @@
 	util/misc.c (1.10): Add two missing #includes Add a .cvsignore for
 	the two binaries beign built Update the docs WRT LessTif issues
 
-2000-12-19 21:08  tringali
-
-	* nedit.doc (1.3): 
-	
-	Removed obsolete references to fnal.gov FTP server.
-
 2000-12-19 21:06  edg
 
 	* source/selection.c (1.5): Added a fix for SF bug 126285: segfault
@@ -1771,66 +1649,40 @@
 
 2000-09-09 22:18  tringali
 
-	* Makefile (1.2, REL-5-1-1), README (1.2, REL-5-1-1), ReleaseNotes
-	(1.1, REL-5-1-1), nc.man (1.2, REL-5-1-1), nedit.doc (1.2,
-	REL-5-1-1), nedit.man (1.2, REL-5-1-1), source/Makefile.common
-	(1.2, REL-5-1-1), source/Makefile.dec (1.2), source/Makefile.hp
-	(1.2), source/Makefile.ibm (1.2), source/Makefile.linux (1.2),
-	source/Makefile.osf (1.2), source/Makefile.sgi (1.2),
-	source/Makefile.solaris (1.2), source/Makefile.sunos (1.2),
-	source/Makefile.ultrix (1.2), source/comnedit.com (1.2, REL-5-1-1),
-	source/file.c (1.2, REL-5-1-1), source/file.h (1.2, REL-5-1-1),
-	source/help.c (1.2, REL-5-1-1), source/help.h (1.2, REL-5-1-1),
-	source/highlight.c (1.2, REL-5-1-1), source/highlight.h (1.2,
-	REL-5-1-1), source/highlightData.c (1.2, REL-5-1-1),
-	source/highlightData.h (1.2, REL-5-1-1), source/interpret.c (1.2,
-	REL-5-1-1), source/lnknedit.com (1.2, REL-5-1-1), source/macro.c
-	(1.2, REL-5-1-1), source/menu.c (1.2, REL-5-1-1), source/menu.h
-	(1.2, REL-5-1-1), source/nc.c (1.2, REL-5-1-1), source/nedit.c
-	(1.2, REL-5-1-1), source/nedit.h (1.2, REL-5-1-1), source/parse.y
-	(1.2, REL-5-1-1), source/preferences.c (1.2, REL-5-1-1),
-	source/preferences.h (1.2, REL-5-1-1), source/regexConvert.c (1.1,
-	REL-5-1-1), source/regexConvert.h (1.1, REL-5-1-1),
-	source/regularExp.c (1.2, REL-5-1-1), source/regularExp.h (1.2,
-	REL-5-1-1), source/search.c (1.2, REL-5-1-1), source/search.h (1.2,
-	REL-5-1-1), source/selection.c (1.2, REL-5-1-1), source/selection.h
-	(1.2, REL-5-1-1), source/server.c (1.2, REL-5-1-1), source/shell.c
-	(1.2, REL-5-1-1), source/shell.h (1.2, REL-5-1-1), source/shift.c
-	(1.2, REL-5-1-1), source/shift.h (1.2, REL-5-1-1),
-	source/smartIndent.c (1.2, REL-5-1-1), source/smartIndent.h (1.2,
-	REL-5-1-1), source/tags.c (1.2, REL-5-1-1), source/tags.h (1.2,
-	REL-5-1-1), source/text.c (1.2, REL-5-1-1), source/text.h (1.2,
-	REL-5-1-1), source/textBuf.c (1.2, REL-5-1-1), source/textBuf.h
-	(1.2, REL-5-1-1), source/textDisp.c (1.2, REL-5-1-1),
-	source/textDisp.h (1.2, REL-5-1-1), source/textDrag.c (1.2,
-	REL-5-1-1), source/textP.h (1.2, REL-5-1-1), source/textSel.c (1.2,
-	REL-5-1-1), source/undo.c (1.2, REL-5-1-1), source/undo.h (1.2,
-	REL-5-1-1), source/userCmds.c (1.2, REL-5-1-1), source/userCmds.h
-	(1.2, REL-5-1-1), source/window.c (1.2, REL-5-1-1), source/window.h
-	(1.2, REL-5-1-1), util/DialogF.c (1.2, REL-5-1-1), util/DialogF.h
-	(1.2, REL-5-1-1), util/Makefile.common (1.2, REL-5-1-1),
-	util/Makefile.dec (1.2), util/Makefile.hp (1.2), util/Makefile.ibm
-	(1.2), util/Makefile.linux (1.2), util/Makefile.sgi (1.2),
-	util/Makefile.solaris (1.2), util/Makefile.sunos (1.2),
-	util/Makefile.ultrix (1.2), util/fileUtils.c (1.2, REL-5-1-1),
-	util/fileUtils.h (1.2, REL-5-1-1), util/fontsel.c (1.2, REL-5-1-1),
-	util/fontsel.h (1.2, REL-5-1-1), util/getfiles.c (1.2, REL-5-1-1),
-	util/getfiles.h (1.2, REL-5-1-1), util/managedList.c (1.2,
-	REL-5-1-1), util/managedList.h (1.2, REL-5-1-1), util/misc.c (1.2,
-	REL-5-1-1), util/misc.h (1.2, REL-5-1-1), util/prefFile.c (1.2,
-	REL-5-1-1), util/prefFile.h (1.2, REL-5-1-1), util/printUtils.c
-	(1.2, REL-5-1-1), util/printUtils.h (1.2, REL-5-1-1),
-	util/vmsUtils.c (1.2, REL-5-1-1), util/vmsUtils.h (1.2, REL-5-1-1):
+	* Makefile (1.2), README (1.2), ReleaseNotes (1.1),
+	source/Makefile.common (1.2), source/comnedit.com (1.2),
+	source/file.c (1.2), source/file.h (1.2), source/help.c (1.2),
+	source/help.h (1.2), source/highlight.c (1.2), source/highlight.h
+	(1.2), source/highlightData.c (1.2), source/highlightData.h (1.2),
+	source/interpret.c (1.2), source/lnknedit.com (1.2), source/macro.c
+	(1.2), source/menu.c (1.2), source/menu.h (1.2), source/nc.c (1.2),
+	source/nedit.c (1.2), source/nedit.h (1.2), source/parse.y (1.2),
+	source/preferences.c (1.2), source/preferences.h (1.2),
+	source/regexConvert.c (1.1), source/regexConvert.h (1.1),
+	source/regularExp.c (1.2), source/regularExp.h (1.2),
+	source/search.c (1.2), source/search.h (1.2), source/selection.c
+	(1.2), source/selection.h (1.2), source/server.c (1.2),
+	source/shell.c (1.2), source/shell.h (1.2), source/shift.c (1.2),
+	source/shift.h (1.2), source/smartIndent.c (1.2),
+	source/smartIndent.h (1.2), source/tags.c (1.2), source/tags.h
+	(1.2), source/text.c (1.2), source/text.h (1.2), source/textBuf.c
+	(1.2), source/textBuf.h (1.2), source/textDisp.c (1.2),
+	source/textDisp.h (1.2), source/textDrag.c (1.2), source/textP.h
+	(1.2), source/textSel.c (1.2), source/undo.c (1.2), source/undo.h
+	(1.2), source/userCmds.c (1.2), source/userCmds.h (1.2),
+	source/window.c (1.2), source/window.h (1.2), util/DialogF.c (1.2),
+	util/DialogF.h (1.2), util/Makefile.common (1.2), util/fileUtils.c
+	(1.2), util/fileUtils.h (1.2), util/fontsel.c (1.2), util/fontsel.h
+	(1.2), util/getfiles.c (1.2), util/getfiles.h (1.2),
+	util/managedList.c (1.2), util/managedList.h (1.2), util/misc.c
+	(1.2), util/misc.h (1.2), util/prefFile.c (1.2), util/prefFile.h
+	(1.2), util/printUtils.c (1.2), util/printUtils.h (1.2),
+	util/vmsUtils.c (1.2), util/vmsUtils.h (1.2) (utags: REL-5-1-1):
 	5.1.1 baseline
 
 2000-09-09 22:12  tringali
 
-	* Makefile (1.1), README (1.1), nc.man (1.1), nedit.doc (1.1),
-	nedit.man (1.1), source/Makefile.common (1.1), source/Makefile.dec
-	(1.1), source/Makefile.hp (1.1), source/Makefile.ibm (1.1),
-	source/Makefile.linux (1.1), source/Makefile.osf (1.1),
-	source/Makefile.sgi (1.1), source/Makefile.solaris (1.1),
-	source/Makefile.sunos (1.1), source/Makefile.ultrix (1.1),
+	* Makefile (1.1), README (1.1), source/Makefile.common (1.1),
 	source/comnedit.com (1.1), source/file.c (1.1), source/file.h
 	(1.1), source/help.c (1.1), source/help.h (1.1), source/highlight.c
 	(1.1), source/highlight.h (1.1), source/highlightData.c (1.1),
@@ -1858,15 +1710,12 @@
 	source/undo.h (1.1), source/userCmds.c (1.1), source/userCmds.h
 	(1.1), source/window.c (1.1), source/window.h (1.1), util/DialogF.c
 	(1.1), util/DialogF.h (1.1), util/Makefile.common (1.1),
-	util/Makefile.dec (1.1), util/Makefile.hp (1.1), util/Makefile.ibm
-	(1.1), util/Makefile.linux (1.1), util/Makefile.sgi (1.1),
-	util/Makefile.solaris (1.1), util/Makefile.sunos (1.1),
-	util/Makefile.ultrix (1.1), util/comutil.com (1.1, REL-5-1-1),
-	util/fileUtils.c (1.1), util/fileUtils.h (1.1), util/fontsel.c
-	(1.1), util/fontsel.h (1.1), util/getfiles.c (1.1), util/getfiles.h
-	(1.1), util/managedList.c (1.1), util/managedList.h (1.1),
-	util/misc.c (1.1), util/misc.h (1.1), util/prefFile.c (1.1),
-	util/prefFile.h (1.1), util/printUtils.c (1.1), util/printUtils.h
-	(1.1), util/vmsParam.h (1.1, REL-5-1-1), util/vmsUtils.c (1.1),
-	util/vmsUtils.h (1.1) (utags: REL-5-0-2): 5.0.2 baseline
+	util/comutil.com (1.1, REL-5-1-1), util/fileUtils.c (1.1),
+	util/fileUtils.h (1.1), util/fontsel.c (1.1), util/fontsel.h (1.1),
+	util/getfiles.c (1.1), util/getfiles.h (1.1), util/managedList.c
+	(1.1), util/managedList.h (1.1), util/misc.c (1.1), util/misc.h
+	(1.1), util/prefFile.c (1.1), util/prefFile.h (1.1),
+	util/printUtils.c (1.1), util/printUtils.h (1.1), util/vmsParam.h
+	(1.1, REL-5-1-1), util/vmsUtils.c (1.1), util/vmsUtils.h (1.1)
+	(utags: REL-5-0-2): 5.0.2 baseline
 
