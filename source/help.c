@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: help.c,v 1.50.2.2 2001/09/04 17:55:28 amai Exp $";
+static const char CVSID[] = "$Id: help.c,v 1.50.2.3 2001/09/07 07:39:29 amai Exp $";
 /*******************************************************************************
 *									       *
 * help.c -- Nirvana Editor help display					       *
@@ -35,6 +35,7 @@ static const char CVSID[] = "$Id: help.c,v 1.50.2.2 2001/09/04 17:55:28 amai Exp
 #include <sys/param.h>
 #endif
 #endif /*VMS*/
+
 #include <Xm/Xm.h>
 #include <Xm/Form.h>
 #include <Xm/ScrolledW.h>
@@ -4873,6 +4874,14 @@ static int findTopicFromShellWidget(Widget shellWidget)
     return -1;
 }
 
+#if XmVersion == 2000
+/* amai: This function may be called before the Motif part
+         is being initialized. The following, public interface
+         is known to initialize at least xmUseVersion.
+	 That interface is declared in <Xm/Xm.h> in Motif 1.2 only.
+	 As for Motif 2.1 we don't need this call anymore?! */
+extern void XmRegisterConverters(void);
+#endif
 
 /* Print version info to stdout */
 void PrintVersion(void) {
@@ -4880,10 +4889,10 @@ void PrintVersion(void) {
     int topic=HELP_VERSION;
     char *text;
   
-    /* amai: This function may be called before the Motif part
-             is being initialized. The following, public interface
-             is known to initialize at least xmUseVersion ! */
-    XmRegisterConverters();
+    
+#if XmVersion < 2001
+    XmRegisterConverters();  /* see comment above */
+#endif
 
     text = (char *)malloc(strlen(HelpText[topic]) + 1024);
     if (text==NULL) {
@@ -4893,8 +4902,8 @@ void PrintVersion(void) {
     sprintf(text, HelpText[topic], 
                   COMPILE_OS, COMPILE_MACHINE, COMPILE_COMPILER,
                   __DATE__, __TIME__,
-                XmVersion, XmVERSION_STRING,
-                xmUseVersion);
+                  XmVersion, XmVERSION_STRING,
+                  xmUseVersion);
     puts(text);
     free(text);
 }
