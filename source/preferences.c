@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: preferences.c,v 1.30.2.1 2001/08/30 20:17:53 amai Exp $";
+static const char CVSID[] = "$Id: preferences.c,v 1.30.2.2 2001/09/13 14:11:51 tringali Exp $";
 /*******************************************************************************
 *									       *
 * preferences.c -- Nirvana Editor preferences processing		       *
@@ -69,6 +69,9 @@ static const char CVSID[] = "$Id: preferences.c,v 1.30.2.1 2001/08/30 20:17:53 a
 #include "smartIndent.h"
 
 #define PREF_FILE_NAME ".nedit"
+
+/* New styles added in 5.2 for auto-upgrade */
+#define ADD_5_2_STYLES " Pointer:#660000:Bold\nRegex:#009944:Bold\nWarning:brown2:Italic"
 
 /* maximum number of word delimiters allowed (256 allows whole character set) */
 #define MAX_WORD_DELIMITERS 256
@@ -627,10 +630,9 @@ static PrefDescripRec PrefDescrip[] = {
     	Text Arg1:SteelBlue4:Bold\n\
 	Text Arg2:RoyalBlue4:Plain\n\
     	Text Escape:gray30:Bold\n\
-	LaTeX Math:darkGreen:Plain\n\
-	Pointer:#660000:Bold\n\
-	Regex:#009944:Bold\n\
-	Warning:brown2:Italic", &TempStringPrefs.styles, NULL, True},
+	LaTeX Math:darkGreen:Plain\n"
+        ADD_5_2_STYLES,
+	&TempStringPrefs.styles, NULL, True},
     {"smartIndentInit", "SmartIndentInit", PREF_ALLOC_STRING,
         "C:Default\n\
 	C++:Default\n\
@@ -890,11 +892,23 @@ void RestoreNEditPrefs(XrmDatabase prefDB, XrmDatabase appDB)
     requiresConversion = PrefData.prefFileRead &&
     	    PrefData.fileVersion[0] == '\0';
     if (requiresConversion) {
-	fprintf(stderr, "NEdit: Converting .nedit file from old version.\n"
-		"    To update, use Preferences -> Save Defaults\n");
+	fprintf(stderr, "NEdit: Converting .nedit file from pre-5.1 version.\n"
+		"    To keep, use Preferences -> Save Defaults\n");
 	updatePatternsTo5dot1();
     }
-     
+    
+    if (PrefData.prefFileRead &&
+        (PrefData.fileVersion[0] == '\0' ||
+        atof(PrefData.fileVersion) < 5.2)) {
+        fprintf(stderr, "NEdit: Converting .nedit file from pre-5.2 version.\n"
+                "    To keep, use Preferences -> Save Defaults\n");
+
+        spliceString(&TempStringPrefs.styles, ADD_5_2_STYLES, NULL);
+        
+        /* Note: we should really insert the XML, CSS, and Regex styles
+           into the master list here. */
+    }
+ 
     /* Do further parsing on resource types which RestorePreferences does
        not understand and reads as strings, to put them in the final form
        in which nedit stores and uses.  If the preferences file was
@@ -1007,7 +1021,7 @@ FROM FILE: %s", "OK", "Cancel", ImportedFile) == 2)
     TempStringPrefs.styles = WriteStylesString();
     TempStringPrefs.smartIndent = WriteSmartIndentString();
     TempStringPrefs.smartIndentCommon = WriteSmartIndentCommonString();
-    strcpy(PrefData.fileVersion, "5.1");
+    strcpy(PrefData.fileVersion, "5.2");
     if (!SavePreferences(XtDisplay(parent), PREF_FILE_NAME, HeaderText,
     	    PrefDescrip, XtNumber(PrefDescrip)))
     	DialogF(DF_WARN, parent, 1,
