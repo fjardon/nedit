@@ -1,6 +1,6 @@
                     NEdit Version 5.2,  October 2001
 
-$Id: README,v 1.13.2.4 2001/10/12 10:36:12 edg Exp $
+$Id: README,v 1.13.2.5 2001/10/12 11:54:40 edg Exp $
 	     
 NEdit is a multi-purpose text editor for the X Window System, which combines a
 standard, easy to use, graphical user interface with the thorough functionality
@@ -62,23 +62,15 @@ The most significant enhancements in this release are:
  
    o Replacement across multiple windows in a session.
    o Case sensitivity may be set independently of regular expressions.
-   o Add "Replace and Find" command, which saves keystrokes when doing
+   o A "Replace and Find" command, which saves keystrokes when doing
      a large-scale find & replace.
-
- - ClearCase version-extended pathnames.
 
  - Many new macro subroutines and variables.
 
  - Multidimensional associative arrays for the macro language.
 
- - Range highlighting of matching delimiters.
-
- - Undo and Redo highlights the text that has changed, when visible.
- 
  - Support for wheel mouse scrolling on servers that support it (XFree86). 
  
- - Improved accelerator key handling.
-
 There are also several smaller improvements and bug fixes, see the file
 ReleaseNotes for details.
 
@@ -110,7 +102,7 @@ The two directories called 'source' and 'util' contain the sources for NEdit.
 'util' should be built first, followed by 'source'. The Makefile in NEdit's
 root directory can be used to build both in sequence if your system is one of
 the supported machines and no modifications are necessary to the Makefiles. To
-build NEdit from the root directory, issue the command: "make <machine-type>";
+build NEdit from the root directory, issue the command: 'make <machine-type>';
 where <machine-type> is one of suffixes of a Makefile in the directory
 'makefiles'. For example, to build the Silicon Graphics version, type:
 
@@ -131,17 +123,17 @@ linked with the code in the source directory to create the nedit executable.
 
 The Makefiles in both source directories consist of two parts, a machine
 dependent part and a machine independent part. The machine dependent Makefiles
-can be found in the directory called "makefiles", and contain machine specific
+can be found in the directory called 'makefiles', and contain machine specific
 header information. They invoke a common machine independent part called
 Makefile.common (which in turn includes also Makefile.dependencies).
 To compile the files in either of these directories, copy or link one of the
-system-specific Makefiles from the directory "makefiles" into the directory,
+system-specific Makefiles from the directory 'makefiles' into the directory,
 and issue the command:
 
     make -f Makefile.<machine-type>
     
 (where <machine-type> is the Makefile suffix).  Alternatively, you can
-name the file "Makefile" and simply type "make".
+name the file 'Makefile' and simply type "make".
 
 If no Makefile exists for your system, check the NEdit web site for more
 contributed Makefiles.  If you can't find one that's close, start from
@@ -194,17 +186,17 @@ To use NEdit in client/server mode, you also need the nedit client program, nc,
 which, again, needs no special installation, except in the VMS case, as above.
 On some systems, the name nc may conflict with an existing program.  In that
 case, choose a different name for the executable and simply rename it.  The
-recommend alternative is "ncl".
+recommend alternative is 'ncl'.
 Don't forget to put the man-pages for nedit and nc into a place where your
 man command is able to find them (e.g. /usr/man/man1/nedit.1)
 
 
 RUNNING NEDIT
 
-To run NEdit, simply type "nedit", optionally followed by the name of a file
+To run NEdit, simply type 'nedit', optionally followed by the name of a file
 or files to edit. On-line help is available from the pulldown menu on the far
 right of the menu bar. For more information on the syntax of the nedit command
-line, look under the heading of "NEdit Command Line."
+line, look under the heading of "NEdit Command Line".
 
 The recommended way to use NEdit, though, is in client/server mode, invoked by
 the nc executable. It allows you to edit multiple files within the same
@@ -366,7 +358,7 @@ non-incremental upgrading (eg., from 5.0 to 5.2) is supported too.
   5.2. NEdit will try to insert additional entries for the newly supported
   language modes and syntax highlighting patterns (CSS, Regex, and XML) and
   highlight styles (Pointer, Regex, Warning).
-  Moreover, the formerly boolean "showMatching" option will silently be
+  Moreover, the formerly boolean 'showMatching' option will silently be
   converted to a tri-state value.
   Users that have customized some of the syntax highlighting patterns may
   consider restoring the default patterns, as many of them have been improved
