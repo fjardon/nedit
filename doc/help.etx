@@ -1,4 +1,4 @@
-.. $Id: help.etx,v 1.49.2.6 2003/10/15 23:08:16 yooden Exp $
+.. $Id: help.etx,v 1.49.2.7 2003/10/24 15:29:25 edg Exp $
 .. NOTE: Remember to supply 'version' variable on setext command line.
 ..       For example,  setext -m -v "version=NEdit Version 6.0".
 ..
@@ -3629,7 +3629,7 @@ Preferences
 **Popups Under Pointer**
   Display pop-up dialogs centered on the current mouse position, as opposed to
   centered on the parent window.  This generally speeds interaction, and is
-  essential for users who users who set their window managers so keyboard focus
+  essential for users who set their window managers so keyboard focus
   follows the mouse.
 
 **Warnings**
