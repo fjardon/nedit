@@ -1,4 +1,4 @@
-/* $Id: rangeset.c,v 1.7.2.2 2003/07/29 17:54:49 slobasso Exp $ */
+/* $Id: rangeset.c,v 1.7.2.3 2003/08/08 16:24:15 slobasso Exp $ */
 /*******************************************************************************
 *									       *
 * rangeset.c	 -- Nirvana Editor rangest functions			       *
@@ -994,8 +994,9 @@ void RangesetBufModifiedCB(int pos, int nInserted, int nDeleted, int nRestyled,
 	char *deletedText, void *cbArg)
 {
     RangesetTable *table = (RangesetTable *)cbArg;
-
-    RangesetTableUpdatePos(table, pos, nInserted, nDeleted);
+    if ((nInserted != nDeleted) || BufCmp(table->buf, pos, nInserted, deletedText) != 0) {
+        RangesetTableUpdatePos(table, pos, nInserted, nDeleted);
+    }
 }
 
 /* -------------------------------------------------------------------------- */
