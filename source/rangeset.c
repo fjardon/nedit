@@ -1,4 +1,4 @@
-/* $Id: rangeset.c,v 1.7.2.4 2003/08/26 09:59:44 edg Exp $ */
+/* $Id: rangeset.c,v 1.7.2.5 2003/09/08 17:03:32 edg Exp $ */
 /*******************************************************************************
 *									       *
 * rangeset.c	 -- Nirvana Editor rangest functions			       *
@@ -341,7 +341,8 @@ static int weighted_at_or_before(int *table, int base, int len, int val)
 	return hi;
 
     while (lo <= hi) {
-	mid = lo + (hi - lo) * (max - val) / (max - min);
+        /* Beware of integer overflow when multiplying large numbers! */
+        mid = lo + (int)((hi - lo) * (double)(max - val) / (max - min));
 	/* we won't worry about min == max - values should be unique */
 
 	if (val == table[mid])
