@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: printUtils.c,v 1.11 2001/08/14 08:37:16 jlous Exp $";
+static const char CVSID[] = "$Id: printUtils.c,v 1.15.2.1 2002/03/28 14:21:13 edg Exp $";
 /*******************************************************************************
 *									       *
 * printUtils.c -- Nirvana library Printer Menu	& Printing Routines   	       *
@@ -232,8 +232,8 @@ void PrintFile(Widget parent, const char *printFile, const char *jobName)
 **			(flpr is a Fermilab utility for printing on
 **			arbitrary systems that support the lpr protocol)
 */
-void LoadPrintPreferences(XrmDatabase prefDB, char *appName, char *appClass,
-	int lookForFlpr)
+void LoadPrintPreferences(XrmDatabase prefDB, const char *appName,
+        const char *appClass, int lookForFlpr)
 {
     static char defaultQueue[MAX_QUEUE_STR], defaultHost[MAX_HOST_STR];
 
@@ -554,7 +554,7 @@ static void allowOnlyNumInput(Widget widget, caddr_t client_data,
     textInserted = (nInserted > 0);
     if ((call_data->reason == XmCR_MODIFYING_TEXT_VALUE) && textInserted) {
 	for (i=0; i<nInserted; i++) {
-            if (!isdigit(call_data->text->ptr[i])) {
+            if (!isdigit((unsigned char)call_data->text->ptr[i])) {
             	call_data->doit = False;
             	return;
             }
@@ -581,7 +581,7 @@ static void noSpaceOrPunct(Widget widget, caddr_t client_data,
     textInserted = (nInserted > 0);
     if ((call_data->reason == XmCR_MODIFYING_TEXT_VALUE) && textInserted) {
 	for (i=0; i<nInserted; i++) {
-            for (j=0; j<XtNumber(prohibited); j++) {
+            for (j=0; j<(int)XtNumber(prohibited); j++) {
         	if (call_data->text->ptr[i] == prohibited[j]) {
             	    call_data->doit = False;
             	    return;
@@ -709,7 +709,7 @@ static void printButtonCB(Widget widget, caddr_t client_data, caddr_t call_data)
 #else
     int nRead;
     FILE *pipe;
-    char errorString[MAX_PRINT_ERROR_LENGTH];
+    char errorString[MAX_PRINT_ERROR_LENGTH], discarded[1024];
 
     /* get the print command from the command text area */
     str = XmTextGetString(Text4);
@@ -720,7 +720,7 @@ static void printButtonCB(Widget widget, caddr_t client_data, caddr_t call_data)
     
     /* Issue the print command using a popen call and recover error messages
        from the output stream of the command. */
-    pipe = (FILE *)popen(command,"r");
+    pipe = popen(command,"r");
     if (pipe == NULL) {
 	DialogF(DF_WARN, widget, 1, "Unable to Print:\n%s",
        		"Dismiss", strerror(errno));
@@ -728,6 +728,11 @@ static void printButtonCB(Widget widget, caddr_t client_data, caddr_t call_data)
     }
     errorString[0] = 0;
     nRead = fread(errorString, sizeof(char), MAX_PRINT_ERROR_LENGTH-1, pipe);
+    /* Make sure that the print command doesn't get stuck when trying to 
+       write a lot of output on stderr (pipe may fill up). We discard 
+       the additional output, though. */
+    while (fread(discarded, sizeof(char), 1024, pipe) > 0);
+
     if (!ferror(pipe))
 	errorString[nRead] = '\0';
     if (pclose(pipe)) {
@@ -962,4 +967,4 @@ static void getVmsQueueDefault(char *defqueue)
 /*	printf("defqueue = %s, length = %d\n", defqueue, ret_len); */
     }   
 }
-#endif
+#endif /*(VMS)*/
