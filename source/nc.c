@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: nc.c,v 1.34.2.3 2003/10/09 09:23:42 edg Exp $";
+static const char CVSID[] = "$Id: nc.c,v 1.34.2.4 2003/10/15 23:08:17 yooden Exp $";
 /*******************************************************************************
 *									       *
 * nc.c -- Nirvana Editor client program for nedit server processes	       *
@@ -111,10 +111,15 @@ static const char cmdLineHelp[] =
 #ifdef VMS
 "";
 #else
-"Usage:  nc [-read] [-create] [-line n | +n] [-do command] [-ask] [-noask]\n\
-           [-svrname name] [-svrcmd command] [-lm languagemode]\n\
-           [-geometry geometry] [-iconic] [-timeout seconds] [-wait]\n\
-           [-V|-version] [--] [file...]\n";
+"Usage:  nc [-read] [-create]\n"
+"           [-line n | +n] [-do command] [-lm languagemode]\n"
+"           [-svrname name] [-svrcmd command]\n"
+"           [-ask] [-noask] [-timeout seconds]\n"
+"           [-geometry geometry | -g geometry] [-icon | -iconic]\n"
+"           [-wait]\n"
+"           [-V | -version]\n"
+"           [-xrm resourcestring] [-display [host]:server[.screen]]\n"
+"           [--] [file...]";
 #endif /*VMS*/
 
 /* Structure to hold X Resource values */
