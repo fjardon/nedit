@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: highlightData.c,v 1.27.2.1 2002/03/12 20:20:20 edg Exp $";
+static const char CVSID[] = "$Id: highlightData.c,v 1.27.2.2 2002/03/13 13:19:26 edg Exp $";
 /*******************************************************************************
 *									       *
 * highlightData.c -- Maintain, and allow user to edit, highlight pattern list  *
@@ -810,7 +810,7 @@ static char *DefaultPatternSets[] = {
 	delimiters:\"[{};<>&~=!|^%[\\]+*|]\":::Text Key::D\n\
 	built ins:\"<(:|\\.|source|alias|bg|bind|break|builtin|cd|chdir|command|compgen|complete|continue|declare|dirs|disown|echo|enable|eval|exec|exit|export|fc|fg|getopts|hash|help|history|jobs|kill|let|local|logout|popd|print|printf|pushd|pwd|read|readonly|return|set|shift|shopt|stop|suspend|test|times|trap|type|typeset|ulimit|umask|unalias|unset|wait|whence)>[\\s\\n;]\":::Subroutine1::D}",
     "Tcl:1:0{\n\
-	Double Quote String:\"\"\"\":\"\"\"\":\"\\n\":String::\n\
+	Double Quote String:\"\"\"\":\"\"\"\"::String::\n\
 	Single Quote String:\"'\":\"'\":\"[^\\\\][^']\":String::\n\
 	Ignore Escaped Chars:\"\\\\(.|\\n)\":::Plain::\n\
 	Variable Ref:\"\\$\\w+|\\$\\{[^}]*}|\\$|#auto\":::Identifier1::\n\
