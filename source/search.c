@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: search.c,v 1.59 2003/06/06 17:06:10 edg Exp $";
+static const char CVSID[] = "$Id: search.c,v 1.59.2.1 2003/06/20 21:43:51 slobasso Exp $";
 /*******************************************************************************
 *									       *
 * search.c -- Nirvana Editor search and replace functions		       *
@@ -414,7 +414,7 @@ static int selectionSpansMultipleLines(WindowInfo *window)
 #endif
 
 void DoFindReplaceDlog(WindowInfo *window, int direction, int keepDialogs,
-        Time time)
+        int searchType, Time time)
 {
 
     /* Create the dialog if it doesn't already exist */
@@ -433,7 +433,7 @@ void DoFindReplaceDlog(WindowInfo *window, int direction, int keepDialogs,
     XmTextSetString(window->replaceWithText, "");
         
     /* Set the initial search type */
-    initToggleButtons(GetPrefSearch(), window->replaceRegexToggle,
+    initToggleButtons(searchType, window->replaceRegexToggle,
                       window->replaceCaseToggle, &window->replaceWordToggle,
                       &window->replaceLastLiteralCase,
                       &window->replaceLastRegexCase);
@@ -559,7 +559,8 @@ static void getSelectionCB(Widget w, SelectionInfo *selectionInfo, Atom *selecti
     selectionInfo->done = 1;
 }
 
-void DoFindDlog(WindowInfo *window, int direction, int keepDialogs, Time time)
+void DoFindDlog(WindowInfo *window, int direction, int keepDialogs,
+        int searchType, Time time)
 {
 
     /* Create the dialog if it doesn't already exist */
@@ -575,7 +576,7 @@ void DoFindDlog(WindowInfo *window, int direction, int keepDialogs, Time time)
     }
 
     /* Set the initial search type */
-    initToggleButtons(GetPrefSearch(), window->findRegexToggle,
+    initToggleButtons(searchType, window->findRegexToggle,
                       window->findCaseToggle, &window->findWordToggle,
                       &window->findLastLiteralCase,
                       &window->findLastRegexCase);

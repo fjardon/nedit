@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: menu.c,v 1.79 2003/06/02 15:18:14 edg Exp $";
+static const char CVSID[] = "$Id: menu.c,v 1.79.2.1 2003/06/20 21:43:51 slobasso Exp $";
 /*******************************************************************************
 *                                                                              *
 * menu.c -- Nirvana Editor menus                                               *
@@ -2765,7 +2765,8 @@ static void shiftRightTabAP(Widget w, XEvent *event, String *args,
 static void findDialogAP(Widget w, XEvent *event, String *args, Cardinal *nArgs)
 {
     DoFindDlog(WidgetToWindow(w), searchDirection(0, args, nArgs),
-               searchKeepDialogs(0, args, nArgs), event->xbutton.time);
+               searchKeepDialogs(0, args, nArgs), searchType(0, args, nArgs),
+               event->xbutton.time);
 }
 
 static void findAP(Widget w, XEvent *event, String *args, Cardinal *nArgs)
@@ -2820,7 +2821,8 @@ static void replaceDialogAP(Widget w, XEvent *event, String *args,
     if (CheckReadOnly(window))
     	return;
     DoFindReplaceDlog(window, searchDirection(0, args, nArgs),
-        searchKeepDialogs(0, args, nArgs), event->xbutton.time);
+        searchKeepDialogs(0, args, nArgs), searchType(0, args, nArgs),
+        event->xbutton.time);
 }
 
 static void replaceAP(Widget w, XEvent *event, String *args, Cardinal *nArgs)
