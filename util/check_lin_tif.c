@@ -87,6 +87,8 @@ char *good_lesstif_2_1_versions[] = {
  * Motif 1.2 mode.
  */
 char *bad_lesstif_1_2_versions[] = {
+    "0.93.36",
+    "0.93.40",
     NULL
 };
 
@@ -95,6 +97,8 @@ char *bad_lesstif_1_2_versions[] = {
  * Motif 2.1 mode.
  */
 char *bad_lesstif_2_1_versions[] = {
+    "0.93.36",
+    "0.93.40",
     NULL
 };
 
