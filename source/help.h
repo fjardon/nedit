@@ -1,14 +1,72 @@
-/* $Id: help.h,v 1.4 2001/08/18 12:24:59 amai Exp $ */
-enum HelpTopic {HELP_VERSION, HELP_START, HELP_SEARCH, HELP_SELECT,
-	HELP_CLIPBOARD, HELP_INDENT, HELP_TABS, HELP_PROGRAMMER, HELP_TAGS,
-	HELP_MOUSE, HELP_KEYBOARD, HELP_FILL, HELP_FORMAT, HELP_SYNTAX,
-	HELP_RECOVERY, HELP_PREFERENCES, HELP_SHELL, HELP_REGEX_BASICS,
-	HELP_REGEX_ESC_SEQ, HELP_REGEX_PAREN, HELP_REGEX_ADV,
-	HELP_REGEX_EXAMPLE, HELP_COMMAND_LINE, HELP_SERVER, HELP_CUSTOMIZE,
-	HELP_RESOURCES, HELP_BINDING, HELP_LEARN, HELP_MACRO_LANG,
-	HELP_MACRO_SUBRS, HELP_ACTIONS, HELP_PATTERNS, HELP_SMART_INDENT,
-	HELP_BUGS, HELP_MAILING_LIST, HELP_DISTRIBUTION, HELP_TABS_DIALOG};
-#define NUM_TOPICS 37
+/*******************************************************************************
+*                                                                              *
+* help.h --  Nirvana Editor help display                                       *
+*                                                                              *
+*                                                                              *
+* Copyright (c) 1999-2001 Mark Edel                                            *
+*                                                                              *
+* This is free software; you can redistribute it and/or modify it under the    *
+* terms of the GNU General Public License as published by the Free Software    *
+* Foundation; either version 2 of the License, or (at your option) any later   *
+* version.                                                                     *
+*                                                                              *
+* This software is distributed in the hope that it will be useful, but WITHOUT *
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License        *
+* for more details.                                                            *
+*                                                                              *
+* You should have received a copy of the GNU General Public License along with *
+* software; if not, write to the Free Software Foundation, Inc., 59 Temple     *
+* Place, Suite 330, Boston, MA  02111-1307 USA                                 *
+*                                                                              *
+* Nirvana Text Editor                                                          *
+* September 10, 1991                                                           *
+*                                                                              *
+* Written by Mark Edel                                                         *
+*                                                                              *
+*******************************************************************************/
+
+#include "help_topic.h"
+
+/*============================================================================*/
+/*                          VARIABLE TYPE DEFINITIONS                         */
+/*============================================================================*/
+
+typedef struct HelpMenu         /* Maintains help menu structure */
+{
+    struct HelpMenu * next;
+    int               level;    /* menu level, submenu > 1               */
+    enum HelpTopic    topic;    /* HELP_none for submenu & separator     */
+    char            * wgtName;
+    int               hideIt;   /* value which determines displayability */
+    char              mnemonic; /* '-' for separator                     */
+    char            * subTitle; /* title for sub menu, or NULL           */
+
+} HelpMenu;
+
+typedef struct Href             /* Source to topic internal hyperlinks */
+{
+    struct Href *  next;
+    int            location;    /* position to link in topic    */
+    enum HelpTopic topic;       /* target of link in this topic */
+    char *         source;      /* hypertext link characters    */
+    char *         target;      /* hypertext target characters  */
+
+} Href;
+
+/*============================================================================*/
+/*                             VARIABLE DECLARATIONS                          */
+/*============================================================================*/
+
+extern HelpMenu H_M[];
+extern char *HelpTitles[];
+extern const char linkdate[];
+extern const char linktime[];
+
+/*============================================================================*/
+/*                             PROGRAM PROTOTYPES                             */
+/*============================================================================*/
 
 void Help(Widget parent, enum HelpTopic topic);
 void PrintVersion(void);
+void InstallHelpLinkActions(XtAppContext context);
