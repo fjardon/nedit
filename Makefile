@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.11.2.2 2003/06/16 08:57:31 edg Exp $
+# $Id: Makefile,v 1.11.2.3 2003/06/16 09:38:58 edg Exp $
 SHELL=/bin/sh
 #
 # Makefile for NEdit text editor
@@ -51,7 +51,6 @@ RELEASE=nedit-5.4BETA-`uname -s`-`uname -p`
 BINDIST-FILES=source/nedit source/nc README COPYRIGHT ReleaseNotes doc/nedit.doc doc/nedit.html doc/nedit.man doc/nc.man doc/faq.txt
 
 dist-bin: $(BINDIST-FILES)
-	(cd doc; make nedit.doc nedit.html)
 	rm -rf $(RELEASE)
 	mkdir -p $(RELEASE)
 	cp $(BINDIST-FILES) $(RELEASE)/
