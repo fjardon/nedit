@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: shell.c,v 1.13 2001/08/14 08:37:16 jlous Exp $";
+static const char CVSID[] = "$Id: shell.c,v 1.13.2.1 2001/10/10 18:32:05 edg Exp $";
 /*******************************************************************************
 *									       *
 * shell.c -- Nirvana Editor shell command execution			       *
@@ -131,6 +131,8 @@ static int substitutePercent(char *outStr, char *inStr, char *subsStr,
 	int outLen);
 static void bannerTimeoutProc(XtPointer clientData, XtIntervalId *id);
 static void flushTimeoutProc(XtPointer clientData, XtIntervalId *id);
+static void safeBufReplace(textBuffer *buf, int *start, int *end, 
+	const char *text);
 
 /*
 ** Filter the current selection through shell command "command".  The selection
@@ -632,6 +634,22 @@ static void bannerTimeoutProc(XtPointer clientData, XtIntervalId *id)
 }
 
 /*
+** Buffer replacement wrapper routine to be used for inserting output from 
+** a command into the buffer, which takes into account that the buffer may 
+** have been shrunken by the user (eg, by Undo). If necessary, the starting
+** and ending positions (part of the state of the command) are corrected.
+*/
+static void safeBufReplace(textBuffer *buf, int *start, int *end, 
+	const char *text)
+{
+    if (*start > buf->length)
+	*start = buf->length;
+    if (*end > buf->length)
+	*end = buf->length;
+    BufReplace(buf, *start, *end, text);
+}
+
+/*
 ** Timer proc for flushing output buffers periodically when the process
 ** takes too long.
 */
@@ -650,7 +668,7 @@ static void flushTimeoutProc(XtPointer clientData, XtIntervalId *id)
     outText = coalesceOutput(&cmdData->outBufs, &len);
     if (len != 0) {
 	if (BufSubstituteNullChars(outText, len, buf)) {
-	    BufReplace(buf, cmdData->leftPos, cmdData->rightPos, outText);
+	    safeBufReplace(buf, &cmdData->leftPos, &cmdData->rightPos, outText);
 	    TextSetCursorPos(cmdData->textW, cmdData->leftPos+strlen(outText));
 	    cmdData->leftPos += len;
 	    cmdData->rightPos = cmdData->leftPos;
@@ -784,7 +802,7 @@ static void finishCmdExecution(WindowInfo *window, int terminatedOnError)
 	    if (reselectStart != -1)
 	    	BufSelect(buf, reselectStart, reselectStart + strlen(outText));
 	} else {
-	    BufReplace(buf, cmdData->leftPos, cmdData->rightPos, outText);
+	    safeBufReplace(buf, &cmdData->leftPos, &cmdData->rightPos, outText);
 	    TextSetCursorPos(cmdData->textW, cmdData->leftPos+strlen(outText));
 	}
     }
