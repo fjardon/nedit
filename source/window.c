@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: window.c,v 1.48.2.1 2002/03/16 20:40:57 edg Exp $";
+static const char CVSID[] = "$Id: window.c,v 1.48.2.2 2002/03/21 08:41:08 edg Exp $";
 /*******************************************************************************
 *									       *
 * window.c -- Nirvana Editor window creation/deletion			       *
@@ -2130,7 +2130,7 @@ static int virtKeyBindingsAreInvalid(const unsigned char* bindings)
     if (maxCount == 1) return False; /* One binding is always ok */
     
     keys = (char**)malloc(maxCount*sizeof(char*));
-    copy = strdup((const char*)bindings);
+    copy = XtNewString((const char*)bindings);
     i = 0;
     pos2 = copy;
     
@@ -2156,7 +2156,7 @@ static int virtKeyBindingsAreInvalid(const unsigned char* bindings)
     if (count <= 1)
     {
        free(keys);
-       free(copy);
+       XtFree(copy);
        return False; /* No conflict */
     }
     
@@ -2168,12 +2168,12 @@ static int virtKeyBindingsAreInvalid(const unsigned char* bindings)
 	{
             /* Duplicate detected */
 	    free(keys);
-	    free(copy);
+	    XtFree(copy);
 	    return True;
 	}
     }
     free(keys);
-    free(copy);
+    XtFree(copy);
     return False;
 }
 

@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: tags.c,v 1.32.2.1 2002/03/12 09:04:13 edg Exp $";
+static const char CVSID[] = "$Id: tags.c,v 1.32.2.2 2002/03/21 08:41:09 edg Exp $";
 /*******************************************************************************
 *									       *
 * tags.c -- Nirvana editor tag file handling        	    	    	       *
@@ -1159,7 +1159,7 @@ static const char *rcs_strdup(const char *str)
        count.  My tests show that it's better to leave this out.  */
     if (len <= sizeof(struct rcs))
     {
-        new_str = strdup(str);
+        new_str = strdup(str); /* GET RID OF strdup() IF EVER ENABLED (not ANSI) */ 
         RcsStats.tgiveup++;
         return;
     }
