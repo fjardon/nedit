@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: windowTitle.c,v 1.3.2.7 2002/03/19 18:29:25 edg Exp $";
+static const char CVSID[] = "$Id: windowTitle.c,v 1.3.2.8 2002/04/16 17:29:12 edg Exp $";
 /*******************************************************************************
 *                                                                              *
 * windowTitle.c -- Nirvana Editor window title customization                   *
@@ -343,7 +343,7 @@ char *FormatWindowTitle(const char* filename,
                     
                 case 'h': /* host name */
 		    hostNamePresent = True;
-		    titlePtr = safeStrCpy(titlePtr, titleEnd, GetHostName());
+		    titlePtr = safeStrCpy(titlePtr, titleEnd, GetNameOfHost());
                     break;
 		    
                 case 'S': /* file status */

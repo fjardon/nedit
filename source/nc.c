@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: nc.c,v 1.10 2001/08/14 08:37:16 jlous Exp $";
+static const char CVSID[] = "$Id: nc.c,v 1.21.2.1 2002/04/16 17:29:12 edg Exp $";
 /*******************************************************************************
 *									       *
 * nc.c -- Nirvana Editor client program for nedit server processes	       *
@@ -51,45 +51,35 @@ static const char CVSID[] = "$Id: nc.c,v 1.10 2001/08/14 08:37:16 jlous Exp $";
 #include <X11/Intrinsic.h>
 #include <X11/Xatom.h>
 #include "../util/fileUtils.h"
+#include "../util/utils.h"
 #include "../util/prefFile.h"
-
-/* If anyone knows where to get this from system include files (in a machine
-   independent way), please change this (L_cuserid is apparently not ANSI) */
-#define MAXUSERNAMELEN 32
-
-/* Ditto for the maximum length for a node name.  SYS_NMLN is not available
-   on most systems, and I don't know what the portable alternative is. */
-#ifdef SYS_NMLN
-#define MAXNODENAMELEN SYS_NMLN
-#else
-#define MAXNODENAMELEN (MAXPATHLEN+2)
-#endif
+#include "../util/clearcase.h"
+#include "../util/system.h"
 
 #define APP_NAME "nc"
 #define APP_CLASS "NEditClient"
 
 static void deadServerTimerProc(XtPointer clientData, XtIntervalId *id);
-static void startServer(const char *message, const char *commandLine);
+static int startServer(const char *message, const char *commandLine);
 static char *parseCommandLine(int argc, char **argv);
-static const char *getUserName(void);
-static const char *getHostName(void);
 static void nextArg(int argc, char **argv, int *argIndex);
+static void printNcVersion(void);
 
-Display *TheDisplay;
+static Display *TheDisplay;
 
 static const char cmdLineHelp[] =
-#ifndef VMS
+#ifdef VMS
+"";
+#else
 "Usage:  nc [-read] [-create] [-line n | +n] [-do command] [-ask] [-noask]\n\
            [-svrname name] [-svrcmd command] [-lm languagemode]\n\
-           [-geometry geometry] [-iconic] [file...]\n";
-#else
-"";
+           [-geometry geometry] [-iconic] [-V|-version] [--] [file...]\n";
 #endif /*VMS*/
 
 /* Structure to hold X Resource values */
 static struct {
     int autoStart;
-    char serverCmd[MAXPATHLEN];
+    char serverCmd[2*MAXPATHLEN]; /* holds executable name + flags */
     char serverName[MAXPATHLEN];
 } Preferences;
 
@@ -110,6 +100,7 @@ static XrmOptionDescRec OpTable[] = {
     {"-svrname", ".serverName", XrmoptionSepArg, (caddr_t)NULL},
     {"-svrcmd", ".serverCommand", XrmoptionSepArg, (caddr_t)NULL},
 };
+
 
 int main(int argc, char **argv)
 {
@@ -150,30 +141,51 @@ int main(int argc, char **argv)
        start a server (nc command line args parallel nedit's).  Include
        -svrname if nc wants a named server, so nedit will match. Special
        characters are protected from the shell by escaping EVERYTHING with \ */
-    for (i=1; i<argc; i++)
-    	length += 1 + strlen(argv[i])*2;
+    for (i=1; i<argc; i++) {
+    	length += 1 + strlen(argv[i])*4 + 2;
+    }
     commandLine = XtMalloc(length+1 + 9 + MAXPATHLEN);
     outPtr = commandLine;
+#if defined(VMS) || defined(__EMX__)
+    /* Non-Unix shells don't want/need esc */
     for (i=1; i<argc; i++) {
     	for (c=argv[i]; *c!='\0'; c++) {
-#if !defined(VMS) && !defined(__EMX__) /* Non-Unix shells don't want/need esc */
-    	    *outPtr++ = '\\';
-#endif
-    	    *outPtr++ = *c;
+            *outPtr++ = *c;
     	}
     	*outPtr++ = ' ';
     }
     *outPtr = '\0';
-    	    
+#else
+    for (i=1; i<argc; i++) {
+    	*outPtr++ = '\'';
+    	for (c=argv[i]; *c!='\0'; c++) {
+            if (*c == '\'') {
+                *outPtr++ = '\'';
+                *outPtr++ = '\\';
+            }
+            *outPtr++ = *c;
+            if (*c == '\'') {
+                *outPtr++ = '\'';
+            }
+    	}
+        *outPtr++ = '\'';
+    	*outPtr++ = ' ';
+    }
+    *outPtr = '\0';
+#endif /* VMS */
+
     /* Convert command line arguments into a command string for the server */
     commandString = parseCommandLine(argc, argv);
-
+    if (commandString == NULL) {
+        fprintf(stderr, "nc: Invalid commandline argument\n");
+	exit(EXIT_FAILURE);
+    }
     /* Open the display and find the root window */
     TheDisplay = XtOpenDisplay (context, NULL, APP_NAME, APP_CLASS, NULL,
     	    0, &argc, argv);
     if (!TheDisplay) {
 	XtWarning ("nc: Can't open display\n");
-	return 1;
+	exit(EXIT_FAILURE);
     }
     rootWindow = RootWindow(TheDisplay, DefaultScreen(TheDisplay));
     
@@ -186,13 +198,10 @@ int main(int argc, char **argv)
        but different contents (and therefore can't be edited in the same nedit
        session). This should have no bad side-effects for non-clearcase users */
     if (Preferences.serverName[0] == '\0') {
-	char *envPtr, *tagPtr;
-	envPtr = getenv("CLEARCASE_ROOT");
-	if (envPtr != NULL) {
-	    tagPtr = strrchr(envPtr, '/');
-	    if (tagPtr != NULL && strlen(tagPtr+1) < MAXPATHLEN)
-		strcpy(Preferences.serverName, tagPtr+1);
-	}
+        const char* viewTag = GetClearCaseViewTag();
+        if (viewTag != NULL && strlen(viewTag) < MAXPATHLEN) {
+            strcpy(Preferences.serverName, viewTag);
+        }
     }
     
     /* Add back the server name resource from the command line or resource
@@ -209,8 +218,8 @@ int main(int argc, char **argv)
     /* Create server property atoms.  Atom names are generated by
        concatenating NEDIT_SERVER_REQUEST_, and NEDIT_SERVER_EXITS_
        with hostname,  user name and optional server name */
-    userName = getUserName();
-    hostName = getHostName();
+    userName = GetUserName();
+    hostName = GetNameOfHost();
     if (Preferences.serverName[0] != '\0') {
     	serverName[0] = '_';
     	strcpy(&serverName[1], Preferences.serverName);
@@ -228,8 +237,10 @@ int main(int argc, char **argv)
     if (XGetWindowProperty(TheDisplay, rootWindow, serverExistsAtom, 0,
     	    INT_MAX, False, XA_STRING, &dummyAtom, &getFmt, &nItems,
     	    &dummyULong, &propValue) != Success || nItems == 0) {
-    	startServer("No servers available, start one (yes)? ", commandLine);
-    	return 0;
+	int success;
+
+	success=startServer("No servers available, start one (yes)? ", commandLine);
+	return success;
     }
     XFree(propValue);
 
@@ -263,15 +274,22 @@ int main(int argc, char **argv)
 ** Xt timer procedure for timeouts on NEdit server requests
 */
 static void deadServerTimerProc(XtPointer clientData, XtIntervalId *id)
-{    
-    startServer("No servers responding, start one (yes)? ", (char *)clientData);
-    exit(EXIT_SUCCESS);
+{   
+    int success;
+    
+    success=startServer("No servers responding, start one (yes)? ",
+            (char *)clientData);
+    if (success==0) {
+       exit(EXIT_SUCCESS);
+    } else {
+       exit(EXIT_FAILURE);
+    }
 }
 
 /*
 ** Prompt the user about starting a server, with "message", then start server
 */
-static void startServer(const char *message, const char *commandLineArgs)
+static int startServer(const char *message, const char *commandLineArgs)
 {
     char c, *commandLine;
 #ifdef VMS
@@ -280,16 +298,18 @@ static void startServer(const char *message, const char *commandLineArgs)
     struct dsc$descriptor_s *cmdDesc;
     char *nulDev = "NL:";
     struct dsc$descriptor_s *nulDevDesc;
-#endif /*VMS*/
+#else
+    int sysrc;
+#endif /* !VMS */
     
     /* prompt user whether to start server */
     if (!Preferences.autoStart) {
-	printf(message);
+	puts(message);
 	do {
     	    c = getc(stdin);
 	} while (c == ' ' || c == '\t');
 	if (c != 'Y' && c != 'y' && c != '\n')
-    	    return;
+    	    return 0;
     }
     
     /* start the server */
@@ -300,39 +320,56 @@ static void startServer(const char *message, const char *commandLineArgs)
     cmdDesc = NulStrToDesc(commandLine);	/* build command descriptor */
     nulDevDesc = NulStrToDesc(nulDev);		/* build "NL:" descriptor */
     spawn_sts = lib$spawn(cmdDesc, nulDevDesc, 0, &spawnFlags, 0,0,0,0,0,0,0,0);
+    XtFree(commandLine);
     if (spawn_sts != SS$_NORMAL) {
 	fprintf(stderr, "Error return from lib$spawn: %d\n", spawn_sts);
 	fprintf(stderr, "Nedit server not started.\n");
-	return;
+	return (-1);
+    } else {
+       FreeStrDesc(cmdDesc);
+       return 0;
     }
-    FreeStrDesc(cmdDesc);
-#elif defined(__EMX__)  /* OS/2 */
+#else
+#if defined(__EMX__)  /* OS/2 */
     /* Unfortunately system() calls a shell determined by the environment
-       variables COMSPEC and EMXSHELL. We have to figure out which one */
+       variables COMSPEC and EMXSHELL. We have to figure out which one. */
     {
-    char *sh, *base;
+    char *sh_spec, *sh, *base;
+    char *CMD_EXE="cmd.exe";
+
     commandLine = XtMalloc(strlen(Preferences.serverCmd) +
-	   strlen(commandLineArgs) + 12);
+	   strlen(commandLineArgs) + 15);
     sh = getenv ("EMXSHELL");
     if (sh == NULL)
       sh = getenv ("COMSPEC");
     if (sh == NULL)
-      sh = strdup("cmd.exe");
-    base=_getname(strdup(sh));
+      sh = CMD_EXE;
+    sh_spec=XtNewString(sh);
+    base=_getname(sh_spec);
     _remext(base);
-    if (stricmp (base, "cmd") == 0 || stricmp (base, "4os2") == 0)
-       sprintf(commandLine, "start /MIN %s %s", Preferences.serverCmd, commandLineArgs);
-    else
-       sprintf(commandLine, "%s %s &", Preferences.serverCmd, commandLineArgs);
-    system(commandLine);
+    if (stricmp (base, "cmd") == 0 || stricmp (base, "4os2") == 0) {
+       sprintf(commandLine, "start /C /MIN %s %s",
+               Preferences.serverCmd, commandLineArgs);
+    } else {
+       sprintf(commandLine, "%s %s &", 
+               Preferences.serverCmd, commandLineArgs);
+    }
+    XtFree(sh_spec);
     }
 #else /* Unix */
     commandLine = XtMalloc(strlen(Preferences.serverCmd) +
     	    strlen(commandLineArgs) + 3);
     sprintf(commandLine, "%s %s&", Preferences.serverCmd, commandLineArgs);
-    system(commandLine);
 #endif
+
+    sysrc=system(commandLine);
     XtFree(commandLine);
+    
+    if (sysrc==0)
+       return 0;
+    else
+       return (-1);
+#endif /* !VMS */
 }
 
 /*
@@ -345,52 +382,63 @@ static char *parseCommandLine(int argc, char **argv)
     char *toDoCommand = "", *langMode = "", *geometry = "";
     char *commandString, *outPtr;
     int lineNum = 0, read = 0, create = 0, iconic = 0, length = 0;
-    int i, lineArg, nRead, charsWritten;
+    int i, lineArg, nRead, charsWritten, opts = True;
     
     /* Allocate a string for output, for the maximum possible length.  The
        maximum length is calculated by assuming every argument is a file,
        and a complete record of maximum length is created for it */
-    for (i=1; i<argc; i++)
+    for (i=1; i<argc; i++) {
     	length += 38 + strlen(argv[i]) + MAXPATHLEN;
+    }
     commandString = XtMalloc(length+1);
     
     /* Parse the arguments and write the output string */
     outPtr = commandString;
     for (i=1; i<argc; i++) {
-	if (!strcmp(argv[i], "-do")) {
+        if (opts && !strcmp(argv[i], "--")) { 
+    	    opts = False; /* treat all remaining arguments as filenames */
+	    continue;
+	} else if (opts && !strcmp(argv[i], "-do")) {
     	    nextArg(argc, argv, &i);
     	    toDoCommand = argv[i];
-    	} else if (!strcmp(argv[i], "-lm")) {
+    	} else if (opts && !strcmp(argv[i], "-lm")) {
     	    nextArg(argc, argv, &i);
     	    langMode = argv[i];
-    	} else if (!strcmp(argv[i], "-g") || !strcmp(argv[i], "-geometry")) {
+    	} else if (opts && (!strcmp(argv[i], "-g")  || 
+	                    !strcmp(argv[i], "-geometry"))) {
     	    nextArg(argc, argv, &i);
     	    geometry = argv[i];
-    	} else if (!strcmp(argv[i], "-read")) {
+    	} else if (opts && !strcmp(argv[i], "-read")) {
     	    read = 1;
-    	} else if (!strcmp(argv[i], "-create")) {
+    	} else if (opts && !strcmp(argv[i], "-create")) {
     	    create = 1;
-    	} else if (!strcmp(argv[i], "-iconic") || !strcmp(argv[i], "-icon")) {
+    	} else if (opts && (!strcmp(argv[i], "-iconic") || 
+	                    !strcmp(argv[i], "-icon"))) {
     	    iconic = 1;
-    	} else if (!strcmp(argv[i], "-line")) {
+    	} else if (opts && !strcmp(argv[i], "-line")) {
     	    nextArg(argc, argv, &i);
 	    nRead = sscanf(argv[i], "%d", &lineArg);
 	    if (nRead != 1)
     		fprintf(stderr, "nc: argument to line should be a number\n");
     	    else
     	    	lineNum = lineArg;
-    	} else if (*argv[i] == '+') {
+    	} else if (opts && (*argv[i] == '+')) {
     	    nRead = sscanf((argv[i]+1), "%d", &lineArg);
 	    if (nRead != 1)
     		fprintf(stderr, "nc: argument to + should be a number\n");
     	    else
     	    	lineNum = lineArg;
-    	} else if (!strcmp(argv[i], "-ask") || !strcmp(argv[i], "-noAsk")) {
+    	} else if (opts && (!strcmp(argv[i], "-ask") || !strcmp(argv[i], "-noAsk"))) {
     	    ; /* Ignore resource-based arguments which are processed later */
-    	} else if (!strcmp(argv[i], "-svrname") || !strcmp(argv[i], "-xrm") ||
-		!strcmp(argv[i], "-svrcmd") || !strcmp(argv[i], "-display")) {
+    	} else if (opts && (!strcmp(argv[i], "-svrname") || 
+	                    !strcmp(argv[i], "-xrm") ||
+		            !strcmp(argv[i], "-svrcmd") || 
+	                    !strcmp(argv[i], "-display"))) {
     	    nextArg(argc, argv, &i); /* Ignore rsrc args with data */
-    	} else if (*argv[i] == '-') {
+    	} else if (opts && (!strcmp(argv[i], "-version") || !strcmp(argv[i], "-V"))) {
+    	    printNcVersion();
+	    exit(EXIT_SUCCESS);
+    	} else if (opts && (*argv[i] == '-')) {
 #ifdef VMS
 	    *argv[i] = '/';
 #endif /*VMS*/
@@ -412,7 +460,10 @@ static char *parseCommandLine(int argc, char **argv)
 	    	XtFree(commandString);
 	    	commandString = newCommandString;
 	    	outPtr = newCommandString + oldLength;
-	    	ParseFilename(nameList[j], name, path);
+	    	if (ParseFilename(nameList[j], name, path) != 0) {
+	           /* An Error, most likely too long paths/strings given */
+	           return NULL;
+		}
     		strcat(path, name);
                 /* See below for casts */
     		sprintf(outPtr, "%d %d %d %d %ld %ld %ld %ld\n%s\n%s\n%s\n%s\n%n",
@@ -426,7 +477,10 @@ static char *parseCommandLine(int argc, char **argv)
 	    if (nameList != NULL)
 	    	free(nameList);
 #else
-    	    ParseFilename(argv[i], name, path);
+    	    if (ParseFilename(argv[i], name, path) != 0) {
+	       /* An Error, most likely too long paths/strings given */
+	       return NULL;
+	    }
     	    strcat(path, name);
     	    /* SunOS 4 acc or acc and/or its runtime library has a bug
     	       such that %n fails (segv) if it follows a string in a
@@ -453,14 +507,14 @@ static char *parseCommandLine(int argc, char **argv)
     	    outPtr += strlen(geometry);
     	    *outPtr++ = '\n';
 	    toDoCommand = "";
-#endif
+#endif /* VMS */
     	}
     }
 #ifdef VMS
     VMSFileScanDone();
 #endif /*VMS*/
     
-    /* If ther's an un-written -do command, write it with an empty file name */
+    /* If there's an un-written -do command, write it with an empty file name */
     if (toDoCommand[0] != '\0') {
 	sprintf(outPtr, "0 0 0 0 0 %d 0 0\n\n%n", (int) strlen(toDoCommand),
 		&charsWritten);
@@ -476,83 +530,29 @@ static char *parseCommandLine(int argc, char **argv)
     return commandString;
 }
 
-/*
-** Return a pointer to the username of the current user in a statically
-** allocated string.
-*/
-static const char *getUserName(void)
-{
-#ifdef VMS
-    return cuserid(NULL);
-#else
-    /* cuserid has apparently been dropped from the ansi C standard, and if
-       strict ansi compliance is turned on (on Sun anyhow, maybe others), calls
-       to cuserid fail to compile.  Older versions of nedit try to use the
-       getlogin call first, then if that fails, use getpwuid and getuid.  This
-       results in the user-name of the original terminal being used, which is
-       not correct when the user uses the su command.  Now, getpwuid only: */
-    struct passwd *passwdEntry;
-
-    passwdEntry = getpwuid(getuid());
-    if (!passwdEntry) {
-       perror("nc: getpwuid() failed ");
-       exit(EXIT_FAILURE);
-    }
-    return passwdEntry->pw_name;
-#endif
-}
-
-/*
-** Returns the hostname of the current system in static string.
-*/
-static const char *getHostName(void)
-{
-#ifdef VMS
-    /* This should be simple, but uname is not supported in the DEC C RTL and
-       gethostname on VMS depends either on Multinet or UCX.  So use uname 
-       on Unix, and use LIB$GETSYI on VMS. Note the VMS hostname will
-       be in DECNET format with trailing double colons, e.g. "FNALV1::".    */
-    int syi_status;
-    struct dsc$descriptor_s *hostnameDesc;
-    unsigned long int syiItemCode = SYI$_NODENAME;	/* get Nodename */
-    unsigned long int unused = 0;
-    unsigned short int hostnameLen = MAXNODENAMELEN+1;
-    static char hostname[MAXNODENAMELEN+1];
-    
-    hostnameDesc = NulStrWrtDesc(hostname, MAXNODENAMELEN+1);
-    syi_status = lib$getsyi(&syiItemCode, &unused, hostnameDesc, &hostnameLen,
-    			    0, 0);
-    if (syi_status != SS$_NORMAL) {
-	fprintf(stderr, "Error return from lib$getsyi: %d", syi_status);
-	strcpy(hostname, "VMS");
-    } else
-    	hostname[hostnameLen] = '\0';
-    FreeStrDesc(hostnameDesc);
-    return hostname;
-#else
-    struct utsname nameStruct;
-    static char hostname[MAXNODENAMELEN+1];
-    int rc;
-    
-    rc=uname(&nameStruct);
-    if (rc<0) {
-       perror("nc: uname() failed ");
-       exit(EXIT_FAILURE);
-    }
-    strcpy(hostname, nameStruct.nodename);
-    return hostname;
-#endif
-}
-
 static void nextArg(int argc, char **argv, int *argIndex)
 {
     if (*argIndex + 1 >= argc) {
 #ifdef VMS
 	    *argv[*argIndex] = '/';
 #endif /*VMS*/
-    	fprintf(stderr, "nc: %s requires an argument\n%s", argv[*argIndex],
-    	        cmdLineHelp);
+    	fprintf(stderr, "nc: %s requires an argument\n%s",
+	        argv[*argIndex], cmdLineHelp);
     	exit(EXIT_FAILURE);
     }
     (*argIndex)++;
+}
+
+
+/* Print version of 'nc' */
+static void printNcVersion(void ) {
+   static const char *const ncHelpText = \
+   "nc (NEdit) Version 5.3 version\n\
+   (February 2002)\n\n\
+     Built on: %s, %s, %s\n\
+     Built at: %s, %s\n";
+     
+    fprintf(stdout, ncHelpText,
+                  COMPILE_OS, COMPILE_MACHINE, COMPILE_COMPILER,
+                  __DATE__, __TIME__);
 }
