@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: help.c,v 1.50.2.8 2001/10/06 11:42:27 amai Exp $";
+static const char CVSID[] = "$Id: help.c,v 1.50.2.9 2001/10/12 19:34:22 tringali Exp $";
 /*******************************************************************************
 *									       *
 * help.c -- Nirvana Editor help display					       *
@@ -106,7 +106,7 @@ static const char *const HelpTitles[NUM_TOPICS] = {
 
 static const char *const HelpText[NUM_TOPICS] = {
 "NEdit Version 5.2\n\
-(October 2001)\n\n\
+October 2001\n\n\
      Built on: %s, %s, %s\n\
      Built at: %s, %s\n\
    With Motif: %d [%s]\n\
