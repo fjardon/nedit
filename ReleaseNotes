@@ -1,7 +1,7 @@
           Release Notes for NEdit Version 5.4, November 2003
 
 
-$Id: ReleaseNotes,v 1.22.2.5 2003/11/19 13:44:28 edg Exp $
+$Id: ReleaseNotes,v 1.22.2.6 2003/11/20 18:37:13 edg Exp $
 
 This file contains last minute notes to users about the release, which are not
 included in the documentation or README files included with the distribution
@@ -167,6 +167,8 @@ Changes since 5.4RC2
   - Nc crash fix on VMS.
   
   - Fixes in highlighting information inspection macros.
+  
+  - Nc -lm command line option fix.
 
 New Features in 5.3
 

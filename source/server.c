@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: server.c,v 1.21.2.2 2003/08/12 11:47:39 edg Exp $";
+static const char CVSID[] = "$Id: server.c,v 1.21.2.3 2003/11/20 18:37:13 edg Exp $";
 /*******************************************************************************
 *									       *
 * server.c -- Nirvana Editor edit-server component			       *
@@ -342,7 +342,7 @@ static void processServerCommandString(char *string)
     	    	    break;
     	    if (*doCommand == '\0') {
                 if (window == NULL) {
-    		    EditNewFile(NULL, iconicFlag, NULL, NULL);
+    		    EditNewFile(NULL, iconicFlag, lmLen==0?NULL:langMode, NULL);
     	        } else {
 	            if (!iconicFlag) {
     		        XMapRaised(TheDisplay, XtWindow(window->shell));
