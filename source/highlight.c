@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: highlight.c,v 1.25.2.2 2002/03/18 23:41:02 edg Exp $";
+static const char CVSID[] = "$Id: highlight.c,v 1.25.2.3 2002/03/25 10:02:52 edg Exp $";
 /*******************************************************************************
 *									       *
 * highlight.c -- Nirvana Editor syntax highlighting (text coloring and font    *
@@ -1706,9 +1706,17 @@ static regexp *compileREAndWarn(Widget parent, const char *re)
     
     compiledRE = CompileRE(re, &compileMsg, REDFLT_STANDARD);
     if (compiledRE == NULL) {
+        char *boundedRe = XtNewString(re);
+        size_t maxLength = DF_MAX_MSG_LENGTH - strlen(compileMsg) - 60;
+        /* Prevent buffer overflow in DialogF. If the re is too long, 
+           truncate it and append ... */
+        if (strlen(boundedRe) > maxLength) {
+           strcpy(&boundedRe[maxLength-3], "...");
+        }
    	DialogF(DF_WARN, parent, 1,
    	       "Error in syntax highlighting regular expression:\n%s\n%s",
-   	       "Dismiss", re, compileMsg);
+   	       "Dismiss", boundedRe, compileMsg);
+        XtFree(boundedRe);
  	return NULL;
     }
     return compiledRE;
