@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: help.c,v 1.76.2.1 2002/03/12 16:59:25 edg Exp $";
+static const char CVSID[] = "$Id: help.c,v 1.76.2.2 2002/03/13 17:15:43 edg Exp $";
 /*******************************************************************************
 *									       *
 * help.c -- Nirvana Editor help display					       *
@@ -524,6 +524,10 @@ static void dismissCB(Widget w, XtPointer clientData, XtPointer callData)
        HelpWindows[topic] as NULL, but it has happened */
     XtDestroyWidget(HelpWindows[topic]);
     HelpWindows[topic] = NULL;
+    if (HelpStyleBuffers[topic] != NULL) {
+	BufFree(HelpStyleBuffers[topic]);
+	HelpStyleBuffers[topic] = NULL;
+    }        
 }
 
 static void searchHelpCB(Widget w, XtPointer clientData, XtPointer callData)
