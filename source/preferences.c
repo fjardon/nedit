@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: preferences.c,v 1.30 2001/08/17 23:02:55 edg Exp $";
+static const char CVSID[] = "$Id: preferences.c,v 1.30.2.1 2001/08/30 20:17:53 amai Exp $";
 /*******************************************************************************
 *									       *
 * preferences.c -- Nirvana Editor preferences processing		       *
@@ -714,8 +714,8 @@ static PrefDescripRec PrefDescrip[] = {
     	PrefData.boldItalicFontString,
     	(void *)sizeof(PrefData.boldItalicFontString), True},
     {"shell", "Shell", PREF_STRING,
-#ifdef __MVS__
-    	"/bin/sh"
+#if defined(__MVS__) || defined(__EMX__)
+    	"/bin/sh",
 #else
         "/bin/csh",
 #endif
