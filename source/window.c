@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: window.c,v 1.48.2.3 2002/04/13 20:24:47 edg Exp $";
+static const char CVSID[] = "$Id: window.c,v 1.48.2.4 2002/04/23 19:52:40 edg Exp $";
 /*******************************************************************************
 *									       *
 * window.c -- Nirvana Editor window creation/deletion			       *
@@ -34,6 +34,7 @@ static const char CVSID[] = "$Id: window.c,v 1.48.2.3 2002/04/13 20:24:47 edg Ex
 #ifndef __MVS__
 #include <sys/param.h>
 #endif
+#include "../util/clearcase.h"
 #endif /*VMS*/
 #include <limits.h>
 #include <math.h>
@@ -83,7 +84,6 @@ static const char CVSID[] = "$Id: window.c,v 1.48.2.3 2002/04/13 20:24:47 edg Ex
 #include "nedit.bm"
 #include "n.bm"
 #include "../util/utils.h"
-#include "../util/clearcase.h"
 #include "windowTitle.h"
 
 /* Initial minimum height of a pane.  Just a fallback in case setPaneMinHeight
@@ -1284,7 +1284,11 @@ void UpdateWindowTitle(const WindowInfo *window)
 {
     char *title = FormatWindowTitle(window->filename,
                                     window->path,
+#ifdef VMS
+                                    NULL,
+#else
                                     GetClearCaseViewTag(),
+#endif /* VMS */
                                     GetPrefServerName(),
                                     IsServer,
                                     window->filenameSet,

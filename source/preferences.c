@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: preferences.c,v 1.49.2.3 2002/04/15 10:46:35 edg Exp $";
+static const char CVSID[] = "$Id: preferences.c,v 1.49.2.4 2002/04/23 19:52:40 edg Exp $";
 /*******************************************************************************
 *									       *
 * preferences.c -- Nirvana Editor preferences processing		       *
@@ -35,6 +35,7 @@ static const char CVSID[] = "$Id: preferences.c,v 1.49.2.3 2002/04/15 10:46:35 e
 #ifndef __MVS__
 #include <sys/param.h>
 #endif
+#include "../util/clearcase.h"
 #endif /*VMS*/
 #include <Xm/Xm.h>
 #include <Xm/SelectioB.h>
@@ -55,7 +56,6 @@ static const char CVSID[] = "$Id: preferences.c,v 1.49.2.3 2002/04/15 10:46:35 e
 #include "../util/DialogF.h"
 #include "../util/managedList.h"
 #include "../util/fontsel.h"
-#include "../util/clearcase.h"
 #include "textBuf.h"
 #include "nedit.h"
 #include "text.h"
@@ -3765,9 +3765,10 @@ static int matchLanguageMode(WindowInfo *window)
 #ifdef VMS
     if (strchr(window->filename, ';') != NULL)
     	fileNameLen = strchr(window->filename, ';') - window->filename;
-#endif
+#else
     if ((versionExtendedPath = GetClearCaseVersionExtendedPath(window->filename)) != NULL)
         fileNameLen = versionExtendedPath - window->filename;
+#endif
     for (i=0; i<NLanguageModes; i++) {
     	for (j=0; j<LanguageModes[i]->nExtensions; j++) {
     	    ext = LanguageModes[i]->extensions[j];
