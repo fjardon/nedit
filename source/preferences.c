@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: preferences.c,v 1.98.2.2 2003/06/16 08:56:28 edg Exp $";
+static const char CVSID[] = "$Id: preferences.c,v 1.98.2.3 2003/07/24 06:07:07 n8gray Exp $";
 /*******************************************************************************
 *									       *
 * preferences.c -- Nirvana Editor preferences processing		       *
@@ -5817,18 +5817,23 @@ void ChooseColors(WindowInfo *window, int forWindow)
             NULL);
     XmStringFree(s1);
     
+    tmpW = XtVaCreateManagedWidget("sep",
+            xmSeparatorGadgetClass, form,
+            XmNtopAttachment, XmATTACH_WIDGET,
+            XmNtopWidget, tmpW,
+            XmNleftAttachment, XmATTACH_FORM,
+            XmNrightAttachment, XmATTACH_FORM, NULL);
+    
     /* The OK, Apply, and Cancel buttons */
     okBtn = XtVaCreateManagedWidget("ok", xmPushButtonWidgetClass, form,
           XmNlabelString, s1=XmStringCreateSimple("OK"),
           XmNtopAttachment, XmATTACH_WIDGET,
           XmNtopWidget, tmpW,
-          /* XmNtopOffset, MARGIN_SPACING, */
+          XmNtopOffset, MARGIN_SPACING,
           XmNleftAttachment, XmATTACH_POSITION,
           XmNleftPosition, 10,
           XmNrightAttachment, XmATTACH_POSITION,
-          XmNrightPosition, 30,
-          XmNbottomAttachment, XmATTACH_POSITION,
-          XmNbottomPosition, 99, NULL);
+          XmNrightPosition, 30, NULL);
     XtAddCallback(okBtn, XmNactivateCallback, colorOkCB, cd);
     XmStringFree(s1);
 
@@ -5837,14 +5842,12 @@ void ChooseColors(WindowInfo *window, int forWindow)
           XmNlabelString, s1=XmStringCreateSimple("Apply"),
           XmNtopAttachment, XmATTACH_WIDGET,
           XmNtopWidget, tmpW,
-          /* XmNtopOffset, MARGIN_SPACING, */
+          XmNtopOffset, MARGIN_SPACING,
           XmNmnemonic, 'A',
           XmNleftAttachment, XmATTACH_POSITION,
           XmNleftPosition, 40,
           XmNrightAttachment, XmATTACH_POSITION,
-          XmNrightPosition, 60,
-          XmNbottomAttachment, XmATTACH_POSITION,
-          XmNbottomPosition, 99, NULL);
+          XmNrightPosition, 60, NULL);
     XtAddCallback(applyBtn, XmNactivateCallback, colorApplyCB, cd);
     XmStringFree(s1);
     
@@ -5853,13 +5856,11 @@ void ChooseColors(WindowInfo *window, int forWindow)
           XmNlabelString, s1=XmStringCreateSimple("Dismiss"),
           XmNtopAttachment, XmATTACH_WIDGET,
           XmNtopWidget, tmpW,
-          /* XmNtopOffset, MARGIN_SPACING, */
+          XmNtopOffset, MARGIN_SPACING,
           XmNleftAttachment, XmATTACH_POSITION,
           XmNleftPosition, 70,
           XmNrightAttachment, XmATTACH_POSITION,
-          XmNrightPosition, 90,
-          XmNbottomAttachment, XmATTACH_POSITION,
-          XmNbottomPosition, 99, NULL);
+          XmNrightPosition, 90, NULL);
     XtAddCallback(dismissBtn, XmNactivateCallback, colorDismissCB, cd);
     XmStringFree(s1);
  
