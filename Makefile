@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.11 2003/05/20 00:27:55 n8gray Exp $
+# $Id: Makefile,v 1.11.2.1 2003/06/16 08:36:39 edg Exp $
 SHELL=/bin/sh
 #
 # Makefile for NEdit text editor
@@ -24,7 +24,7 @@ all:
 	@- (cd source; if [ -f ../makefiles/Makefile.$@ -a ! -f ./Makefile.$@ ];\
 	   then ln -s ../makefiles/Makefile.$@ .; fi)
 	(cd util; \
-	    $(MAKE) -f Makefile.$@ verify_config; \
+	    $(MAKE) -f Makefile.$@ verify_config && \
 	    $(MAKE) -f Makefile.$@ libNUtil.a)
 	(cd source; $(MAKE) -f Makefile.$@ nedit nc)
 
