@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: help.c,v 1.50.2.1 2001/08/22 15:41:14 amai Exp $";
+static const char CVSID[] = "$Id: help.c,v 1.50.2.2 2001/09/04 17:55:28 amai Exp $";
 /*******************************************************************************
 *									       *
 * help.c -- Nirvana Editor help display					       *
@@ -1144,7 +1144,7 @@ you are only using the built-in patterns.",
 "If a system crash, network failure, X server crash, or program error should \
 happen while you are editing a file, you can still recover most of your work.  \
 NEdit maintains a backup file which it updates periodically (every 8 editing \
-operations or 80 characters typed).  This file is has the same name as the \
+operations or 80 characters typed).  This file has the same name as the \
 file that you are editing, but with the character \"~\" (tilde) on Unix or \
 \"_\" (underscore) on VMS prefixed \
 to the name.  To recover a file after a crash, simply rename the file to \

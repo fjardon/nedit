@@ -1,6 +1,6 @@
                      NEdit Version 5.2, August, 2001
 
-$Id: nedit.doc,v 1.4 2001/08/13 09:55:48 amai Exp $
+$Id: nedit.doc,v 1.4.2.1 2001/09/04 17:55:28 amai Exp $
 
 NEdit is a standard GUI (Graphical User Interface) style text editor for
 programs and plain-text files.  Users of Macintosh and MS Windows based text
@@ -3461,7 +3461,7 @@ If a system crash, network failure, X server crash, or program error should
 happen while you are editing a file, you can easily recover most of your work.
 NEdit maintains a backup file which it updates periodically (every 8 editing
 operations or 30 characters typed under Unix, or 80 characters under VMS).
-This file is has the same name as the file that you are editing, but with the
+This file has the same name as the file that you are editing, but with the
 character "~" (tilde) on Unix or "_" (underscore) on VMS prefixed to the name.
 To recover a file after a crash, simply rename the file to remove the tilde
 or underscore character, replacing the older version of the file.  Because
