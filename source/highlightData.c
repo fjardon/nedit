@@ -1,4 +1,4 @@
-static const char CVSID[] = "$Id: highlightData.c,v 1.19 2001/08/16 18:33:47 slobasso Exp $";
+static const char CVSID[] = "$Id: highlightData.c,v 1.19.2.1 2001/10/01 13:34:46 amai Exp $";
 /*******************************************************************************
 *									       *
 * highlightData.c -- Maintain, and allow user to edit, highlight pattern list  *
@@ -390,7 +390,7 @@ static char *DefaultPatternSets[] = {
 	cast:\"[^\\w\\s]\\s*\\n?\\s*\\(\\s*([\\l_][\\w\\.]*)\\s*\\)\":::Keyword::\n\
 	cast type:\"\\1\":\"\"::Storage Type:cast:C\n\
 	declaration:\"<[\\l_][\\w\\.]*>((:?\\s*\\[\\s*\\]\\s*)*)(?=\\s*\\n?\\s*(?!instanceof)[\\l_]\\w*)\":::Storage Type::\n\
-	declaration brackets:\"\\2\":\"\"::Keyword:declaration:C\n\
+	declaration brackets:\"\\1\":\"\"::Keyword:declaration:C\n\
 	variable:\"<[\\l_]\\w*>\":::Identifier1::D\n\
 	braces and parens:\"[(){}[\\]]\":::Keyword::D\n\
 	signs:\"[-+*/%=,.;:<>!|&^?]\":::Keyword::D\n\
